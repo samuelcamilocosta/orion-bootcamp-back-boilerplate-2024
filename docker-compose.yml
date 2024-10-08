@@ -24,8 +24,8 @@ services:
     image: mysql
     environment:
       MYSQL_USER: orion-constellation_root
-      MYSQL_PASSWORD: docker
-      MYSQL_ROOT_PASSWORD: docker
+      MYSQL_PASSWORD: j5m966qp7jiypfda
+      MYSQL_ROOT_PASSWORD: m45ug42qkr5pdzbb
       MYSQL_DATABASE: orion-constellation
     ports:
       - 3306:3306
