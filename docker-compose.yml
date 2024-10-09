@@ -1,9 +1,7 @@
-version: '3.7'
-
 services:
-  orion-api:
-    container_name: orion-api
-    image: orion-api:dev
+  orion-constellation-api:
+    container_name: orion-constellation-api
+    image: orion-constellation-api:dev
     build:
       context: .
       target: development
@@ -17,44 +15,27 @@ services:
       NODE_ENV: development
       SERVER_PORT: 4444
       DB_DATABASE: orion
-      DB_CONNECTION_STRING: mongodb://orion_root:j5m966qp7jiypfda@orion-mongo:27017
-      # DB_CONNECTION_STRING: mysql://orion_root:j5m966qp7jiypfda@orion-mysql:3306
+      DB_CONNECTION_STRING: mysql://orion_constellation_root:j5m966qp7jiypfda@orion-constellation-mysql:3306
     networks:
-      - orion-connect
+      - orion-constellation-connect
   
-  orion-mongo:
-    container_name: orion-mongo
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: orion_root
-      MONGO_INITDB_ROOT_PASSWORD: j5m966qp7jiypfda
-      MONGO_INITDB_DATABASE: orion
-    ports:
-      - 27017:27017
-    volumes:
-      - ~/docker/volumes/OrionApi_MongoDB:/data/db
-    networks:
-      - orion-connect
-    logging:
-      driver: none
-  
-  orion-mysql:
-    container_name: orion-mysql
+  orion-constellation-mysql:
+    container_name: orion-constellation-mysql
     image: mysql
     environment:
-      MYSQL_USER: orion_root
+      MYSQL_USER: orion-constellation_root
       MYSQL_PASSWORD: j5m966qp7jiypfda
       MYSQL_ROOT_PASSWORD: m45ug42qkr5pdzbb
-      MYSQL_DATABASE: orion
+      MYSQL_DATABASE: orion-constellation
     ports:
       - 3306:3306
     volumes:
-      - ~/docker/volumes/OrionApi_MySQL:/var/lib/mysql
+      - ~/docker/volumes/OrionConstellationApi_MySQL:/var/lib/mysql
     networks:
-      - orion-connect
+      - orion-constellation-connect
     logging:
       driver: none
-
+      
 networks:
-  orion-connect:
+  orion-constellation-connect:
     driver: bridge
