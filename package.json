@@ -1,7 +1,7 @@
 {
-  "name": "orion-api",
+  "name": "reforca-o-bem-api",
   "version": "1.0.0",
-  "description": "Boilerplate para as APIs do Orion Bootcamp",
+  "description": "API do projeto Reforça o Bem",
   "author": "",
   "license": "ISC",
   "scripts": {

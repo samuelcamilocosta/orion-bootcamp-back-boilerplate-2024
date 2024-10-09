@@ -1,9 +1,9 @@
 version: '3.7'
 
 services:
-  orion-api:
-    container_name: orion-api
-    image: orion-api:dev
+  reforca-api:
+    container_name: reforca-api
+    image: reforca-api:dev
     build:
       context: .
       target: development
@@ -16,45 +16,45 @@ services:
     environment:
       NODE_ENV: development
       SERVER_PORT: 4444
-      DB_DATABASE: orion
-      DB_CONNECTION_STRING: mongodb://orion_root:j5m966qp7jiypfda@orion-mongo:27017
-      # DB_CONNECTION_STRING: mysql://orion_root:j5m966qp7jiypfda@orion-mysql:3306
+      DB_DATABASE: reforca
+      DB_CONNECTION_STRING: mongodb://reforca_root:j5m966qp7jiypfda@reforca-mongo:27017
+      # DB_CONNECTION_STRING: mysql://reforca_root:j5m966qp7jiypfda@reforca-mysql:3306
     networks:
-      - orion-connect
-  
-  orion-mongo:
-    container_name: orion-mongo
+      - reforca-connect
+
+  reforca-mongo:
+    container_name: reforca-mongo
     image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: orion_root
+      MONGO_INITDB_ROOT_USERNAME: reforca_root
       MONGO_INITDB_ROOT_PASSWORD: j5m966qp7jiypfda
-      MONGO_INITDB_DATABASE: orion
+      MONGO_INITDB_DATABASE: reforca
     ports:
       - 27017:27017
     volumes:
-      - ~/docker/volumes/OrionApi_MongoDB:/data/db
+      - ~/docker/volumes/ReforcaApi_MongoDB:/data/db
     networks:
-      - orion-connect
+      - reforca-connect
     logging:
       driver: none
-  
-  orion-mysql:
-    container_name: orion-mysql
+
+  reforca-mysql:
+    container_name: reforca-mysql
     image: mysql
     environment:
-      MYSQL_USER: orion_root
+      MYSQL_USER: reforca_root
       MYSQL_PASSWORD: j5m966qp7jiypfda
       MYSQL_ROOT_PASSWORD: m45ug42qkr5pdzbb
-      MYSQL_DATABASE: orion
+      MYSQL_DATABASE: reforca
     ports:
       - 3306:3306
     volumes:
-      - ~/docker/volumes/OrionApi_MySQL:/var/lib/mysql
+      - ~/docker/volumes/reforcaApi_MySQL:/var/lib/mysql
     networks:
-      - orion-connect
+      - reforca-connect
     logging:
       driver: none
 
 networks:
-  orion-connect:
+  reforca-connect:
     driver: bridge
