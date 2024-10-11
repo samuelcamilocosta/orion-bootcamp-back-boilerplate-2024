@@ -14,16 +14,19 @@ services:
     environment:
       NODE_ENV: development
       SERVER_PORT: 4444
-      DB_DATABASE: orion
+      DB_DATABASE: orion-constellation
       DB_CONNECTION_STRING: mysql://orion_constellation_root:j5m966qp7jiypfda@orion-constellation-mysql:3306
     networks:
       - orion-constellation-connect
-  
+    depends_on:
+      orion-constellation-mysql:
+        condition: service_healthy
+
   orion-constellation-mysql:
     container_name: orion-constellation-mysql
     image: mysql
     environment:
-      MYSQL_USER: orion-constellation_root
+      MYSQL_USER: orion_constellation_root
       MYSQL_PASSWORD: j5m966qp7jiypfda
       MYSQL_ROOT_PASSWORD: m45ug42qkr5pdzbb
       MYSQL_DATABASE: orion-constellation
@@ -35,7 +38,12 @@ services:
       - orion-constellation-connect
     logging:
       driver: none
-      
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
 networks:
   orion-constellation-connect:
     driver: bridge
