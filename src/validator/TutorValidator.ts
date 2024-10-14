@@ -1,7 +1,6 @@
 import { body } from 'express-validator';
 import { cpf } from 'cpf-cnpj-validator';
 import { Tutor } from '../entity/Tutor';
-import { Subject } from '../entity/Subject';
 import { EducationLevel } from '../entity/EducationLevel';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
@@ -166,23 +165,6 @@ export class TutorValidator extends BaseValidator {
 
           if (existingTutor) {
             return Promise.reject('Email já cadastrado');
-          }
-
-          return true;
-        }),
-
-      body('subjects')
-        .trim()
-        .isArray()
-        .withMessage('Matérias devem ser uma lista de IDs.')
-        .notEmpty()
-        .withMessage('Matérias são obrigatórias.')
-        .custom(async (value: string[]): Promise<boolean> => {
-          const subjectRepository = MysqlDataSource.getRepository(Subject);
-          const subjects = await subjectRepository.findByIds(value);
-
-          if (subjects.length !== value.length) {
-            return Promise.reject('Uma ou mais matérias não existem.');
           }
 
           return true;
