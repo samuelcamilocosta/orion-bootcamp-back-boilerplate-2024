@@ -113,6 +113,19 @@ export class TutorValidator extends BaseValidator {
             return Promise.resolve({ hashedPassword, salt });
           }
         ),
+      
+        body('confirmPassword')
+        .trim()
+        .isString()
+        .withMessage('Confirmação de senha deve ser uma string.')
+        .notEmpty()
+        .withMessage('Confirmação de senha é obrigatória.')
+        .custom((value, { req }) => {
+          if (value !== req.body.password) {
+            throw new Error('As senhas não correspondem.');
+          }
+          return true;
+        }),  
 
       body('cpf')
         .trim()
