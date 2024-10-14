@@ -24,6 +24,10 @@ export class Student {
     @Column({ type: 'varchar', length: 255, nullable: false })
     salt: string;
 
+    @ManyToOne(() => EducationLevel)
+    @JoinColumn({ name: 'educationId' }) // Isso define explicitamente o nome da coluna FK
+    educationLevel: EducationLevel;
+    
     @ManyToMany(() => Subject, { cascade: true})
     @JoinTable({
         name: 'student_subjects_subject',
@@ -38,5 +42,6 @@ export class Student {
     })
     subjects: Subject[];
 
+    
     
 }
