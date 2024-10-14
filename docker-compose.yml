@@ -17,14 +17,13 @@ services:
       NODE_ENV: development
       SERVER_PORT: 4444
       DB_DATABASE: reforca
-      DB_CONNECTION_STRING: mongodb://reforca_root:j5m966qp7jiypfda@reforca-mongo:27017
-      # DB_CONNECTION_STRING: mysql://reforca_root:j5m966qp7jiypfda@reforca-mysql:3306
+      DB_CONNECTION_STRING: mongodb://reforca_root:j5m966qp7jiypfda@reforca-mongo:27017/admin
     networks:
       - reforca-connect
 
   reforca-mongo:
     container_name: reforca-mongo
-    image: mongo
+    image: mongo:4.4
     environment:
       MONGO_INITDB_ROOT_USERNAME: reforca_root
       MONGO_INITDB_ROOT_PASSWORD: j5m966qp7jiypfda
@@ -32,7 +31,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ~/docker/volumes/ReforcaApi_MongoDB:/data/db
+      - mongo-data:/data/db
     networks:
       - reforca-connect
     logging:
@@ -49,7 +48,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ~/docker/volumes/reforcaApi_MySQL:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     networks:
       - reforca-connect
     logging:
@@ -58,3 +57,7 @@ services:
 networks:
   reforca-connect:
     driver: bridge
+
+volumes:
+  mongo-data:
+  mysql-data:
