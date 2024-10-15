@@ -3,9 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
-  JoinTable
+  JoinTable,
+  ManyToOne,
+  JoinColumn
 } from 'typeorm';
 import { Subject } from './Subject';
+import { EducationLevel } from './EducationLevel';
 
 @Entity()
 export class Student {
