@@ -127,8 +127,6 @@ export class TutorController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    console.log('Received request to save tutor:', req.body);
-
     const {
       fullName,
       username,
@@ -155,11 +153,9 @@ export class TutorController {
         await MysqlDataSource.getRepository(EducationLevel).findByIds(
           educationLevel
         );
-      console.log('Found education levels:', foundEducationLevels);
 
       if (foundEducationLevels) {
         tutor.educationLevels = foundEducationLevels;
-        console.log('Saved tutor education levels', tutor.educationLevels);
       }
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
