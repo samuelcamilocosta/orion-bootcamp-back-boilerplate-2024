@@ -8,9 +8,9 @@ const router = Router();
 router.get('/', new HomeController().hello);
 
 router.post(
-    '/api/register/tutor',
-    TutorValidator.createTutor(),
-    new TutorController().create
-  );
+  '/api/register/tutor',
+  TutorValidator.createTutor(),
+  new TutorController().create
+);
 
 export default router;
