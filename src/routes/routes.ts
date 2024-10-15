@@ -1,8 +1,18 @@
 import { Router } from 'express';
 import { HomeController } from '../controller/HomeController';
+import { UserController } from '../controller/UserController';
 
 const router = Router();
-const userController = new HomeController();
+const homeController = new HomeController();
+const userController = new UserController();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Home
+ *   description: Rota inicial
+ */
+router.get('/', homeController.hello);
 
 /**
  * @swagger
@@ -10,26 +20,6 @@ const userController = new HomeController();
  *   name: Users
  *   description: API para gestão de usuários
  */
-
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Retorna uma mensagem de Hello
- *     tags: [Home]
- *     responses:
- *       200:
- *         description: Retorna uma mensagem de sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Hello'
- */
-router.get('/', userController.hello);
 
 /**
  * @swagger
@@ -65,7 +55,7 @@ router.get('/', userController.hello);
  *       500:
  *         description: Erro ao criar usuário
  */
-router.post('/users', userController.createUser);
+router.post('/api/users', userController.createUser);
 
 /**
  * @swagger
@@ -90,7 +80,7 @@ router.post('/users', userController.createUser);
  *       500:
  *         description: Erro ao buscar usuários
  */
-router.get('/users', userController.getAllUsers);
+router.get('/api/users', userController.getAllUsers);
 
 /**
  * @swagger
@@ -113,7 +103,7 @@ router.get('/users', userController.getAllUsers);
  *       500:
  *         description: Erro ao buscar usuário
  */
-router.get('/users/:id', userController.getUserById);
+router.get('/api/users/:id', userController.getUserById);
 
 /**
  * @swagger
@@ -136,6 +126,6 @@ router.get('/users/:id', userController.getUserById);
  *       500:
  *         description: Erro ao buscar usuário
  */
-router.get('/users/:email', userController.getUserByEmail);
+router.get('/api/users/email/:email', userController.getUserByEmail);
 
 export default router;

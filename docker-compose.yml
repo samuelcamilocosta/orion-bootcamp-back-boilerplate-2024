@@ -17,9 +17,10 @@ services:
       NODE_ENV: development
       SERVER_PORT: 4444
       DB_DATABASE: reforca
-      DB_CONNECTION_STRING: mongodb://reforca_root:j5m966qp7jiypfda@reforca-mongo:27017/admin
+      DB_CONNECTION_STRING: mongodb://reforca_root:j5m966qp7jiypfda@reforca-mongo:27017/reforca?authSource=admin
+      JWT_SECRET: mySuperSecretKey12345  
     networks:
-      - reforca-connect
+      - reforca-connect 
 
   reforca-mongo:
     container_name: reforca-mongo
@@ -33,9 +34,7 @@ services:
     volumes:
       - mongo-data:/data/db
     networks:
-      - reforca-connect
-    logging:
-      driver: none
+      - reforca-connect 
 
   reforca-mysql:
     container_name: reforca-mysql
@@ -50,10 +49,9 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
-      - reforca-connect
-    logging:
-      driver: none
+      - reforca-connect  
 
+# Definição da rede que será compartilhada pelos serviços
 networks:
   reforca-connect:
     driver: bridge

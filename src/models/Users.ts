@@ -1,48 +1,41 @@
-import mongoose from 'mongoose';
+import { Entity, Column, ObjectIdColumn, BeforeInsert } from 'typeorm';
 import bcrypt from 'bcrypt';
 
 // Expressão regular para validar o formato do email
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Definir o esquema do Mongoose para o usuário
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: function (email: string) {
-        return emailRegex.test(email); // Validação de formato de e-mail
-      },
-      message: 'O e-mail fornecido está em um formato inválido.'
+@Entity('users') // Define a entidade para MongoDB
+export class User {
+    @ObjectIdColumn() // Usado para MongoDB
+    id: string;
+
+    @Column()
+    name: string;
+
+    @Column({
+        unique: true,
+        nullable: false
+    })
+    email: string;
+
+    @Column()
+    password: string;
+
+    @Column({ type: 'date', default: () => 'NOW()' })
+    createdAt: Date;
+
+    // Função para validar o e-mail antes de inserir
+    @BeforeInsert()
+    validateEmail() {
+        if (!emailRegex.test(this.email)) {
+            throw new Error('O e-mail fornecido está em um formato inválido.');
+        }
     }
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
 
-// Função para fazer hash da senha antes de salvar
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Criar e exportar o modelo do Mongoose
-export const User = mongoose.model('User', userSchema);
+    // Função para hash da senha antes de inserir no banco
+    @BeforeInsert()
+    async hashPassword() {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    }
+}
