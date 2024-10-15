@@ -83,9 +83,13 @@ export class TutorValidator extends BaseValidator {
 
           return true;
         })
-        .customSanitizer((value: string): string => {
+        .customSanitizer((value: string): Date => {
           const [day, month, year] = value.split('/');
-          const newBirthDate = `${year}-${month}-${day}`;
+          const newBirthDate = new Date(`${year}-${month}-${day}`);
+
+          if (isNaN(newBirthDate.getTime())) {
+            throw new Error('Data de nascimento inválida.');
+          }
 
           return newBirthDate;
         }),
