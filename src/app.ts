@@ -5,14 +5,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import { MysqlDataSource } from './config/database';
 import { swaggerConfig } from './config/swagger';
 import routes from './routes';
-
-MysqlDataSource.initialize()
-  .then(() => {
-    console.log('Database initialized!');
-  })
-  .catch((err) => {
-    console.error('Database Error: ', err);
-  });
+import connectWithRetry from 'config/retryConnection';
 
 const app = express();
 
@@ -27,6 +20,14 @@ app.get('/swagger.json', (_req, res) => res.send(swaggerSpec));
 
 console.log(`Add swagger on /swagger`);
 
-app.listen(process.env.SERVER_PORT, () => {
-  console.log(`Server listening on port ${process.env.SERVER_PORT}`);
-});
+MysqlDataSource.initialize()
+  .then(() => {
+    console.log('Database initialized!');
+    app.listen(process.env.SERVER_PORT, () => {
+      console.log(`Server listening on port ${process.env.SERVER_PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Database Error: ', err);
+    connectWithRetry();
+  });
