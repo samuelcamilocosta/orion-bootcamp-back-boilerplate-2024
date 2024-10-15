@@ -74,10 +74,14 @@ export class TutorController {
    *                   type: string
    *                 cpf:
    *                   type: string
+   *                 salt:
+   *                   type: string
    *                 educationLevels:
    *                   type: array
    *                   items:
    *                     type: integer
+   *                 tutorId:
+   *                   type: integer
    *       '400':
    *         description: Validation error
    *         content:
