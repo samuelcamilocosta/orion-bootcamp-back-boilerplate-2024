@@ -19,8 +19,8 @@ export class Tutor {
   @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
   username: string;
 
-  @Column({ type: 'varchar', length: 10, nullable: false })
-  birthDate: string;
+  @Column({ type: 'date', nullable: false })
+  birthDate: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
