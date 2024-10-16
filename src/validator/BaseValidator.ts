@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { Schema, checkSchema, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 
 export class BaseValidator {
-  protected static validationList(schema: Schema): Array<RequestHandler> {
+  public static validationList(
+    schema: RequestHandler[]
+  ): Array<RequestHandler> {
     return [
-      ...checkSchema(schema),
+      ...schema,
       (req: Request, res: Response, next: NextFunction): void | Response => {
         const errors = validationResult(req);
 
