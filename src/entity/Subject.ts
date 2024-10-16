@@ -7,4 +7,4 @@ export class Subject {
 
     @Column({ type: 'varchar', length: 255, nullable: false })
     subjectName: string;
-}
+} 

@@ -25,5 +25,5 @@ export class Student extends User {
     subjects: Subject[];
 
     
-    
+     
 }

@@ -5,7 +5,7 @@ import { LevelName } from './LevelName';
 export class EducationLevel {
     @PrimaryGeneratedColumn()
     educationId: number;
-
+ 
     @Column({ type: 'enum', enum: LevelName, nullable: false })
     levelType: LevelName;
 }

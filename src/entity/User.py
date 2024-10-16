@@ -22,4 +22,4 @@ export class User {
 
     @Column({ type: 'date', nullable: false })
     birthDate: Date;
-}
+} 
