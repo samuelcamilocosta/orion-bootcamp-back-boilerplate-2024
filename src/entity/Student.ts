@@ -1,39 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
 import { Subject } from './Subject';
+import { EducationLevel } from './EducationLevel';
+import { User } from './User';
 
 @Entity()
-export class Student {
-    @PrimaryGeneratedColumn()
-    studentId: number;
-
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    fullName: string;
-
-    @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
-    username: string;
-
-    @Column({ type: 'varchar', length: 10, nullable: false })
-    birthDate: string;
-
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    password: string;
-
-    @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
-    email: string;
-
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    salt: string;
-
-    @ManyToOne(() => EducationLevel)
-    @JoinColumn({ name: 'educationId' }) // Isso define explicitamente o nome da coluna FK
+export class Student extends User {
+    
+    @ManyToOne(() => EducationLevel, { nullable: false })
+    @JoinColumn({ name: 'educationId' }) 
     educationLevel: EducationLevel;
     
-    @ManyToMany(() => Subject, { cascade: true})
+    @ManyToMany(() => Subject, { cascade: true })
     @JoinTable({
-        name: 'student_subjects_subject',
+        name: 'student_subjects',
         joinColumn: {
             name: 'studentId',
-            referencedColumnName: 'studentId',
+            referencedColumnName: 'id',
         },
         inverseJoinColumn: {
             name: 'subjectId',

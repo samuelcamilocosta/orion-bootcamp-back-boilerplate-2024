@@ -1,39 +1,20 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
 import { Subject } from './Subject';
 import { EducationLevel } from './EducationLevel';
+import { User } from './User';
 
 @Entity()
-export class Tutor {
-    @PrimaryGeneratedColumn()
-    tutorId: number;
-
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    fullName: string;
-
-    @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
-    username: string;
-
-    @Column({ type: 'varchar', length: 10, nullable: false })
-    birthDate: string;
-
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    password: string;
-
-    @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
-    email: string;
+export class Tutor extends User {
 
     @Column({ type: 'varchar', length: 11, unique: true,  nullable: false })
     cpf: string;
-
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    salt: string;
 
     @ManyToMany(() => Subject, { cascade: true})
     @JoinTable({
         name: 'tutor_subjects_subject',
         joinColumn: {
             name: 'tutorId',
-            referencedColumnName: 'tutorId',
+            referencedColumnName: 'id',
         },
         inverseJoinColumn: {
             name: 'subjectId',
@@ -44,10 +25,10 @@ export class Tutor {
 
     @ManyToMany(() => EducationLevel, { cascade: true})
     @JoinTable({
-        name: 'tutor_education_levels_education_level',
+        name: 'tutor_education_levels',
         joinColumn: {
             name: 'tutorId',
-            referencedColumnName: 'tutorId',
+            referencedColumnName: 'id',
         },
         inverseJoinColumn: {
             name: 'educationLevelId',

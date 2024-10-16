@@ -1,10 +1,11 @@
-import { Entity, ManyToMany, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { LevelName } from './LevelName';
 
 @Entity()
 export class EducationLevel {
     @PrimaryGeneratedColumn()
     educationId: number;
 
-    @Column({ type: 'varchar', length: 255, nullable: false })
-    levelType: string;
+    @Column({ type: 'enum', enum: LevelName, nullable: false })
+    levelType: LevelName;
 }
