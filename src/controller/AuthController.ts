@@ -4,10 +4,14 @@ import {
     requestPasswordReset,
     resetPassword
 } from '../services/AuthService';
+import { CustomError } from '../interfaces/CustomError';
 
-interface CustomError extends Error {
-    message: string;
-}
+
+const exampleFunction = (): void => {
+    const error: CustomError = new Error('Erro personalizado');
+    error.status = 400;
+    throw error;
+  };
 
 // Controlador para login de usuário
 export const login = async (req: Request, res: Response) => {

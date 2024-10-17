@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 
 dotenv.config();
@@ -6,7 +6,7 @@ dotenv.config();
 // Use uma string de conexão MongoDB diretamente
 export const MongoDataSource = new DataSource({
     type: 'mongodb',
-    url : process.env.DB_CONNECTION_STRING || '',
+    url: process.env.DB_CONNECTION_STRING || '',
     database: process.env.DB_DATABASE || 'reforca',
     synchronize: false,
     logging: true,
