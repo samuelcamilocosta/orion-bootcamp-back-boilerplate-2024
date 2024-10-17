@@ -5,6 +5,7 @@ import { EducationLevel } from '../entity/EducationLevel';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
 import { MysqlDataSource } from '../config/database';
+import { In } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 const birthDateRegex =
@@ -199,7 +200,7 @@ export class TutorValidator extends BaseValidator {
 
           const parsedValues = value.map((id: string) => Number(id));
           const educationLevels =
-            await educationLevelRepository.findByIds(parsedValues);
+            await educationLevelRepository.find({where: { educationId: In(parsedValues)}});
           if (educationLevels.length !== value.length) {
             return Promise.reject('Um ou mais níveis de ensino não existem.');
           }
