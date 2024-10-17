@@ -5,7 +5,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import { MysqlDataSource } from './config/database';
 import { swaggerConfig } from './config/swagger';
 import routes from './routes';
-import connectWithRetry from 'config/retryConnection';
+import connectWithRetry from './config/retryConnection';
 
 const app = express();
 

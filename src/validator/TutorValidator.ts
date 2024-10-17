@@ -24,7 +24,7 @@ export class TutorValidator extends CommonValidations {
       body('cpf')
         .trim()
         .isString()
-        .withMessage('CPF deve ser uma string.')
+        .withMessage('CPF inválido.')
         .notEmpty()
         .withMessage('CPF é obrigatório.')
         .custom((value: string): boolean => {
