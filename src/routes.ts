@@ -3,8 +3,10 @@ import { HomeController } from './controller/HomeController';
 import { TutorController } from './controller/TutorController';
 import { TutorValidator } from './validator/TutorValidator';
 import { StudentValidator } from './validator/StudentValidator';
+import { AuthValidator } from './validator/AuthValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
+import { AuthController } from './controller/AuthController';
 
 const router = Router();
 
@@ -36,5 +38,8 @@ router.post(
 );
 
 router.get('/api/get/educationlevel', new EducationLevelController().getAll);
+
+// Login route
+router.post('/api/login', AuthValidator.login(), new AuthController().login);
 
 export default router;
