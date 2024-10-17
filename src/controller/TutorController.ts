@@ -163,7 +163,6 @@ export class TutorController {
 
       return res.status(201).json(tutor);
     } catch (error) {
-      console.error('Error saving tutor:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });
     }
   }
@@ -173,7 +172,6 @@ export class TutorController {
       const tutor = await MysqlDataSource.getRepository(Tutor).find();
       return res.status(200).json(tutor);
     } catch (error) {
-      console.error('Erro fetching tutor:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }

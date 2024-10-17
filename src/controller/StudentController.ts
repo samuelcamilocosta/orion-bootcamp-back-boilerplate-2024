@@ -11,8 +11,6 @@ export class StudentController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    console.log('Received request to save student:', req.body);
-
     const { fullName, username, birthDate, password, email, educationLevel } =
       req.body;
 
@@ -35,17 +33,12 @@ export class StudentController {
 
       if (foundEducationLevel) {
         student.educationLevel = foundEducationLevel;
-        console.log(
-          'Assigned education level to student:',
-          student.educationLevel
-        );
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
 
       return res.status(201).json(student);
     } catch (error) {
-      console.error('Error saving student:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });
     }
   }
@@ -55,7 +48,6 @@ export class StudentController {
       const student = await MysqlDataSource.getRepository(Student).find();
       return res.status(200).json(student);
     } catch (error) {
-      console.error('Erro fetching students:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }

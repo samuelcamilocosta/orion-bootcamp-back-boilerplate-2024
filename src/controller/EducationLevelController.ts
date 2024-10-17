@@ -19,7 +19,6 @@ export class EducationLevelController {
       await MysqlDataSource.getRepository(EducationLevel).save(educationLevel);
       return res.status(201).json(educationLevel);
     } catch (error) {
-      console.error('Error saving education level:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });
     }
   }
@@ -30,7 +29,6 @@ export class EducationLevelController {
         await MysqlDataSource.getRepository(EducationLevel).find();
       return res.status(200).json(educationLevels);
     } catch (error) {
-      console.error('Erro fetching education levels:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
