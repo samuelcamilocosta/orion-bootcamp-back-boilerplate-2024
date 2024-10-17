@@ -84,17 +84,19 @@ export class User {
     }
   }
 
-  /**
-   * Aplica hash à senha do usuário antes de inserir no banco de dados.
-   * Gera um salt e aplica bcrypt caso a senha não esteja previamente criptografada.
-   */
-  @BeforeInsert()
-  async hashPassword() {
-    if (!this.password.startsWith('$2b$')) {
-      const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-    }
+/**
+ * Aplica hash à senha do usuário antes de inserir no banco de dados.
+ * Gera um salt e aplica bcrypt caso a senha não esteja previamente criptografada.
+ * 
+ * @returns Uma Promise que resolve sem retornar valores (`void`).
+ */
+@BeforeInsert()
+async hashPassword(): Promise<void> {
+  if (!this.password?.startsWith('$2b$')) {
+    const salt: string = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
   }
+}
 
   /**
    * Compara a senha fornecida com a senha armazenada.
