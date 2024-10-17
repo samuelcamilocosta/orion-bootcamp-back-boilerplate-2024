@@ -3,3 +3,4 @@
 docker/volumes/
 coverage/
 package-lock.json
+.env
