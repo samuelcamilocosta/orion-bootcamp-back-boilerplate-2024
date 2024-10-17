@@ -10,8 +10,6 @@ export class AuthValidator extends BaseValidator {
     return this.validationList([
       body('email')
         .trim()
-        .isString()
-        .withMessage('Email inválido.')
         .notEmpty()
         .withMessage('Email é obrigatório.')
         .isEmail()
