@@ -25,7 +25,7 @@ router.get('/api/get/student', new StudentController().getAll);
 router.post('/api/register/student', new StudentController().create);
 
 // Education Level routes
-router.get(
+router.post(
   '/api/register/educationlevel',
   new EducationLevelController().create
 );
