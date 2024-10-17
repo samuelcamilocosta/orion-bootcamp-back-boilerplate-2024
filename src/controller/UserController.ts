@@ -19,23 +19,23 @@ export class UserController {
     async createUser(req: Request, res: Response): Promise<Response> {
         const { name, email, password, confirmPassword } = req.body;
 
-        console.log('Tentando criar um usuário com email:', email);
+
 
         if (password !== confirmPassword) {
-            console.log('As senhas não coincidem');
+            
             return res.status(400).json({ message: 'As senhas não coincidem' });
         }
 
         try {
             const userRepository = MongoDataSource.getMongoRepository(User);
 
-            console.log('Verificando se o email já está cadastrado:', email);
+            
             const existingUser = await userRepository.findOne({
                 where: { email }
             });
 
             if (existingUser) {
-                console.log('Email já cadastrado:', email);
+                
                 return res.status(400).json({ message: 'Email já cadastrado' });
             }
 
@@ -59,7 +59,7 @@ export class UserController {
                 token
             });
         } catch (error: any) {
-            console.error('Erro ao criar usuário:', error);
+            
             return res
                 .status(500)
                 .json({ message: 'Erro ao criar usuário', error });
@@ -80,7 +80,7 @@ export class UserController {
 
             return res.status(200).json(users);
         } catch (error: any) {
-            console.error('Erro ao buscar usuários:', error);
+            
             return res
                 .status(500)
                 .json({ message: 'Erro ao buscar usuários', error });
@@ -111,7 +111,7 @@ export class UserController {
 
             return res.status(200).json(user);
         } catch (error: any) {
-            console.error('Erro ao buscar usuário pelo ID:', error);
+            
             return res
                 .status(500)
                 .json({ message: 'Erro ao buscar usuário', error });
@@ -140,7 +140,7 @@ export class UserController {
 
             return res.status(200).json(user);
         } catch (error: any) {
-            console.error('Erro ao buscar usuário pelo email:', error);
+            
             return res
                 .status(500)
                 .json({ message: 'Erro ao buscar usuário', error });
