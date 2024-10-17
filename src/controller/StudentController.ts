@@ -11,29 +11,34 @@ export class StudentController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, username, birthDate, email, educationLevel, password } =
+    console.log('Received request to save student:', req.body);
+
+    const { fullName, username, birthDate, password, email, educationLevel } =
       req.body;
 
-    // const { hashedPassword, salt } = password;
-    const salt = 'salt-exemple';
+    const { hashedPassword, salt } = password;
+
     const student = new Student();
     student.fullName = fullName;
     student.username = username;
     student.birthDate = birthDate;
-    student.password = password;
+    student.password = hashedPassword;
     student.email = email;
     student.salt = salt;
 
     try {
-      const foundEducationLevels = await MysqlDataSource.getRepository(
+      const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).findOne({
         where: { educationId: educationLevel }
       });
-      console.log('Found education levels:', foundEducationLevels);
 
-      if (foundEducationLevels) {
-        student.educationLevel = foundEducationLevels;
+      if (foundEducationLevel) {
+        student.educationLevel = foundEducationLevel;
+        console.log(
+          'Assigned education level to student:',
+          student.educationLevel
+        );
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
