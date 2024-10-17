@@ -166,8 +166,9 @@ export class CommonValidations {
           MysqlDataSource.getRepository(EducationLevel);
 
         const parsedValues = value.map((id: string) => Number(id));
-        const educationLevels =
-          await educationLevelRepository.find({ where: {educationId: In([parsedValues])}});
+        const educationLevels = await educationLevelRepository.find({
+          where: { educationId: In([parsedValues]) }
+        });
         if (educationLevels.length !== value.length) {
           return Promise.reject('Uma ou mais faixas de ensino não existem.');
         }
