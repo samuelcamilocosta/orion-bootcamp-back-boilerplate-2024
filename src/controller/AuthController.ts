@@ -1,67 +1,41 @@
 import { Request, Response } from 'express';
-import {
-    loginUser,
-    requestPasswordReset,
-    resetPassword
-} from '../services/AuthService';
+
 import { CustomError } from '../interfaces/CustomError';
+import { AuthService } from '../services/AuthService';
 
 
-const exampleFunction = (): void => {
+const ErrorCustom = (): void => {
     const error: CustomError = new Error('Erro personalizado');
     error.status = 400;
     throw error;
   };
 
 // Controlador para login de usuário
-export const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-
-    try {
-        const user = await loginUser(email, password); // Faz o login chamando loginUser do AuthService
-        res.status(200).json({ message: 'Login bem-sucedido', user });
-    } catch (error) {
-        const customError = error as CustomError;
-
-        // Verificação de erros personalizados
-        if (customError.message === 'E-mail inválido') {
-            return res.status(400).json({ error: customError.message });
-        }
-
-        if (customError.message === 'Senha incorreta') {
-            return res.status(401).json({ error: customError.message });
-        }
-
-        // Erro genérico
-        return res.status(500).json({
-            error: 'Erro ao realizar login. Tente novamente mais tarde.'
-        });
+export class AuthController {
+    // Função de login
+    async login(req: Request, res: Response): Promise<Response> {
+      try {
+        const { email, password } = req.body;
+        const token = await AuthService.loginUser(email, password);
+        return res.status(200).json({ token });
+      } catch (error) {
+        const customError: CustomError = error as CustomError;
+        return res.status(customError.status || 500).json({ message: customError.message });
+      }
     }
-};
-
-// Controlador para solicitar redefinição de senha
-export const forgotPassword = async (req: Request, res: Response) => {
-    const { email } = req.body;
-
-    try {
-        // Tenta enviar o email de redefinição de senha
-        await requestPasswordReset(email);
-        res.status(200).json({
-            message: 'Email de redefinição de senha enviado'
-        });
-    } catch (error) {
-        const customError = error as CustomError;
-
-        if (customError.message === 'Usuário não encontrado') {
-            return res.status(404).json({ error: customError.message });
-        }
-
-        // Erro genérico
-        return res.status(500).json({
-            error: 'Erro ao processar solicitação. Tente novamente mais tarde.'
-        });
+  
+    // Função para redefinição de senha
+    async resetPassword(req: Request, res: Response): Promise<Response> {
+      try {
+        const { email } = req.body;
+        await AuthService.requestPasswordReset(email);
+        return res.status(200).json({ message: 'Password reset email sent.' });
+      } catch (error) {
+        const customError: CustomError = error as CustomError;
+        return res.status(customError.status || 500).json({ message: customError.message });
+      }
     }
-};
+  }
 
 // Controlador para redefinir a senha
 export const resetUserPassword = async (req: Request, res: Response) => {
@@ -69,7 +43,7 @@ export const resetUserPassword = async (req: Request, res: Response) => {
 
     try {
         // Tenta redefinir a senha do usuário
-        await resetPassword(token, newPassword);
+        await AuthService.resetPassword(token, newPassword);
         res.status(200).json({ message: 'Senha redefinida com sucesso' });
     } catch (error) {
         const customError = error as CustomError;
