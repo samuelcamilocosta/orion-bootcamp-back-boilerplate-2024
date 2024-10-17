@@ -21,6 +21,18 @@ export class User {
     @Column()
     password: string;
 
+    @Column({ type: 'int', default: 0 })
+    loginCount: number;
+
+    @Column({ type: 'date', nullable: true })
+    lastLogin: Date;
+
+    @Column({ nullable: true })
+    resetPasswordToken?: string;
+
+    @Column({ type: 'date', nullable: true })
+    resetPasswordExpires?: Date;
+
     @Column({ type: 'date', default: () => 'NOW()' })
     createdAt: Date;
 
@@ -35,7 +47,15 @@ export class User {
     // Função para hash da senha antes de inserir no banco
     @BeforeInsert()
     async hashPassword() {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
+        // Evitar recriptografia
+        if (!this.password.startsWith('$2b$')) {
+            const salt = await bcrypt.genSalt(10);
+            this.password = await bcrypt.hash(this.password, salt);
+        }
+    }
+
+    // Método para comparar a senha armazenada com a fornecida
+    async comparePassword(candidatePassword: string): Promise<boolean> {
+        return bcrypt.compare(candidatePassword, this.password);
     }
 }

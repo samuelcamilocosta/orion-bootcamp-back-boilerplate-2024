@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { HomeController } from '../controller/HomeController';
 import { UserController } from '../controller/UserController';
+import {
+    login,
+    forgotPassword,
+    resetUserPassword
+} from '../controller/AuthController'; // Importando os controladores de autenticação
 
 const router = Router();
 const homeController = new HomeController();
@@ -127,5 +132,86 @@ router.get('/api/users/:id', userController.getUserById);
  *         description: Erro ao buscar usuário
  */
 router.get('/api/users/email/:email', userController.getUserByEmail);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Fazer login
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso
+ *       400:
+ *         description: Credenciais inválidas
+ */
+router.post('/api/auth/login', login); // Usando o controlador 'login' de AuthController
+
+/**
+ * @swagger
+ * /api/auth/reset-password-request:
+ *   post:
+ *     summary: Solicitar redefinição de senha
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Solicitação de redefinição de senha enviada
+ *       404:
+ *         description: Usuário não encontrado
+ */
+router.post('/api/auth/reset-password-request', forgotPassword); // Usando forgotPassword de AuthController
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Redefinir a senha usando o token
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               token:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Senha redefinida com sucesso
+ *       400:
+ *         description: Token inválido ou expirado
+ */
+router.post('/api/auth/reset-password', resetUserPassword); // Usando resetUserPassword de AuthController
 
 export default router;
