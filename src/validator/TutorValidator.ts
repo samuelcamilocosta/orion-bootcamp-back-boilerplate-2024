@@ -5,6 +5,7 @@ import { EducationLevel } from '../entity/EducationLevel';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
 import { MysqlDataSource } from '../config/database';
+import { In } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 const birthDateRegex =
@@ -23,21 +24,21 @@ export class TutorValidator extends BaseValidator {
       body('fullName')
         .trim()
         .isString()
-        .withMessage('Nome completo deve ser uma string.')
+        .withMessage('Nome completo inválido.')
         .notEmpty()
         .withMessage('Nome completo é obrigatório.'),
 
       body('username')
         .trim()
         .isString()
-        .withMessage('Nome de usuário deve ser uma string.')
+        .withMessage('Nome de usuário inválido.')
         .notEmpty()
         .withMessage('Nome de usuário é obrigatório.'),
 
       body('birthDate')
         .trim()
         .isString()
-        .withMessage('Data de nascimento deve ser uma string.')
+        .withMessage('Data de nascimento inválida.')
         .notEmpty()
         .withMessage('Data de nascimento é obrigatória.')
         .custom((value: string): boolean => {
@@ -97,7 +98,7 @@ export class TutorValidator extends BaseValidator {
       body('confirmPassword')
         .trim()
         .isString()
-        .withMessage('Confirmação de senha deve ser uma string.')
+        .withMessage('Confirmação de senha inválida.')
         .notEmpty()
         .withMessage('Confirmação de senha é obrigatória.')
         .custom((value, { req }) => {
@@ -110,7 +111,7 @@ export class TutorValidator extends BaseValidator {
       body('password')
         .trim()
         .isString()
-        .withMessage('Senha deve ser uma string.')
+        .withMessage('Senha inválida.')
         .notEmpty()
         .withMessage('Senha é obrigatória.')
         .isLength({ min: 6 })
@@ -134,7 +135,7 @@ export class TutorValidator extends BaseValidator {
       body('cpf')
         .trim()
         .isString()
-        .withMessage('CPF deve ser uma string.')
+        .withMessage('CPF inválido.')
         .notEmpty()
         .withMessage('CPF é obrigatório.')
         .custom((value: string): boolean => {
@@ -169,7 +170,7 @@ export class TutorValidator extends BaseValidator {
       body('email')
         .trim()
         .isString()
-        .withMessage('Email deve ser uma string.')
+        .withMessage('Email inválido.')
         .notEmpty()
         .withMessage('Email é obrigatório.')
         .isEmail()
@@ -190,18 +191,18 @@ export class TutorValidator extends BaseValidator {
       body('educationLevel')
         .trim()
         .isArray()
-        .withMessage('Faixas de ensino devem ser uma lista de IDs.')
+        .withMessage('Níveis de ensino inválidos.')
         .notEmpty()
-        .withMessage('Faixas de ensino são obrigatória.')
+        .withMessage('Níveis de ensino são obrigatórios.')
         .custom(async (value: string[]): Promise<boolean> => {
           const educationLevelRepository =
             MysqlDataSource.getRepository(EducationLevel);
 
           const parsedValues = value.map((id: string) => Number(id));
           const educationLevels =
-            await educationLevelRepository.findByIds(parsedValues);
+            await educationLevelRepository.find({where: { educationId: In(parsedValues)}});
           if (educationLevels.length !== value.length) {
-            return Promise.reject('Uma ou mais faixas de ensino não existem.');
+            return Promise.reject('Um ou mais níveis de ensino não existem.');
           }
 
           return true;
