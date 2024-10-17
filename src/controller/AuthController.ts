@@ -83,6 +83,8 @@ export class AuthController {
       const isTutor = await tutorRepository.findOne({ where: { email } });
       const isStudent = await studentRepository.findOne({ where: { email } });
 
+      const incorrectPassword = 'Senha incorreta.'
+
       if (!isTutor && !isStudent) {
         return res.status(404).json({ message: 'Email não encontrado.' });
       }
@@ -92,14 +94,14 @@ export class AuthController {
       if (isTutor) {
         isMatch = await bcrypt.compare(password, isTutor.password);
         if (!isMatch) {
-          return res.status(400).json({ message: 'Senha incorreta.' });
+          return res.status(400).json({ message: incorrectPassword });
         }
       }
 
       if (isStudent) {
         isMatch = await bcrypt.compare(password, isStudent.password);
         if (!isMatch) {
-          return res.status(400).json({ message: 'Senha incorreta.' });
+          return res.status(400).json({ message: incorrectPassword });
         }
       }
 
