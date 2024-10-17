@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-
 import { CustomError } from '../interfaces/CustomError';
 import { AuthService } from '../services/AuthService';
 
@@ -19,9 +18,11 @@ export const throwCustomError = (
     throw error;
 };
 
-// Controlador para login de usuário
+// Controlador de autenticação
 export class AuthController {
-    // Função de login
+    /**
+     * Função de login do usuário.
+     */
     async login(req: Request, res: Response): Promise<Response> {
         try {
             const { email, password } = req.body;
@@ -35,14 +36,16 @@ export class AuthController {
         }
     }
 
-    // Função para redefinição de senha
-    async resetPassword(req: Request, res: Response): Promise<Response> {
+    /**
+     * Função para solicitar redefinição de senha.
+     */
+    async forgotPassword(req: Request, res: Response): Promise<Response> {
         try {
             const { email } = req.body;
             await AuthService.requestPasswordReset(email);
-            return res
-                .status(200)
-                .json({ message: 'Password reset email sent.' });
+            return res.status(200).json({
+                message: 'Solicitação de redefinição de senha enviada.'
+            });
         } catch (error) {
             const customError: CustomError = error as CustomError;
             return res
@@ -50,26 +53,28 @@ export class AuthController {
                 .json({ message: customError.message });
         }
     }
-}
 
-// Controlador para redefinir a senha
-export const resetUserPassword = async (req: Request, res: Response) => {
-    const { token, newPassword } = req.body;
+    /**
+     * Função para redefinir a senha do usuário.
+     */
+    async resetPassword(req: Request, res: Response): Promise<Response> {
+        const { token, newPassword } = req.body;
 
-    try {
-        // Tenta redefinir a senha do usuário
-        await AuthService.resetPassword(token, newPassword);
-        res.status(200).json({ message: 'Senha redefinida com sucesso' });
-    } catch (error) {
-        const customError = error as CustomError;
+        try {
+            await AuthService.resetPassword(token, newPassword);
+            return res
+                .status(200)
+                .json({ message: 'Senha redefinida com sucesso' });
+        } catch (error) {
+            const customError: CustomError = error as CustomError;
 
-        if (customError.message === 'Token inválido ou expirado') {
-            return res.status(400).json({ error: customError.message });
+            if (customError.message === 'Token inválido ou expirado') {
+                return res.status(400).json({ error: customError.message });
+            }
+
+            return res.status(500).json({
+                error: 'Erro ao redefinir a senha. Tente novamente mais tarde.'
+            });
         }
-
-        // Erro genérico
-        return res.status(500).json({
-            error: 'Erro ao redefinir a senha. Tente novamente mais tarde.'
-        });
     }
-};
+}

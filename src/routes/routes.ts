@@ -1,15 +1,12 @@
 import { Router } from 'express';
 import { HomeController } from '../controller/HomeController';
 import { UserController } from '../controller/UserController';
-import {
-    login,
-    forgotPassword,
-    resetUserPassword
-} from '../controller/AuthController'; // Importando os controladores de autenticação
+import { AuthController } from '../controller/AuthController'; // Importação corrigida para usar a classe AuthController
 
 const router = Router();
 const homeController = new HomeController();
 const userController = new UserController();
+const authController = new AuthController(); // Instância do AuthController
 
 /**
  * @swagger
@@ -60,7 +57,7 @@ router.get('/', homeController.hello);
  *       500:
  *         description: Erro ao criar usuário
  */
-router.post('/api/users', userController.createUser);
+router.post('/api/users', (req, res) => userController.createUser(req, res));
 
 /**
  * @swagger
@@ -85,7 +82,7 @@ router.post('/api/users', userController.createUser);
  *       500:
  *         description: Erro ao buscar usuários
  */
-router.get('/api/users', userController.getAllUsers);
+router.get('/api/users', (req, res) => userController.getAllUsers(req, res));
 
 /**
  * @swagger
@@ -108,7 +105,9 @@ router.get('/api/users', userController.getAllUsers);
  *       500:
  *         description: Erro ao buscar usuário
  */
-router.get('/api/users/:id', userController.getUserById);
+router.get('/api/users/:id', (req, res) =>
+    userController.getUserById(req, res)
+);
 
 /**
  * @swagger
@@ -131,7 +130,9 @@ router.get('/api/users/:id', userController.getUserById);
  *       500:
  *         description: Erro ao buscar usuário
  */
-router.get('/api/users/email/:email', userController.getUserByEmail);
+router.get('/api/users/email/:email', (req, res) =>
+    userController.getUserByEmail(req, res)
+);
 
 /**
  * @swagger
@@ -159,7 +160,7 @@ router.get('/api/users/email/:email', userController.getUserByEmail);
  *       400:
  *         description: Credenciais inválidas
  */
-router.post('/api/auth/login', login); // Usando o controlador 'login' de AuthController
+router.post('/api/auth/login', (req, res) => authController.login(req, res));
 
 /**
  * @swagger
@@ -184,7 +185,9 @@ router.post('/api/auth/login', login); // Usando o controlador 'login' de AuthCo
  *       404:
  *         description: Usuário não encontrado
  */
-router.post('/api/auth/reset-password-request', forgotPassword); // Usando forgotPassword de AuthController
+router.post('/api/auth/reset-password-request', (req, res) =>
+    authController.forgotPassword(req, res)
+);
 
 /**
  * @swagger
@@ -212,6 +215,8 @@ router.post('/api/auth/reset-password-request', forgotPassword); // Usando forgo
  *       400:
  *         description: Token inválido ou expirado
  */
-router.post('/api/auth/reset-password', resetUserPassword); // Usando resetUserPassword de AuthController
+router.post('/api/auth/reset-password', (req, res) =>
+    authController.resetPassword(req, res)
+);
 
 export default router;
