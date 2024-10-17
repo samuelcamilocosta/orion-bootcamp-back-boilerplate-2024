@@ -19,23 +19,18 @@ export class UserController {
     async createUser(req: Request, res: Response): Promise<Response> {
         const { name, email, password, confirmPassword } = req.body;
 
-
-
         if (password !== confirmPassword) {
-            
             return res.status(400).json({ message: 'As senhas não coincidem' });
         }
 
         try {
             const userRepository = MongoDataSource.getMongoRepository(User);
 
-            
             const existingUser = await userRepository.findOne({
                 where: { email }
             });
 
             if (existingUser) {
-                
                 return res.status(400).json({ message: 'Email já cadastrado' });
             }
 
@@ -47,6 +42,7 @@ export class UserController {
                 password: hashedPassword
             });
             await userRepository.save(newUser);
+
             const token: string = jwt.sign(
                 { userId: newUser.id },
                 process.env.JWT_SECRET!,
@@ -58,11 +54,11 @@ export class UserController {
                 user: newUser,
                 token
             });
-        } catch (error: any) {
-            
-            return res
-                .status(500)
-                .json({ message: 'Erro ao criar usuário', error });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            }
+            return res.status(500).json({ message: 'Erro desconhecido' });
         }
     }
 
@@ -79,11 +75,11 @@ export class UserController {
             const users = await userRepository.find();
 
             return res.status(200).json(users);
-        } catch (error: any) {
-            
-            return res
-                .status(500)
-                .json({ message: 'Erro ao buscar usuários', error });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            }
+            return res.status(500).json({ message: 'Erro desconhecido' });
         }
     }
 
@@ -110,11 +106,11 @@ export class UserController {
             }
 
             return res.status(200).json(user);
-        } catch (error: any) {
-            
-            return res
-                .status(500)
-                .json({ message: 'Erro ao buscar usuário', error });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            }
+            return res.status(500).json({ message: 'Erro desconhecido' });
         }
     }
 
@@ -139,11 +135,11 @@ export class UserController {
             }
 
             return res.status(200).json(user);
-        } catch (error: any) {
-            
-            return res
-                .status(500)
-                .json({ message: 'Erro ao buscar usuário', error });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return res.status(500).json({ message: error.message });
+            }
+            return res.status(500).json({ message: 'Erro desconhecido' });
         }
     }
 }

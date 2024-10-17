@@ -3,9 +3,19 @@ import { Request, Response } from 'express';
 import { CustomError } from '../interfaces/CustomError';
 import { AuthService } from '../services/AuthService';
 
-const ErrorCustom = (): void => {
-    const error: CustomError = new Error('Erro personalizado');
-    error.status = 400;
+/**
+ * Função utilitária para lançar um erro personalizado.
+ *
+ * @param message - A mensagem do erro.
+ * @param status - O código de status HTTP associado ao erro (opcional, padrão 400).
+ * @throws {CustomError} - Lança um erro personalizado.
+ */
+export const throwCustomError = (
+    message: string,
+    status: number = 400
+): never => {
+    const error: CustomError = new Error(message);
+    error.status = status;
     throw error;
 };
 
