@@ -83,7 +83,7 @@ export class AuthController {
       const isTutor = await tutorRepository.findOne({ where: { email } });
       const isStudent = await studentRepository.findOne({ where: { email } });
 
-      const incorrectPassword = 'Senha incorreta.'
+      const incorrectPassword = 'Senha incorreta.';
 
       if (!isTutor && !isStudent) {
         return res.status(404).json({ message: 'Email não encontrado.' });
