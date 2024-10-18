@@ -30,7 +30,7 @@ export class EducationLevelController {
         await MysqlDataSource.getRepository(EducationLevel).find();
       return res.status(200).json(educationLevels);
     } catch (error) {
-      console.error('Erro fetching education levels:', error);
+      console.error('Error fetching education levels:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
