@@ -3,36 +3,33 @@ import { CustomError } from '../interfaces/CustomError';
 import { AuthService } from '../services/AuthService';
 
 /**
- * Função utilitária para lançar um erro personalizado.
- *
- * @param message - A mensagem do erro.
- * @param status - O código de status HTTP associado ao erro (opcional, padrão 400).
- * @throws {CustomError} - Lança um erro personalizado.
+ * Controlador de autenticação.
  */
-export const throwCustomError = (
-    message: string,
-    status: number = 400
-): never => {
-    const error: CustomError = new Error(message);
-    error.status = status;
-    throw error;
-};
-
-// Controlador de autenticação
 export class AuthController {
-    /**
-     * Função de login do usuário.
-     */
-    async login(req: Request, res: Response): Promise<Response> {
-        try {
-            const { email, password } = req.body;
-            const token = await AuthService.loginUser(email, password);
-            return res.status(200).json({ token });
-        } catch (error) {
-            const customError: CustomError = error as CustomError;
-            return res
-                .status(customError.status || 500)
-                .json({ message: customError.message });
-        }
+  /**
+   * Realiza o login do usuário, gerando e retornando o token JWT.
+   *
+   * @param req - Requisição contendo email e senha do usuário.
+   * @param res - Resposta HTTP com o token JWT ou uma mensagem de erro.
+   * @returns Resposta com o token JWT gerado ou erro.
+   */
+  async login(req: Request, res: Response): Promise<Response> {
+    try {
+      const { email, password } = req.body;
+      const token = await AuthService.loginUser(email, password);
+
+      return res.status(200).json({
+        message: 'Login bem-sucedido',
+        token,
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        // Mensagem genérica para erros de autenticação
+        return res
+          .status(error.status)
+          .json({ message: 'Credenciais inválidas' });
+      }
+      return res.status(500).json({ message: 'Erro interno de servidor' });
     }
+  }
 }
