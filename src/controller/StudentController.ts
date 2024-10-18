@@ -41,7 +41,7 @@ export class StudentController {
    *               educationLevel:
    *                 type: integer
    *                 description: ID of the education level
-   *                 example: 1
+   *                 example: [1]
    *               password:
    *                 type: string
    *                 description: Password of the student
