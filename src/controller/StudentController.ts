@@ -46,6 +46,10 @@ export class StudentController {
    *                 type: string
    *                 description: Password of the student
    *                 example: "P@ssword123"
+   *               confirmPassword:
+   *                 type: string
+   *                 description: Confirmation password of the student
+   *                 example: "P@ssword123"
    *     responses:
    *       '201':
    *         description: Student successfully created
@@ -72,9 +76,6 @@ export class StudentController {
    *                     educationId:
    *                       type: integer
    *                       example: 1
-   *                 salt:
-   *                   type: string
-   *                   example: "randomSaltString"
    *                 studentId:
    *                   type: integer
    *                   example: 123
@@ -95,13 +96,13 @@ export class StudentController {
    *                         example: "field"
    *                       value:
    *                         type: string
-   *                         example: "invalid_value"
+   *                         example: ""
    *                       msg:
    *                         type: string
-   *                         example: "Field is required."
+   *                         example: "Nome completo é obrigatório."
    *                       path:
    *                         type: string
-   *                         example: "fieldName"
+   *                         example: "fullName"
    *                       location:
    *                         type: string
    *                         example: "body"
@@ -114,7 +115,7 @@ export class StudentController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Internal Server Error"
+   *                   example: "Erro interno do servidor."
    *                 error:
    *                   type: string
    */
@@ -138,21 +139,30 @@ export class StudentController {
     student.salt = salt;
 
     try {
-      const foundEducationLevel = await MysqlDataSource.getRepository(
+      const foundEducationLevelId = await MysqlDataSource.getRepository(
         EducationLevel
       ).findOne({
         where: { educationId: educationLevel }
       });
 
-      if (foundEducationLevel) {
-        student.educationLevel = foundEducationLevel;
+      if (foundEducationLevelId) {
+        student.educationLevel = foundEducationLevelId;
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
 
-      return res.status(201).json(student);
+      return res.status(201).json({
+        fullName: student.fullName,
+        username: student.username,
+        birthDate: student.birthDate,
+        email: student.email,
+        educationLevel: student.educationLevel,
+        id: student.id
+      });
     } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      return res
+        .status(500)
+        .json({ message: 'Erro interno do servidor.', error });
     }
   }
 
@@ -161,7 +171,7 @@ export class StudentController {
       const student = await MysqlDataSource.getRepository(Student).find();
       return res.status(200).json(student);
     } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }
