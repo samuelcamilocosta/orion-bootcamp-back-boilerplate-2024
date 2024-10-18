@@ -51,29 +51,26 @@ export class AuthController {
    *             schema:
    *               type: object
    *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Senha incorreta."
-   *                 errors:
-   *                   type: array
-   *                   items:
-   *                     type: object
-   *                     properties:
-   *                       type:
-   *                         type: string
-   *                         example: "field"
-   *                       value:
-   *                         type: string
-   *                         example: ""
-   *                       msg:
-   *                         type: string
-   *                         example: "Email é obrigatório."
-   *                       path:
-   *                         type: string
-   *                         example: "email"
-   *                       location:
-   *                         type: string
-   *                         example: "body"
+   *                    errors:
+   *                     type: array
+   *                     items:
+   *                      type: object
+   *                      properties:
+   *                        type:
+   *                          type: string
+   *                          example: "field"
+   *                        value:
+   *                          type: string
+   *                          example: ""
+   *                        msg:
+   *                          type: string
+   *                          example: "Email é obrigatório."
+   *                        path:
+   *                          type: string
+   *                          example: "email"
+   *                        location:
+   *                          type: string
+   *                          example: "body"
    *       '404':
    *         description: Email not found
    *         content:
@@ -93,6 +90,7 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
+   *                   example: "Erro interno do servidor."
    *                 error:
    *                   type: string
    */
@@ -133,7 +131,7 @@ export class AuthController {
     } catch (error) {
       return res
         .status(500)
-        .json({ message: 'Internal Server Error.', error: error.message });
+        .json({ message: 'Erro interno do servidor.', error: error.message });
     }
   }
 }

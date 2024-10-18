@@ -116,15 +116,11 @@ export class TutorController {
    *               properties:
    *                 message:
    *                   type: string
+   *                   example: "Erro interno do servidor."
    *                 error:
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const {
       fullName,
       username,

@@ -120,11 +120,6 @@ export class StudentController {
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { fullName, username, birthDate, password, email, educationLevel } =
       req.body;
 
