@@ -147,19 +147,27 @@ export class TutorController {
     tutor.salt = salt;
 
     try {
-      const foundEducationLevels = await MysqlDataSource.getRepository(
+      const foundEducationLevelId = await MysqlDataSource.getRepository(
         EducationLevel
       ).find({
         where: { educationId: educationLevel }
       });
 
-      if (foundEducationLevels) {
-        tutor.educationLevels = foundEducationLevels;
+      if (foundEducationLevelId) {
+        tutor.educationLevels = foundEducationLevelId;
       }
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
 
-      return res.status(201).json(tutor);
+      return res.status(201).json({
+        fullName: tutor.fullName,
+        username: tutor.username,
+        birthDate: tutor.birthDate,
+        email: tutor.email,
+        educationLevel: tutor.educationLevels,
+        cpf: tutor.cpf,
+        id: tutor.id
+      });
     } catch (error) {
       return res.status(500).json({ message: 'Internal Server Error', error });
     }
