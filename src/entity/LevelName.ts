@@ -1,5 +1,5 @@
 export enum LevelName {
-    FUNDAMENTAL = 'Fundamental',
-    MEDIO = 'Médio',
-    PREVESTIBULAR = 'Pré-Vestibular'
-} 
+  FUNDAMENTAL = 'Fundamental',
+  MEDIO = 'Médio',
+  PREVESTIBULAR = 'Pré-Vestibular'
+}

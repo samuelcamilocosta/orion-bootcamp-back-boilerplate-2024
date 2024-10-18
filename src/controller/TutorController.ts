@@ -149,10 +149,11 @@ export class TutorController {
     tutor.salt = salt;
 
     try {
-      const foundEducationLevels =
-        await MysqlDataSource.getRepository(EducationLevel).findByIds(
-          educationLevel
-        );
+      const foundEducationLevels = await MysqlDataSource.getRepository(
+        EducationLevel
+      ).find({
+        where: { educationId: educationLevel }
+      });
 
       if (foundEducationLevels) {
         tutor.educationLevels = foundEducationLevels;

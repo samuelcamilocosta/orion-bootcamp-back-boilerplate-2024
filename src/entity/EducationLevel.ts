@@ -3,9 +3,9 @@ import { LevelName } from './LevelName';
 
 @Entity()
 export class EducationLevel {
-    @PrimaryGeneratedColumn()
-    educationId: number;
- 
-    @Column({ type: 'enum', enum: LevelName, nullable: false })
-    levelType: LevelName;
+  @PrimaryGeneratedColumn()
+  educationId: number;
+
+  @Column({ type: 'enum', enum: LevelName, nullable: false })
+  levelType: LevelName;
 }
