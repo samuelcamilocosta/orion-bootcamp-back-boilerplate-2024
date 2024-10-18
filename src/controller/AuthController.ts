@@ -41,6 +41,9 @@ export class AuthController {
    *                 message:
    *                   type: string
    *                   example: "Login bem-sucedido."
+   *                 user:
+   *                   type: string
+   *                   example: "aluno"
    *       '400':
    *         description: Invalid credentials or validation error
    *         content:
@@ -110,12 +113,14 @@ export class AuthController {
       }
 
       let isMatch = false;
+      const loginSuccess = 'Login bem-sucedido.';
 
       if (isTutor) {
         isMatch = await bcrypt.compare(password, isTutor.password);
         if (!isMatch) {
           return res.status(400).json({ message: incorrectPassword });
         }
+        return res.status(200).json({ message: loginSuccess, user: 'tutor' });
       }
 
       if (isStudent) {
@@ -123,9 +128,8 @@ export class AuthController {
         if (!isMatch) {
           return res.status(400).json({ message: incorrectPassword });
         }
+        return res.status(200).json({ message: loginSuccess, user: 'aluno' });
       }
-
-      return res.status(200).json({ message: 'Login bem-sucedido.' });
     } catch (error) {
       return res
         .status(500)
