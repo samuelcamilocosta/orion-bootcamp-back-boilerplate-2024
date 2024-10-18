@@ -42,7 +42,7 @@ export class AuthController {
    *                   type: string
    *                   example: "Login bem-sucedido."
    *       '400':
-   *         description: Invalid credentials
+   *         description: Invalid credentials or validation error
    *         content:
    *           application/json:
    *             schema:
@@ -51,6 +51,26 @@ export class AuthController {
    *                 message:
    *                   type: string
    *                   example: "Senha incorreta."
+   *                 errors:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       type:
+   *                         type: string
+   *                         example: "field"
+   *                       value:
+   *                         type: string
+   *                         example: ""
+   *                       msg:
+   *                         type: string
+   *                         example: "Email é obrigatório."
+   *                       path:
+   *                         type: string
+   *                         example: "email"
+   *                       location:
+   *                         type: string
+   *                         example: "body"
    *       '404':
    *         description: Email not found
    *         content:
