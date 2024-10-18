@@ -72,9 +72,6 @@ export class StudentController {
    *                     educationId:
    *                       type: integer
    *                       example: 1
-   *                 salt:
-   *                   type: string
-   *                   example: "randomSaltString"
    *                 studentId:
    *                   type: integer
    *                   example: 123
@@ -138,19 +135,26 @@ export class StudentController {
     student.salt = salt;
 
     try {
-      const foundEducationLevel = await MysqlDataSource.getRepository(
+      const foundEducationLevelId = await MysqlDataSource.getRepository(
         EducationLevel
       ).findOne({
         where: { educationId: educationLevel }
       });
 
-      if (foundEducationLevel) {
-        student.educationLevel = foundEducationLevel;
+      if (foundEducationLevelId) {
+        student.educationLevel = foundEducationLevelId;
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
 
-      return res.status(201).json(student);
+      return res.status(201).json({
+        fullName: student.fullName,
+        username: student.username,
+        birthDate: student.birthDate,
+        email: student.email,
+        educationLevel: student.educationLevel,
+        id: student.id
+      });
     } catch (error) {
       return res.status(500).json({ message: 'Internal Server Error', error });
     }

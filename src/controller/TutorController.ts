@@ -74,8 +74,6 @@ export class TutorController {
    *                   type: string
    *                 cpf:
    *                   type: string
-   *                 salt:
-   *                   type: string
    *                 educationLevels:
    *                   type: array
    *                   items:
