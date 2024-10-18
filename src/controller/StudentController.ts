@@ -46,6 +46,10 @@ export class StudentController {
    *                 type: string
    *                 description: Password of the student
    *                 example: "P@ssword123"
+   *               confirmPassword:
+   *                 type: string
+   *                 description: Confirmation password of the student
+   *                 example: "P@ssword123"
    *     responses:
    *       '201':
    *         description: Student successfully created
