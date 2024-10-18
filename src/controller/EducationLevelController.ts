@@ -19,7 +19,9 @@ export class EducationLevelController {
       await MysqlDataSource.getRepository(EducationLevel).save(educationLevel);
       return res.status(201).json(educationLevel);
     } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      return res
+        .status(500)
+        .json({ message: 'Erro interno do servidor.', error });
     }
   }
 
@@ -29,7 +31,7 @@ export class EducationLevelController {
         await MysqlDataSource.getRepository(EducationLevel).find();
       return res.status(200).json(educationLevels);
     } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }

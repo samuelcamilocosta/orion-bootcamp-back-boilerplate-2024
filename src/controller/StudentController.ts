@@ -96,13 +96,13 @@ export class StudentController {
    *                         example: "field"
    *                       value:
    *                         type: string
-   *                         example: "invalid_value"
+   *                         example: ""
    *                       msg:
    *                         type: string
-   *                         example: "Field is required."
+   *                         example: "Nome completo é obrigatório."
    *                       path:
    *                         type: string
-   *                         example: "fieldName"
+   *                         example: "fullName"
    *                       location:
    *                         type: string
    *                         example: "body"
@@ -115,7 +115,7 @@ export class StudentController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Internal Server Error"
+   *                   example: "Erro interno do servidor."
    *                 error:
    *                   type: string
    */
@@ -160,7 +160,9 @@ export class StudentController {
         id: student.id
       });
     } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      return res
+        .status(500)
+        .json({ message: 'Erro interno do servidor.', error });
     }
   }
 
@@ -169,7 +171,7 @@ export class StudentController {
       const student = await MysqlDataSource.getRepository(Student).find();
       return res.status(200).json(student);
     } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }
