@@ -35,46 +35,4 @@ export class AuthController {
                 .json({ message: customError.message });
         }
     }
-
-    /**
-     * Função para solicitar redefinição de senha.
-     */
-    async forgotPassword(req: Request, res: Response): Promise<Response> {
-        try {
-            const { email } = req.body;
-            await AuthService.requestPasswordReset(email);
-            return res.status(200).json({
-                message: 'Solicitação de redefinição de senha enviada.'
-            });
-        } catch (error) {
-            const customError: CustomError = error as CustomError;
-            return res
-                .status(customError.status || 500)
-                .json({ message: customError.message });
-        }
-    }
-
-    /**
-     * Função para redefinir a senha do usuário.
-     */
-    async resetPassword(req: Request, res: Response): Promise<Response> {
-        const { token, newPassword } = req.body;
-
-        try {
-            await AuthService.resetPassword(token, newPassword);
-            return res
-                .status(200)
-                .json({ message: 'Senha redefinida com sucesso' });
-        } catch (error) {
-            const customError: CustomError = error as CustomError;
-
-            if (customError.message === 'Token inválido ou expirado') {
-                return res.status(400).json({ error: customError.message });
-            }
-
-            return res.status(500).json({
-                error: 'Erro ao redefinir a senha. Tente novamente mais tarde.'
-            });
-        }
-    }
 }

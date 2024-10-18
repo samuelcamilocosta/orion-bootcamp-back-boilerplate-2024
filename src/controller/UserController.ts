@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import { User } from '../models/Users';
-import { MongoDataSource } from '../config/database';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
+import { UserRepository } from '../repositories/UserRepository'; // Substituído para usar o repositório
+import { hashPassword } from '../library/bcrypt'; // Importação correta da função hash
+import { generateToken } from '../library/jwt'; // Importação correta da função JWT
 
 /**
  * Controlador para operações relacionadas aos usuários.
@@ -24,9 +22,7 @@ export class UserController {
         }
 
         try {
-            const userRepository = MongoDataSource.getMongoRepository(User);
-
-            const existingUser = await userRepository.findOne({
+            const existingUser = await UserRepository.findOne({
                 where: { email }
             });
 
@@ -34,19 +30,19 @@ export class UserController {
                 return res.status(400).json({ message: 'Email já cadastrado' });
             }
 
-            const hashedPassword: string = await bcrypt.hash(password, 10);
+            const hashedPassword = await hashPassword(password);
 
-            const newUser = userRepository.create({
+            const newUser = UserRepository.create({
                 name,
                 email,
                 password: hashedPassword
             });
-            await userRepository.save(newUser);
+            await UserRepository.save(newUser);
 
-            const token: string = jwt.sign(
+            const token = generateToken(
                 { userId: newUser.id },
                 process.env.JWT_SECRET!,
-                { expiresIn: '1h' }
+                '1h'
             );
 
             return res.status(201).json({
@@ -54,87 +50,6 @@ export class UserController {
                 user: newUser,
                 token
             });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                return res.status(500).json({ message: error.message });
-            }
-            return res.status(500).json({ message: 'Erro desconhecido' });
-        }
-    }
-
-    /**
-     * Função para obter todos os usuários.
-     *
-     * @param _req - Objeto de requisição HTTP (não utilizado).
-     * @param res - Objeto de resposta HTTP.
-     * @returns Promise que resolve em uma resposta HTTP contendo todos os usuários.
-     */
-    async getAllUsers(_req: Request, res: Response): Promise<Response> {
-        try {
-            const userRepository = MongoDataSource.getMongoRepository(User);
-            const users = await userRepository.find();
-
-            return res.status(200).json(users);
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                return res.status(500).json({ message: error.message });
-            }
-            return res.status(500).json({ message: 'Erro desconhecido' });
-        }
-    }
-
-    /**
-     * Função para obter um usuário pelo ID.
-     *
-     * @param req - Objeto de requisição contendo o ID do usuário.
-     * @param res - Objeto de resposta HTTP.
-     * @returns Promise que resolve em uma resposta HTTP com o usuário encontrado ou erro 404.
-     */
-    async getUserById(req: Request, res: Response): Promise<Response> {
-        const { id } = req.params;
-
-        try {
-            const userRepository = MongoDataSource.getMongoRepository(User);
-            const user = await userRepository.findOne({
-                where: { _id: new ObjectId(id) }
-            });
-
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({ message: 'Usuário não encontrado' });
-            }
-
-            return res.status(200).json(user);
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                return res.status(500).json({ message: error.message });
-            }
-            return res.status(500).json({ message: 'Erro desconhecido' });
-        }
-    }
-
-    /**
-     * Função para obter um usuário pelo email.
-     *
-     * @param req - Objeto de requisição contendo o email do usuário.
-     * @param res - Objeto de resposta HTTP.
-     * @returns Promise que resolve em uma resposta HTTP com o usuário encontrado ou erro 404.
-     */
-    async getUserByEmail(req: Request, res: Response): Promise<Response> {
-        const { email } = req.params;
-
-        try {
-            const userRepository = MongoDataSource.getMongoRepository(User);
-            const user = await userRepository.findOne({ where: { email } });
-
-            if (!user) {
-                return res
-                    .status(404)
-                    .json({ message: 'Usuário não encontrado' });
-            }
-
-            return res.status(200).json(user);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 return res.status(500).json({ message: error.message });
