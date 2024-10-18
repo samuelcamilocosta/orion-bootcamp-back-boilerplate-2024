@@ -14,7 +14,6 @@ export class StudentController {
     const { fullName, username, birthDate, email, educationLevel, password } =
       req.body;
 
-    // const { hashedPassword, salt } = password;
     const salt = 'salt-exemple';
     const student = new Student();
     student.fullName = fullName;
@@ -30,7 +29,6 @@ export class StudentController {
       ).findOne({
         where: { educationId: educationLevel }
       });
-      console.log('Found education levels:', foundEducationLevels);
 
       if (foundEducationLevels) {
         student.educationLevel = foundEducationLevels;
@@ -50,7 +48,7 @@ export class StudentController {
       const student = await MysqlDataSource.getRepository(Student).find();
       return res.status(200).json(student);
     } catch (error) {
-      console.error('Erro fetching students:', error);
+      console.error('Error fetching students:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
