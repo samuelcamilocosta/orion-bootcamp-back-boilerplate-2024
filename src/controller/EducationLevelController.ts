@@ -7,9 +7,7 @@ export class EducationLevelController {
     const { levelType } = req.body;
 
     if (!levelType) {
-      return res
-        .status(400)
-        .json({ message: 'O campo levelType é obrigatório.' });
+      return res.status(400).json({ message: 'Nível de ensino é obrigatório.' });
     }
 
     const educationLevel = new EducationLevel();
