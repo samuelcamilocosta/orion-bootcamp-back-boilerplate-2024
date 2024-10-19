@@ -7,6 +7,7 @@ import { AuthValidator } from './validator/AuthValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
 import { AuthController } from './controller/AuthController';
+import cors from 'cors';
 
 const router = Router();
 
@@ -40,6 +41,11 @@ router.post(
 router.get('/api/get/educationlevel', new EducationLevelController().getAll);
 
 // Login route
-router.post('/api/login', AuthValidator.login(), new AuthController().login);
+router.post(
+  '/api/login',
+  cors(),
+  AuthValidator.login(),
+  new AuthController().login
+);
 
 export default router;
