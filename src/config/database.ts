@@ -1,22 +1,24 @@
+import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 
+dotenv.config();
+
+// Use uma string de conexão MongoDB diretamente
 export const MongoDataSource = new DataSource({
-  name: 'default',
-  type: 'mongodb',
-  authSource: 'admin',
-  database: process.env.DB_DATABASE,
-  url: process.env.DB_CONNECTION_STRING,
-  entities: ['src/entity/*.ts', 'entity/*.js'],
-  logging: true,
-  synchronize: true
+    type: 'mongodb',
+    url: process.env.DB_CONNECTION_STRING || '',
+    database: process.env.DB_DATABASE || 'reforca',
+    synchronize: false,
+    logging: true,
+    entities: ['src/models/*.ts']
 });
 
-export const MysqlDataSource = new DataSource({
-  name: 'default',
-  type: 'mysql',
-  database: process.env.DB_DATABASE,
-  url: process.env.DB_CONNECTION_STRING,
-  entities: ['src/entity/*.ts', 'entity/*.js'],
-  logging: true,
-  synchronize: true
-});
+export const connectDB = async () => {
+    try {
+        await MongoDataSource.initialize();
+        console.log('MongoDB connected successfully with TypeORM!');
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
+    }
+};

@@ -1,2 +1,6 @@
 /dist
 /node_modules
+docker/volumes/
+coverage/
+package-lock.json
+.env

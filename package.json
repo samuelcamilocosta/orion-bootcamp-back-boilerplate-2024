@@ -1,38 +1,60 @@
 {
-  "name": "orion-api",
+  "name": "reforca-o-bem-api",
   "version": "1.0.0",
-  "description": "Boilerplate para as APIs do Orion Bootcamp",
+  "description": "API do projeto Reforça o Bem",
   "author": "",
   "license": "ISC",
   "scripts": {
     "start:dev": "npx nodemon -L",
     "build": "npm run lint && npx tsc",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/cors": "2.8.14",
     "@types/express": "4.17.19",
+    "@types/jest": "29.5.13",
     "@types/node": "20.8.6",
+    "@types/supertest": "6.0.2",
     "@types/swagger-jsdoc": "6.0.1",
     "@types/swagger-ui-express": "4.1.4",
     "@typescript-eslint/eslint-plugin": "6.7.5",
     "@typescript-eslint/parser": "6.7.5",
     "eslint": "8.51.0",
-    "eslint-config-prettier": "9.0.0",
-    "eslint-plugin-prettier": "5.0.1",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "husky": "8.0.0",
+    "jest": "29.7.0",
+    "lint-staged": "15.2.10",
     "nodemon": "3.0.1",
+    "prettier": "3.0.0",
+    "supertest": "7.0.0",
+    "ts-jest": "29.2.5",
     "ts-node": "10.9.1",
     "typescript": "5.2.2"
   },
   "dependencies": {
+    "bcrypt": "5.1.1",
     "cors": "2.8.5",
+    "dotenv": "16.4.5",
     "express": "4.21.0",
-    "mongodb": "5.9.0",
+    "jsonwebtoken": "9.0.2",
+    "mongodb": "5.9.2",
     "mysql2": "3.11.3",
+    "nodemailer": "6.9.15",
     "reflect-metadata": "0.1.13",
     "swagger-jsdoc": "6.2.8",
     "swagger-ui-express": "5.0.1",
     "typeorm": "0.3.20"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,json,css,md}": [
+      "prettier --write"
+    ]
   }
 }

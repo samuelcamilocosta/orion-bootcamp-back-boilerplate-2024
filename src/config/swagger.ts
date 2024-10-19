@@ -1,29 +1,33 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 
 export const swaggerConfig: swaggerJSDoc.OAS3Options = {
-  swaggerDefinition: {
+  definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Orion API',
-      description: 'Documentação da API do projeto Orion.',
-      version: '1.0.0'
+      title: 'Reforça o Bem API',
+      description: 'Documentação da API do projeto Reforça o Bem.',
+      version: '1.0.0',
     },
-    host: 'localhost:4444',
-    // Não obrigatório, serve apenas para definir a ordem das categorias
-    tags: [],
-    externalDocs: {
-      description: 'View swagger.json',
-      url: '../swagger.json'
-    },
+    servers: [
+      {
+        url: 'http://localhost:4444/api',
+        description: 'Servidor local',
+      },
+    ],
     components: {
       securitySchemes: {
         BearerAuth: {
-          in: 'header',
           type: 'http',
-          scheme: 'bearer'
-        }
-      }
-    }
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Insira o token no formato: Bearer {token}',
+        },
+      },
+    },
+    externalDocs: {
+      description: 'Ver swagger.json',
+      url: '/swagger.json',
+    },
   },
-  apis: ['src/controller/*.ts', 'controller/*.js']
+  apis: ['src/controller/*.ts', 'src/routes/*.ts'],
 };
