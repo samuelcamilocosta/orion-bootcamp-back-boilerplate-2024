@@ -4,26 +4,32 @@ import { comparePassword } from '../library/bcrypt';
 import { JwtService } from '../library/jwt';
 
 /**
- * Serviço de autenticação para lidar com a lógica de login.
+ * Serviço de autenticação para lidar com lógica de login.
  */
 export class AuthService {
+  private userRepository: UserRepository;
+
+  constructor() {
+    // Inicializa o UserRepository como uma classe
+    this.userRepository = new UserRepository();
+  }
+
   /**
-   * Autentica o usuário com base em seu e-mail e senha e gera um token JWT.
+   * Função para autenticar o usuário e gerar um token JWT.
    *
-   * @param email - O e-mail do usuário.
-   * @param password - A senha do usuário.
+   * @param email - Email do usuário.
+   * @param password - Senha do usuário.
    * @returns O token JWT gerado.
-   * @throws {CustomError} Se o usuário não for encontrado ou se a senha for inválida.
    */
-  static async loginUser(email: string, password: string): Promise<string> {
-    // Verifica se o usuário existe no banco de dados
-    const user = await UserRepository.findOne({ where: { email } });
+  async loginUser(email: string, password: string): Promise<string> {
+    // Verifica se o usuário existe utilizando o UserRepository encapsulado
+    const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
       throw new CustomError('Usuário não encontrado', 404);
     }
 
-    // Compara a senha fornecida com a senha armazenada
+    // Compara a senha utilizando a função de biblioteca
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {

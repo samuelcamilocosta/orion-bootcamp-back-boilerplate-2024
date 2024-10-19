@@ -1,7 +1,7 @@
 import jwt, { SignOptions } from 'jsonwebtoken';
 
 /**
- * Classe responsável pela geração e validação de tokens JWT.
+ * Serviço para lidar com a geração e verificação de tokens JWT.
  */
 export class JwtService {
   /**
@@ -22,18 +22,13 @@ export class JwtService {
   }
 
   /**
-   * Verifica se um token JWT é válido.
+   * Verifica e decodifica um token JWT.
    *
    * @param token - O token JWT a ser verificado.
    * @param secret - A chave secreta usada para verificar o token.
-   * @returns O payload decodificado se o token for válido.
-   * @throws {Error} Se o token for inválido ou expirado.
+   * @returns O payload decodificado ou uma exceção se for inválido.
    */
   static verifyToken(token: string, secret: string): object | string {
-    try {
-      return jwt.verify(token, secret);
-    } catch (error) {
-      throw new Error('Token inválido ou expirado');
-    }
+    return jwt.verify(token, secret);
   }
 }

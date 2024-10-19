@@ -1,17 +1,45 @@
-import { MongoDataSource } from '../config/database';
+import { MongoRepository } from 'typeorm';
 import { User } from '../models/Users';
+import { MongoDataSource } from '../config/database';
 
 /**
- * Repositório de usuários que interage com o banco de dados MongoDB.
+ * Repositório da entidade User para encapsular o acesso aos dados.
  */
-export const UserRepository = MongoDataSource.getMongoRepository(User);
+export class UserRepository {
+  private repository: MongoRepository<User>;
 
-/**
- * Busca um usuário no banco de dados pelo email.
- *
- * @param email - O email do usuário que está sendo buscado.
- * @returns O usuário correspondente ao email ou `null` se não encontrado.
- */
-export const findUserByEmail = async (email: string): Promise<User | null> => {
-  return UserRepository.findOne({ where: { email } });
-};
+  constructor() {
+    // Inicializa o repositório do TypeORM
+    this.repository = MongoDataSource.getMongoRepository(User);
+  }
+
+  /**
+   * Encontra um usuário pelo e-mail.
+   *
+   * @param email - O e-mail do usuário.
+   * @returns Uma Promise que resolve no usuário encontrado ou undefined.
+   */
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.repository.findOne({ where: { email } });
+  }
+
+  /**
+   * Salva um novo usuário no banco de dados.
+   *
+   * @param user - O usuário a ser salvo.
+   * @returns O usuário salvo.
+   */
+  async save(user: User): Promise<User> {
+    return this.repository.save(user);
+  }
+
+  /**
+   * Cria uma instância de usuário sem salvar no banco.
+   *
+   * @param userData - Os dados do usuário.
+   * @returns A instância do usuário criada.
+   */
+  create(userData: Partial<User>): User {
+    return this.repository.create(userData);
+  }
+}

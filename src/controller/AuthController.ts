@@ -6,6 +6,13 @@ import { AuthService } from '../services/AuthService';
  * Controlador de autenticação.
  */
 export class AuthController {
+  private authService: AuthService;
+
+  constructor() {
+    // Instancia o AuthService
+    this.authService = new AuthService();
+  }
+
   /**
    * Realiza o login do usuário, gerando e retornando o token JWT.
    *
@@ -16,7 +23,7 @@ export class AuthController {
   async login(req: Request, res: Response): Promise<Response> {
     try {
       const { email, password } = req.body;
-      const token = await AuthService.loginUser(email, password);
+      const token = await this.authService.loginUser(email, password);
 
       return res.status(200).json({
         message: 'Login bem-sucedido',

@@ -7,6 +7,13 @@ import { CustomError } from '../interfaces/CustomError';
  * Controlador para operações relacionadas aos usuários.
  */
 export class UserController {
+  private userRepository: UserRepository;
+
+  constructor() {
+    // Inicializa a instância da classe UserRepository
+    this.userRepository = new UserRepository();
+  }
+
   /**
    * Cria um novo usuário.
    *
@@ -23,10 +30,8 @@ export class UserController {
     }
 
     try {
-      // Verifica se o email já está cadastrado
-      const existingUser = await UserRepository.findOne({
-        where: { email },
-      });
+      // Verifica se o email já está cadastrado usando o método encapsulado
+      const existingUser = await this.userRepository.findByEmail(email);
 
       // Lança um erro se o email já estiver cadastrado
       if (existingUser) {
@@ -36,15 +41,14 @@ export class UserController {
       // Cria o hash da senha
       const hashedPassword = await hashPassword(password);
 
-      // Cria o novo usuário
-      const newUser = UserRepository.create({
+      // Cria o novo usuário e salva no banco de dados
+      const newUser = this.userRepository.create({
         name,
         email,
         password: hashedPassword, // Armazena a senha já hashada
       });
 
-      // Salva o novo usuário no banco de dados
-      await UserRepository.save(newUser);
+      await this.userRepository.save(newUser);
 
       // Retorna uma resposta de sucesso sem expor dados sensíveis
       return res.status(201).json({
