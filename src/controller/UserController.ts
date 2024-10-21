@@ -10,7 +10,6 @@ export class UserController {
   private userRepository: UserRepository;
 
   constructor() {
-    // Inicializa a instância da classe UserRepository
     this.userRepository = new UserRepository();
   }
 
@@ -19,53 +18,59 @@ export class UserController {
    *
    * @param req - Requisição contendo os dados do usuário.
    * @param res - Resposta HTTP.
-   * @returns Uma resposta contendo os dados do usuário criado.
+   * @returns Uma resposta contendo os dados do usuário criado ou uma mensagem de erro.
    */
   async createUser(req: Request, res: Response): Promise<Response> {
     const { name, email, password, confirmPassword } = req.body;
 
-    // Validação de senhas
-    if (password !== confirmPassword) {
-      throw new CustomError('As senhas não coincidem', 400);
-    }
-
     try {
-      // Verifica se o email já está cadastrado usando o método encapsulado
+      // Validação do email
       const existingUser = await this.userRepository.findByEmail(email);
-
-      // Lança um erro se o email já estiver cadastrado
       if (existingUser) {
         throw new CustomError('Email já cadastrado', 400);
+      }
+
+      // Validação do tamanho da senha
+      if (password.length < 8) {
+        throw new CustomError(
+          'A senha deve conter pelo menos 8 caracteres',
+          400,
+        );
+      }
+
+      // Validação de senhas correspondentes
+      if (password !== confirmPassword) {
+        throw new CustomError('As senhas não coincidem', 400);
       }
 
       // Cria o hash da senha
       const hashedPassword = await hashPassword(password);
 
-      // Cria o novo usuário e salva no banco de dados
+      // Cria o novo usuário
       const newUser = this.userRepository.create({
         name,
         email,
-        password: hashedPassword, // Armazena a senha já hashada
+        password: hashedPassword,
       });
 
+      // Salva o novo usuário no banco de dados
       await this.userRepository.save(newUser);
 
-      // Retorna uma resposta de sucesso sem expor dados sensíveis
+      // Retorna uma resposta de sucesso
       return res.status(201).json({
         message: 'Usuário criado com sucesso',
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-        },
+        user: { id: newUser.id, email: newUser.email },
       });
     } catch (error) {
-      // Trata o erro caso seja uma instância de CustomError
+      // Tratamento de erros no processo de criação de usuário
       if (error instanceof CustomError) {
         return res.status(error.status).json({ message: error.message });
       }
 
-      // Trata outros erros desconhecidos
-      return res.status(500).json({ message: 'Erro desconhecido' });
+      // Tratamento de erro desconhecido
+      return res
+        .status(500)
+        .json({ message: 'Erro desconhecido ao criar usuário' });
     }
   }
 }
