@@ -7,6 +7,7 @@ import { AuthValidator } from './validator/AuthValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
 import { AuthController } from './controller/AuthController';
+import { authMiddleware } from './middleware/AuthMiddleware';
 import cors from 'cors';
 
 const router = Router();
@@ -22,10 +23,10 @@ router.post(
   new TutorController().create
 );
 
-router.get('/api/get/tutor', cors(), new TutorController().getAll);
+router.get('/api/get/tutor', cors(), authMiddleware, new TutorController().getAll);
 
 // Students routes
-router.get('/api/get/student', cors(), new StudentController().getAll);
+router.get('/api/get/student', cors(), authMiddleware, new StudentController().getAll);
 
 router.post(
   '/api/register/student',
@@ -38,12 +39,14 @@ router.post(
 router.post(
   '/api/register/educationlevel',
   cors(),
+  authMiddleware,
   new EducationLevelController().create
 );
 
 router.get(
   '/api/get/educationlevel',
   cors(),
+  authMiddleware, 
   new EducationLevelController().getAll
 );
 
