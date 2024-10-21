@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 
+interface DecodedToken{
+    id: number;
+    email: string;
+    userType: string;
+}
+
 export const authMiddleware = (requiredRole?: string) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const token = req.headers.authorization?.split(' ')[1];
@@ -10,7 +16,7 @@ export const authMiddleware = (requiredRole?: string) => {
         }
 
         try {
-            const decoded = jwt.verify(token, (process.env as any).JWT_SECRET);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
             (req as any).user = decoded;
 
             if (requiredRole && decoded.userType !== requiredRole){
