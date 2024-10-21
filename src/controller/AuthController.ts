@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
@@ -111,6 +112,8 @@ export class AuthController {
       }
 
       let isMatch = false;
+      let user = null;
+      let userType = "";
       const loginSuccess = 'Login bem-sucedido.';
 
       if (isTutor) {
@@ -118,7 +121,8 @@ export class AuthController {
         if (!isMatch) {
           return res.status(400).json({ message: incorrectPassword });
         }
-        return res.status(200).json({ message: loginSuccess, user: 'tutor' });
+        user = isTutor;
+        userType = 'tutor';
       }
 
       if (isStudent) {
@@ -126,8 +130,13 @@ export class AuthController {
         if (!isMatch) {
           return res.status(400).json({ message: incorrectPassword });
         }
-        return res.status(200).json({ message: loginSuccess, user: 'aluno' });
+        user = isStudent;
+        userType = 'student';
       }
+
+      const token = jwt.sign( { id: user!.id, email: user!.email, userType }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+
+      return res.status(200).json({ message: loginSuccess, user: userType, token });
     } catch (error) {
       return res
         .status(500)
