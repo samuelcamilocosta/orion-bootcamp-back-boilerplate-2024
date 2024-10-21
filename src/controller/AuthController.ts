@@ -134,9 +134,9 @@ export class AuthController {
         userType = 'student';
       }
 
-      const token = jwt.sign( { id: user!.id, email: user!.email, userType }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+      const token = jwt.sign( { id: user!.id, email: user!.email, userType }, process.env.JWT_SECRET!, { expiresIn: '8h' });
 
-      return res.status(200).json({ message: loginSuccess, user: userType, token });
+      return res.status(200).json({ message: loginSuccess, user: userType, token: token });
     } catch (error) {
       return res
         .status(500)
