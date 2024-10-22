@@ -14,12 +14,13 @@ export class StudentController {
     const { fullName, username, birthDate, email, educationLevel, password } =
       req.body;
 
-    const salt = 'salt-exemple';
+    const { hashedPassword, salt } = password;
+
     const student = new Student();
     student.fullName = fullName;
     student.username = username;
     student.birthDate = birthDate;
-    student.password = password;
+    student.password = hashedPassword;
     student.email = email;
     student.salt = salt;
 
