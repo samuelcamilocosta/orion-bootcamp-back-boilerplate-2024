@@ -125,7 +125,7 @@ export class StudentController {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, username, birthDate, password, email, educationLevel } =
+    const { fullName, username, birthDate, password, email, educationLevelId } =
       req.body;
 
     const { hashedPassword, salt } = password;
@@ -139,14 +139,14 @@ export class StudentController {
     student.salt = salt;
 
     try {
-      const foundEducationLevelId = await MysqlDataSource.getRepository(
+      const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).findOne({
-        where: { educationId: educationLevel }
+        where: { educationId: educationLevelId }
       });
 
-      if (foundEducationLevelId) {
-        student.educationLevel = foundEducationLevelId;
+      if (foundEducationLevel) {
+        student.educationLevel = foundEducationLevel;
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
