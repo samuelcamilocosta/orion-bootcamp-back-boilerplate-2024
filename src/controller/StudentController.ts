@@ -36,8 +36,7 @@ export class StudentController {
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
-
-      return res.status(201).json(student);
+      return res.status(201).json('Student successfully created');
     } catch (error) {
       console.error('Error saving student:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });
@@ -46,7 +45,9 @@ export class StudentController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const student = await MysqlDataSource.getRepository(Student).find();
+      const student = await MysqlDataSource.getRepository(Student).find({
+        select: ['username', 'email', 'fullName']
+      });
       return res.status(200).json(student);
     } catch (error) {
       console.error('Error fetching students:', error);
