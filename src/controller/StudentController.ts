@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { EducationLevel } from '../entity/EducationLevel';
-import { validationResult } from 'express-validator';
 import { Student } from '../entity/Student';
 
 export class StudentController {

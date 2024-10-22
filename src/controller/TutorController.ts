@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
-import { validationResult } from 'express-validator';
 
 export class TutorController {
   /**
@@ -172,10 +171,13 @@ export class TutorController {
   }
 
   async getAll(req: Request, res: Response) {
+    console.log('Rota getAll de tutores acessada.');
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find();
+      console.log('Tutores encontrados:', tutor);
       return res.status(200).json(tutor);
     } catch (error) {
+      console.error('Erro ao buscar tutores:', error);
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
