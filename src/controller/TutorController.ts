@@ -147,14 +147,14 @@ export class TutorController {
     tutor.salt = salt;
 
     try {
-      const foundEducationLevelId = await MysqlDataSource.getRepository(
+      const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).find({
         where: { educationId: educationLevelId }
       });
 
-      if (foundEducationLevelId) {
-        tutor.educationLevels = foundEducationLevelId;
+      if (foundEducationLevel) {
+        tutor.educationLevels = foundEducationLevel;
       }
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
