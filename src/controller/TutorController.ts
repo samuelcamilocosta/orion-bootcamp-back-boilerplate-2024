@@ -74,7 +74,7 @@ export class TutorController {
    *                   type: string
    *                 cpf:
    *                   type: string
-   *                 educationLevels:
+   *                 educationLevel:
    *                   type: array
    *                   items:
    *                     type: integer

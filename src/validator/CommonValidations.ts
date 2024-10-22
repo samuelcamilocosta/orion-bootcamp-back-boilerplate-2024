@@ -155,7 +155,7 @@ export class CommonValidations {
   }
 
   protected educationLevel() {
-    return body('educationLevel')
+    return body('educationLevelId')
       .trim()
       .isArray()
       .withMessage('Níveis de ensino inválidos.')
