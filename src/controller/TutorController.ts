@@ -3,6 +3,7 @@ import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
 import { validationResult } from 'express-validator';
+import { In } from 'typeorm';
 
 export class TutorController {
   /**
@@ -150,7 +151,7 @@ export class TutorController {
       const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).find({
-        where: { educationId: educationLevelId }
+        where: { educationId: In(educationLevelId) }
       });
 
       if (foundEducationLevel) {
