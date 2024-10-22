@@ -23,10 +23,20 @@ router.post(
   new TutorController().create
 );
 
-router.get('/api/get/tutor', cors(), authMiddleware, new TutorController().getAll);
+router.get(
+  '/api/get/tutor',
+  cors(),
+  authMiddleware(),
+  new TutorController().getAll
+);
 
 // Students routes
-router.get('/api/get/student', cors(), authMiddleware, new StudentController().getAll);
+router.get(
+  '/api/get/student',
+  cors(),
+  authMiddleware(),
+  new StudentController().getAll
+);
 
 router.post(
   '/api/register/student',
@@ -39,14 +49,14 @@ router.post(
 router.post(
   '/api/register/educationlevel',
   cors(),
-  authMiddleware,
+  authMiddleware(),
   new EducationLevelController().create
 );
 
 router.get(
   '/api/get/educationlevel',
   cors(),
-  authMiddleware, 
+  authMiddleware(),
   new EducationLevelController().getAll
 );
 
