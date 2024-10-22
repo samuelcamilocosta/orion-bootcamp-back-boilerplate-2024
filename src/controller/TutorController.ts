@@ -161,7 +161,7 @@ export class TutorController {
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
 
-      return res.status(201).json(tutor);
+      return res.status(201).json('Tutor successfully created');
     } catch (error) {
       console.error('Error saving tutor:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });
@@ -170,7 +170,9 @@ export class TutorController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const tutor = await MysqlDataSource.getRepository(Tutor).find();
+      const tutor = await MysqlDataSource.getRepository(Tutor).find({
+        select: ['username', 'email', 'fullName']
+      });
       return res.status(200).json(tutor);
     } catch (error) {
       console.error('Error fetching tutor:', error);
