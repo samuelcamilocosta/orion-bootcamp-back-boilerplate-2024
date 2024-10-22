@@ -45,6 +45,9 @@ export class AuthController {
    *                 user:
    *                   type: string
    *                   example: "aluno"
+   *                 token:
+   *                   type: string
+   *                   description: JWT token for authenticated requests
    *       '400':
    *         description: Invalid credentials or validation error
    *         content:
