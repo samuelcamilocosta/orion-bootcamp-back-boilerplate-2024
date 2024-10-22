@@ -116,7 +116,7 @@ export class AuthController {
 
       let isMatch = false;
       let user = null;
-      let userType = '';
+      let role = '';
       const loginSuccess = 'Login bem-sucedido.';
 
       if (isTutor) {
@@ -125,7 +125,7 @@ export class AuthController {
           return res.status(400).json({ message: incorrectPassword });
         }
         user = isTutor;
-        userType = 'tutor';
+        role = 'tutor';
       }
 
       if (isStudent) {
@@ -134,18 +134,18 @@ export class AuthController {
           return res.status(400).json({ message: incorrectPassword });
         }
         user = isStudent;
-        userType = 'student';
+        role = 'student';
       }
 
       const token = jwt.sign(
-        { id: user!.id, email: user!.email, userType },
+        { id: user!.id, email: user!.email, role },
         process.env.JWT_SECRET!,
         { expiresIn: '8h' }
       );
 
       return res
         .status(200)
-        .json({ message: loginSuccess, user: userType, token: token });
+        .json({ message: loginSuccess, role: role, token: token });
     } catch (error) {
       return res
         .status(500)

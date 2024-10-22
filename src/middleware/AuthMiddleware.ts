@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 interface DecodedToken {
   id: number;
   email: string;
-  userType: string;
+  role: string;
 }
 
 export const authMiddleware = (requiredRole?: string) => {
@@ -24,7 +24,7 @@ export const authMiddleware = (requiredRole?: string) => {
       ) as DecodedToken;
       (req as unknown as { decoded: DecodedToken }).decoded = decoded;
 
-      if (requiredRole && decoded.userType !== requiredRole) {
+      if (requiredRole && decoded.role !== requiredRole) {
         return res
           .status(403)
           .json({ message: 'Acesso negado. Permissão insuficiente.' });
