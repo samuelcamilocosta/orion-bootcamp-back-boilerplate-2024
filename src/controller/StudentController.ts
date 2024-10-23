@@ -36,7 +36,10 @@ export class StudentController {
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
-      return res.status(201).json('Student successfully created');
+      return res.status(201).json({
+        email: student.email,
+        password: student.password
+      });
     } catch (error) {
       console.error('Error saving student:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });

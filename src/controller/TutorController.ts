@@ -161,7 +161,10 @@ export class TutorController {
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
 
-      return res.status(201).json('Tutor successfully created');
+      return res.status(201).json({
+        email: tutor.email,
+        password: tutor.password
+      });
     } catch (error) {
       console.error('Error saving tutor:', error);
       return res.status(500).json({ message: 'Internal Server Error', error });
