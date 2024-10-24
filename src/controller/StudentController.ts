@@ -37,7 +37,7 @@ export class StudentController {
    *                 type: string
    *                 description: Email address of the student
    *                 example: "nomeestudante@exemplo.com"
-   *               educationLevel:
+   *               educationLevelId:
    *                 type: integer
    *                 description: ID of the education level
    *                 example: [1]
@@ -119,7 +119,12 @@ export class StudentController {
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const { fullName, username, birthDate, password, email, educationLevel } =
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { fullName, username, birthDate, password, email, educationLevelId } =
       req.body;
 
     const { hashedPassword, salt } = password;
@@ -133,14 +138,14 @@ export class StudentController {
     student.salt = salt;
 
     try {
-      const foundEducationLevelId = await MysqlDataSource.getRepository(
+      const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).findOne({
-        where: { educationId: educationLevel }
+        where: { educationId: educationLevelId }
       });
 
-      if (foundEducationLevelId) {
-        student.educationLevel = foundEducationLevelId;
+      if (foundEducationLevel) {
+        student.educationLevel = foundEducationLevel;
       }
 
       await MysqlDataSource.getRepository(Student).save(student);
