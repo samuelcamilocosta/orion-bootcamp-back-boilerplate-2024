@@ -34,7 +34,7 @@ export class TutorController {
    *               birthDate:
    *                 type: string
    *                 description: Birth date in the format YYYY-MM-DD
-   *                 example: "1990-01-01"
+   *                 example: "01/01/1990"
    *               email:
    *                 type: string
    *                 description: Email address of the tutor
@@ -42,7 +42,7 @@ export class TutorController {
    *               cpf:
    *                 type: string
    *                 description: CPF of the tutor
-   *                 example: "123.456.789-10"
+   *                 example: "388.229.490-64"
    *               educationLevelId:
    *                 type: array
    *                 items:
