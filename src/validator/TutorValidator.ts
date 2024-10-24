@@ -199,8 +199,9 @@ export class TutorValidator extends BaseValidator {
             MysqlDataSource.getRepository(EducationLevel);
 
           const parsedValues = value.map((id: string) => Number(id));
-          const educationLevels =
-            await educationLevelRepository.find({where: { educationId: In(parsedValues)}});
+          const educationLevels = await educationLevelRepository.find({
+            where: { educationId: In(parsedValues) }
+          });
           if (educationLevels.length !== value.length) {
             return Promise.reject('Um ou mais níveis de ensino não existem.');
           }
