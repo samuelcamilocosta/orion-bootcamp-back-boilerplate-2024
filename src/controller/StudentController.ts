@@ -135,6 +135,7 @@ export class StudentController {
     student.username = username;
     student.birthDate = birthDate;
     student.password = hashedPassword;
+    student.password = hashedPassword;
     student.email = email;
     student.salt = salt;
 
@@ -168,7 +169,9 @@ export class StudentController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const student = await MysqlDataSource.getRepository(Student).find();
+      const student = await MysqlDataSource.getRepository(Student).find({
+        select: ['username', 'email', 'fullName']
+      });
       return res.status(200).json(student);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });

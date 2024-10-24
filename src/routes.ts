@@ -5,6 +5,7 @@ import { TutorValidator } from './validator/TutorValidator';
 import { StudentValidator } from './validator/StudentValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
+import { StudentValidator } from './validator/StudentValidator';
 
 const router = Router();
 

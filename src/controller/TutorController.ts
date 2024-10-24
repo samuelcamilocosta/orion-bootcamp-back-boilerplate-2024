@@ -178,7 +178,9 @@ export class TutorController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const tutor = await MysqlDataSource.getRepository(Tutor).find();
+      const tutor = await MysqlDataSource.getRepository(Tutor).find({
+        select: ['username', 'email', 'fullName']
+      });
       return res.status(200).json(tutor);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });
