@@ -43,6 +43,7 @@ export class TutorController {
    *                 type: string
    *                 description: CPF of the tutor
    *                 example: "388.229.490-64"
+   *                 example: "388.229.490-64"
    *               educationLevelId:
    *                 type: array
    *                 items:
