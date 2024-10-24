@@ -28,7 +28,25 @@ export class CommonValidations {
       .isString()
       .withMessage('Nome de usuário inválido.')
       .notEmpty()
-      .withMessage('Nome de usuário é obrigatório.');
+      .withMessage('Nome de usuário é obrigatório.')
+      .custom(async (value: string): Promise<boolean> => {
+        const tutorRepository = MysqlDataSource.getRepository(Tutor);
+        const studentRepository = MysqlDataSource.getRepository(Student);
+
+        const existingTutor = await tutorRepository.findOne({
+          where: { username: value }
+        });
+
+        const existingStudent = await studentRepository.findOne({
+          where: { username: value }
+        });
+
+        if (existingTutor || existingStudent) {
+          return Promise.reject('Nome de usuário já cadastrado.');
+        }
+
+        return true;
+      });
   }
 
   protected birthDate() {
@@ -147,7 +165,7 @@ export class CommonValidations {
         });
 
         if (existingTutor || existingStudent) {
-          return Promise.reject('Email já cadastrado');
+          return Promise.reject('Email já cadastrado.');
         }
 
         return true;
