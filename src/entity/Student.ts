@@ -1,7 +1,15 @@
-import { Entity, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  JoinTable,
+  JoinColumn,
+  OneToMany
+} from 'typeorm';
 import { Subject } from './Subject';
 import { EducationLevel } from './EducationLevel';
 import { User } from './User';
+import { LessonRequest } from './LessonRequest';
 
 @Entity()
 export class Student extends User {
@@ -22,4 +30,7 @@ export class Student extends User {
     }
   })
   subjects: Subject[];
+
+  @OneToMany(() => LessonRequest, (lessonRequest) => lessonRequest.student)
+  lessonRequests: LessonRequest[];
 }
