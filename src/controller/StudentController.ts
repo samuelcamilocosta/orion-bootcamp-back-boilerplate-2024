@@ -135,7 +135,6 @@ export class StudentController {
     student.username = username;
     student.birthDate = birthDate;
     student.password = hashedPassword;
-    student.password = hashedPassword;
     student.email = email;
     student.salt = salt;
 
