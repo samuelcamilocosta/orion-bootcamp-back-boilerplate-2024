@@ -6,8 +6,8 @@ import bcrypt from 'bcrypt';
  * @returns O salt gerado.
  */
 export const generateSalt = async (): Promise<string> => {
-  const saltRounds = 10;
-  return bcrypt.genSalt(saltRounds);
+    const saltRounds = 10;
+    return bcrypt.genSalt(saltRounds);
 };
 
 /**
@@ -17,8 +17,8 @@ export const generateSalt = async (): Promise<string> => {
  * @returns O hash da senha.
  */
 export const hashPassword = async (password: string): Promise<string> => {
-  const salt = await generateSalt();
-  return bcrypt.hash(password, salt);
+    const salt = await generateSalt();
+    return bcrypt.hash(password, salt);
 };
 
 /**
@@ -29,8 +29,8 @@ export const hashPassword = async (password: string): Promise<string> => {
  * @returns Um booleano indicando se as senhas correspondem.
  */
 export const comparePassword = async (
-  password: string,
-  hashedPassword: string,
+    password: string,
+    hashedPassword: string
 ): Promise<boolean> => {
-  return bcrypt.compare(password, hashedPassword);
+    return bcrypt.compare(password, hashedPassword);
 };

@@ -10,7 +10,7 @@
  * @returns `true` se o e-mail estiver no formato correto, `false` caso contrário.
  */
 export const validateEmail = (email: string): boolean => {
-  // Expressão regular para verificar o formato de e-mails válidos
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+    // Expressão regular para verificar o formato de e-mails válidos
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 };

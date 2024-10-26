@@ -6,8 +6,8 @@
  * @returns Verdadeiro se as senhas coincidirem, falso caso contrário.
  */
 export const validatePasswords = (
-  password: string,
-  confirmPassword: string,
+    password: string,
+    confirmPassword: string
 ): boolean => {
-  return password === confirmPassword;
+    return password === confirmPassword;
 };

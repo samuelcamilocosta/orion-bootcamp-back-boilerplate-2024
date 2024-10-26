@@ -8,8 +8,8 @@ import { CustomError } from '../interfaces/CustomError';
  * @throws {CustomError} - Lança um erro personalizado com status e mensagem.
  */
 export const throwCustomError = (
-  message: string,
-  status: number = 400,
+    message: string,
+    status: number = 400
 ): never => {
-  throw new CustomError(message, status);
+    throw new CustomError(message, status);
 };

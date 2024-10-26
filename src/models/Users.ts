@@ -6,87 +6,44 @@ import bcrypt from 'bcrypt';
  */
 @Entity('users')
 export class User {
-  /**
-   * Identificador único do usuário.
-   */
-  @ObjectIdColumn()
-  id: string;
+    @ObjectIdColumn()
+    id: string; // Identificador único do usuário
 
-  /**
-   * Nome do usuário.
-   */
-  @Column()
-  name: string;
+    @Column()
+    name: string; // Nome do usuário
 
-  /**
-   * E-mail do usuário.
-   * Deve ser único e não pode ser nulo.
-   */
-  @Column({
-    unique: true,
-    nullable: false,
-  })
-  email: string;
+    @Column({ unique: true, nullable: false })
+    email: string; // E-mail do usuário, deve ser único e não pode ser nulo
 
-  /**
-   * Senha do usuário armazenada com hash.
-   */
-  @Column()
-  password: string;
+    @Column()
+    password: string; // Senha do usuário armazenada com hash
 
-  /**
-   * Número de logins realizados pelo usuário.
-   */
-  @Column({ type: 'int', default: 0 })
-  loginCount: number;
+    @Column({ type: 'int', default: 0 })
+    loginCount: number; // Número de logins realizados pelo usuário
 
-  /**
-   * Data e hora do último login do usuário.
-   */
-  @Column({ type: 'date', nullable: true })
-  lastLogin: Date;
+    @Column({ type: 'date', nullable: true })
+    lastLogin: Date; // Data e hora do último login do usuário
 
-  /**
-   * Data de criação do usuário.
-   * Valor padrão é a data/hora atual.
-   */
-  @Column({ type: 'date', default: () => 'NOW()' })
-  createdAt: Date;
+    @Column({ type: 'date', default: () => 'NOW()' })
+    createdAt: Date; // Data de criação do usuário
 
-  /**
-   * Valida o e-mail do usuário antes de inserir no banco de dados.
-   *
-   * @throws {Error} Se o formato do e-mail for inválido.
-   */
-  @BeforeInsert()
-  validateEmail(): void {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.email)) {
-      throw new Error('O e-mail fornecido está em um formato inválido.');
+    @BeforeInsert()
+    validateEmail(): void {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.email)) {
+            throw new Error('O e-mail fornecido está em um formato inválido.');
+        }
     }
-  }
 
-  /**
-   * Aplica hash à senha do usuário antes de inserir no banco de dados.
-   * Gera um salt e aplica bcrypt caso a senha não esteja previamente criptografada.
-   *
-   * @returns Uma Promise que resolve sem retornar valores (`void`).
-   */
-  @BeforeInsert()
-  async hashPassword(): Promise<void> {
-    if (!this.password?.startsWith('$2b$')) {
-      const salt: string = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
+    @BeforeInsert()
+    async hashPassword(): Promise<void> {
+        if (!this.password.startsWith('$2b$')) {
+            const salt = await bcrypt.genSalt(10);
+            this.password = await bcrypt.hash(this.password, salt);
+        }
     }
-  }
 
-  /**
-   * Compara a senha fornecida com a senha armazenada.
-   *
-   * @param candidatePassword - Senha que será comparada à senha do usuário.
-   * @returns Uma Promise que resolve em `true` se as senhas coincidirem ou `false` caso contrário.
-   */
-  async comparePassword(candidatePassword: string): Promise<boolean> {
-    return bcrypt.compare(candidatePassword, this.password);
-  }
+    async comparePassword(candidatePassword: string): Promise<boolean> {
+        return bcrypt.compare(candidatePassword, this.password);
+    }
 }
