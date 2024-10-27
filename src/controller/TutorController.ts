@@ -43,7 +43,7 @@ export class TutorController {
    *                 type: string
    *                 description: CPF of the tutor
    *                 example: "123.456.789-10"
-   *               educationLevelId:
+   *               educationLevelIds:
    *                 type: array
    *                 items:
    *                   type: integer
@@ -132,7 +132,7 @@ export class TutorController {
       birthDate,
       email,
       cpf,
-      educationLevelId,
+      educationLevelIds,
       password
     } = req.body;
 
@@ -151,7 +151,7 @@ export class TutorController {
       const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).find({
-        where: { educationId: In(educationLevelId) }
+        where: { educationId: In(educationLevelIds) }
       });
 
       if (foundEducationLevel) {
@@ -165,7 +165,7 @@ export class TutorController {
         username: tutor.username,
         birthDate: tutor.birthDate,
         email: tutor.email,
-        educationLevel: tutor.educationLevels,
+        educationLevels: tutor.educationLevels,
         cpf: tutor.cpf,
         id: tutor.id
       });
