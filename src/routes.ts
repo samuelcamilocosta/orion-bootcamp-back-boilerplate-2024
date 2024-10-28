@@ -22,6 +22,8 @@ router.post(
 
 router.get('/api/get/tutor', new TutorController().getAll);
 
+router.get('/api/get/tutor/:id', new TutorController().getById);
+
 // Students routes
 router.get('/api/get/student', new StudentController().getAll);
 
@@ -30,6 +32,8 @@ router.post(
   StudentValidator.createStudent(),
   new StudentController().create
 );
+
+router.get('/api/get/student/:id', new StudentController().getById);
 
 // Education Level routes
 router.post(
