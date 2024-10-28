@@ -193,7 +193,7 @@ export class TutorController {
       });
 
       if (!tutor) {
-        res.status(404).json({ message: 'Tutor não encontrado.' });
+        return res.status(404).json({ message: 'Tutor não encontrado.' });
       }
 
       return res.status(200).json(tutor);

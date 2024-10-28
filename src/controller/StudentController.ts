@@ -59,16 +59,16 @@ export class StudentController {
   }
 
   async getById(req: Request, res: Response) {
-    const { id } = req.params;
-
     try {
+      const { id } = req.params;
+
       const student = await MysqlDataSource.getRepository(Student).findOne({
         where: { id: Number(id) },
         relations: ['educationLevel']
       });
 
       if (!student) {
-        res.status(404).json({ message: 'Estudante não encontrado.' });
+        return res.status(404).json({ message: 'Estudante não encontrado.' });
       }
 
       return res.status(200).json(student);
