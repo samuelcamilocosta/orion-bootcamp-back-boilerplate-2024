@@ -13,7 +13,7 @@ export class AuthService {
 
   static async verifyPassword(user: Tutor | Student, password: string) {
     const isMatch = await bcrypt.compare(password, user.password);
-    const role = user instanceof Tutor ? 'tutor' : 'aluno';
+    const role = user instanceof Tutor ? 'tutor' : 'student';
     return { isMatch, role };
   }
 
