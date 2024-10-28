@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
+import { Repository } from 'typeorm';
 
 export class AuthController {
   /**
@@ -98,43 +99,28 @@ export class AuthController {
    *                 error:
    *                   type: string
    */
-  async login(req: Request, res: Response): Promise<Response> {
+  public login = async (req: Request, res: Response): Promise<Response> => {
     const { email, password } = req.body;
 
     try {
       const tutorRepository = MysqlDataSource.getRepository(Tutor);
       const studentRepository = MysqlDataSource.getRepository(Student);
 
-      const isTutor = await tutorRepository.findOne({ where: { email } });
-      const isStudent = await studentRepository.findOne({ where: { email } });
-
+      const user = await this.findUserByEmail(
+        email,
+        tutorRepository,
+        studentRepository
+      );
+      const loginSuccess = 'Login bem-sucedido.';
       const incorrectPassword = 'Senha incorreta.';
 
-      if (!isTutor && !isStudent) {
+      if (!user) {
         return res.status(404).json({ message: 'Email não encontrado.' });
       }
 
-      let isMatch = false;
-      let user = null;
-      let role = '';
-      const loginSuccess = 'Login bem-sucedido.';
-
-      if (isTutor) {
-        isMatch = await bcrypt.compare(password, isTutor.password);
-        if (!isMatch) {
-          return res.status(400).json({ message: incorrectPassword });
-        }
-        user = isTutor;
-        role = 'tutor';
-      }
-
-      if (isStudent) {
-        isMatch = await bcrypt.compare(password, isStudent.password);
-        if (!isMatch) {
-          return res.status(400).json({ message: incorrectPassword });
-        }
-        user = isStudent;
-        role = 'student';
+      const { isMatch, role } = await this.verifyPassword(user, password);
+      if (!isMatch) {
+        return res.status(400).json({ message: incorrectPassword });
       }
 
       const token = jwt.sign(
@@ -143,13 +129,28 @@ export class AuthController {
         { expiresIn: '8h' }
       );
 
-      return res
-        .status(200)
-        .json({ message: loginSuccess, role: role, token: token });
+      return res.status(200).json({ message: loginSuccess, role, token });
     } catch (error) {
       return res
         .status(500)
         .json({ message: 'Erro interno do servidor.', error: error.message });
     }
-  }
+  };
+
+  private findUserByEmail = async (
+    email: string,
+    tutorRepository: Repository<Tutor>,
+    studentRepository: Repository<Student>
+  ) => {
+    const user =
+      (await tutorRepository.findOne({ where: { email } })) ||
+      (await studentRepository.findOne({ where: { email } }));
+    return user;
+  };
+
+  private verifyPassword = async (user: Tutor | Student, password: string) => {
+    const isMatch = await bcrypt.compare(password, user.password);
+    const role = user instanceof Tutor ? 'tutor' : 'aluno';
+    return { isMatch, role };
+  };
 }
