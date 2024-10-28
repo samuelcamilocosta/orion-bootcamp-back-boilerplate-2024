@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import * as jwt from 'jsonwebtoken';
+import { AuthService } from '../service/AuthService';
 
 interface DecodedToken {
   id: number;
@@ -18,10 +18,7 @@ export const authMiddleware = (requiredRole?: string) => {
     }
 
     try {
-      const decoded = jwt.verify(
-        token,
-        process.env.JWT_SECRET as string
-      ) as DecodedToken;
+      const decoded = AuthService.verifyToken(token) as DecodedToken;
       (req as unknown as { decoded: DecodedToken }).decoded = decoded;
 
       if (requiredRole && decoded.role !== requiredRole) {

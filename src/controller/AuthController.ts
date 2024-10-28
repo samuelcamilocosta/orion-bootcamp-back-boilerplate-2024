@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
 import { Repository } from 'typeorm';
+import { AuthService } from '../service/AuthService';
 
 export class AuthController {
   /**
@@ -118,18 +117,19 @@ export class AuthController {
         return res.status(404).json({ message: 'Email não encontrado.' });
       }
 
-      const { isMatch, role } = await this.verifyPassword(user, password);
+      const { isMatch, role } = await AuthService.verifyPassword(
+        user,
+        password
+      );
       if (!isMatch) {
         return res.status(400).json({ message: incorrectPassword });
       }
 
-      const token = jwt.sign(
-        { id: user!.id, email: user!.email, role },
-        process.env.JWT_SECRET!,
-        { expiresIn: '8h' }
-      );
+      const token = AuthService.generateToken(user.id, user.email, role);
 
-      return res.status(200).json({ message: loginSuccess, role, token });
+      return res
+        .status(200)
+        .json({ message: loginSuccess, role: role, token: token });
     } catch (error) {
       return res
         .status(500)
@@ -146,11 +146,5 @@ export class AuthController {
       (await tutorRepository.findOne({ where: { email } })) ||
       (await studentRepository.findOne({ where: { email } }));
     return user;
-  };
-
-  private verifyPassword = async (user: Tutor | Student, password: string) => {
-    const isMatch = await bcrypt.compare(password, user.password);
-    const role = user instanceof Tutor ? 'tutor' : 'aluno';
-    return { isMatch, role };
   };
 }
