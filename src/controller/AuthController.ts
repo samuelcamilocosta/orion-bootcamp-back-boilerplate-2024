@@ -105,7 +105,7 @@ export class AuthController {
       const tutorRepository = MysqlDataSource.getRepository(Tutor);
       const studentRepository = MysqlDataSource.getRepository(Student);
 
-      const user = await this.findUserByEmail(
+      const user = await AuthService.findUserByEmail(
         email,
         tutorRepository,
         studentRepository
@@ -135,16 +135,5 @@ export class AuthController {
         .status(500)
         .json({ message: 'Erro interno do servidor.', error: error.message });
     }
-  };
-
-  private findUserByEmail = async (
-    email: string,
-    tutorRepository: Repository<Tutor>,
-    studentRepository: Repository<Student>
-  ) => {
-    const user =
-      (await tutorRepository.findOne({ where: { email } })) ||
-      (await studentRepository.findOne({ where: { email } }));
-    return user;
   };
 }
