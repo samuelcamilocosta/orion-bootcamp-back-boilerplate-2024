@@ -118,6 +118,7 @@ export class TutorController {
    *               properties:
    *                 message:
    *                   type: string
+   *                   example: "Erro interno do servidor."
    *                 error:
    *                   type: string
    */
@@ -171,6 +172,42 @@ export class TutorController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/get/tutor:
+   *   get:
+   *     summary: Retrieve a list of all tutors
+   *     tags: [tutor]
+   *     responses:
+   *       '200':
+   *         description: A list of tutors
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 properties:
+   *                   username:
+   *                     type: string
+   *                     example: "nometutor"
+   *                   email:
+   *                     type: string
+   *                     example: "usuario_tutor@exemplo.com"
+   *                   fullName:
+   *                     type: string
+   *                     example: "Nome Tutor"
+   *       '500':
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async getAll(req: Request, res: Response) {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find({
@@ -178,11 +215,76 @@ export class TutorController {
       });
       return res.status(200).json(tutor);
     } catch (error) {
-      console.error('Error fetching tutor:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 
+  /**
+   * @swagger
+   * /api/get/tutor/{id}:
+   *   get:
+   *     summary: Retrieve a tutor by ID
+   *     tags: [tutor]
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         description: ID of the tutor to retrieve
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     responses:
+   *       '200':
+   *         description: A tutor object
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 id:
+   *                   type: integer
+   *                   example: 1
+   *                 username:
+   *                   type: string
+   *                   example: "nometutor"
+   *                 email:
+   *                   type: string
+   *                   example: "usuario_tutor@exemplo.com"
+   *                 fullName:
+   *                   type: string
+   *                   example: "Nome Tutor"
+   *                 educationLevels:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       educationId:
+   *                         type: integer
+   *                         example: 1
+   *                       levelType:
+   *                         type: string
+   *                         example: "Fundamental"
+   *       '404':
+   *         description: Tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Tutor não encontrado."
+   *       '500':
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async getById(req: Request, res: Response) {
     const { id } = req.params;
 
