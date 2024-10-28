@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
-import { validationResult } from 'express-validator';
 import { In } from 'typeorm';
 
 export class TutorController {
