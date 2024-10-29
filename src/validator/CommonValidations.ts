@@ -173,22 +173,29 @@ export class CommonValidations {
   }
 
   protected educationLevel() {
-    return body('educationLevelId')
+    return body(['educationLevelId', 'educationLevelIds'])
       .trim()
-      .isArray()
-      .withMessage('Níveis de ensino inválidos.')
-      .notEmpty()
-      .withMessage('Níveis de ensino são obrigatórios.')
-      .custom(async (value: string[]): Promise<boolean> => {
+      .custom(async (value, { req }) => {
         const educationLevelRepository =
           MysqlDataSource.getRepository(EducationLevel);
 
-        const parsedValues = value.map((id: string) => Number(id));
-        const educationLevels = await educationLevelRepository.find({
-          where: { educationId: In([parsedValues]) }
+        const educationLevelId = req.body.educationLevelId;
+        const educationLevelIds = req.body.educationLevelIds;
+
+        if (!educationLevelId && !educationLevelIds) {
+          throw new Error('Níveis de ensino são obrigatórios.');
+        }
+
+        const educationLevels =
+          educationLevelIds || (educationLevelId ? [educationLevelId] : []);
+
+        const parsedValues = educationLevels.map((id: string) => Number(id));
+        const existingEducationLevels = await educationLevelRepository.find({
+          where: { educationId: In(parsedValues) }
         });
-        if (educationLevels.length !== value.length) {
-          return Promise.reject('Uma ou mais faixas de ensino não existem.');
+
+        if (existingEducationLevels.length !== parsedValues.length) {
+          throw new Error('Um ou mais níveis de ensino não existem.');
         }
 
         return true;
