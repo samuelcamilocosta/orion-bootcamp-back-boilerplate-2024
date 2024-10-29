@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
-import { Repository } from 'typeorm';
 import { AuthService } from '../service/AuthService';
 
 export class AuthController {
