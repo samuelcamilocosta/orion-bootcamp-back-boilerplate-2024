@@ -56,7 +56,6 @@ router.post(
 router.get(
   '/api/get/educationlevel',
   cors(),
-  authMiddleware(),
   new EducationLevelController().getAll
 );
 
