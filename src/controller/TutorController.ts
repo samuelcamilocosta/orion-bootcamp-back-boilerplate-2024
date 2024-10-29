@@ -3,6 +3,7 @@ import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
 import { validationResult } from 'express-validator';
+import { In } from 'typeorm';
 
 export class TutorController {
   /**
@@ -42,7 +43,7 @@ export class TutorController {
    *                 type: string
    *                 description: CPF of the tutor
    *                 example: "123.456.789-10"
-   *               educationLevel:
+   *               educationLevelIds:
    *                 type: array
    *                 items:
    *                   type: integer
@@ -74,9 +75,7 @@ export class TutorController {
    *                   type: string
    *                 cpf:
    *                   type: string
-   *                 salt:
-   *                   type: string
-   *                 educationLevels:
+   *                 educationLevel:
    *                   type: array
    *                   items:
    *                     type: integer
@@ -133,7 +132,7 @@ export class TutorController {
       birthDate,
       email,
       cpf,
-      educationLevel,
+      educationLevelIds,
       password
     } = req.body;
 
@@ -149,25 +148,31 @@ export class TutorController {
     tutor.salt = salt;
 
     try {
-      const foundEducationLevels = await MysqlDataSource.getRepository(
+      const foundEducationLevel = await MysqlDataSource.getRepository(
         EducationLevel
       ).find({
-        where: { educationId: educationLevel }
+        where: { educationId: In(educationLevelIds) }
       });
 
-      if (foundEducationLevels) {
-        tutor.educationLevels = foundEducationLevels;
+      if (foundEducationLevel) {
+        tutor.educationLevels = foundEducationLevel;
       }
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
 
       return res.status(201).json({
+        fullName: tutor.fullName,
+        username: tutor.username,
+        birthDate: tutor.birthDate,
         email: tutor.email,
-        password: tutor.password
+        educationLevels: tutor.educationLevels,
+        cpf: tutor.cpf,
+        id: tutor.id
       });
     } catch (error) {
-      console.error('Error saving tutor:', error);
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      return res
+        .status(500)
+        .json({ message: 'Erro interno do servidor.', error });
     }
   }
 
@@ -178,8 +183,7 @@ export class TutorController {
       });
       return res.status(200).json(tutor);
     } catch (error) {
-      console.error('Error fetching tutor:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }

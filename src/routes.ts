@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { HomeController } from './controller/HomeController';
 import { TutorController } from './controller/TutorController';
 import { TutorValidator } from './validator/TutorValidator';
+import { StudentValidator } from './validator/StudentValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
 import { StudentValidator } from './validator/StudentValidator';
