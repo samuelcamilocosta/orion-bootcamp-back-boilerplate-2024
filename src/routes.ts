@@ -9,6 +9,8 @@ import { EducationLevelController } from './controller/EducationLevelController'
 import { AuthController } from './controller/AuthController';
 import { authMiddleware } from './middleware/AuthMiddleware';
 import cors from 'cors';
+import { LessonRequestController } from './controller/LessonRequestController';
+import { SubjectController } from './controller/SubjectController';
 
 const router = Router();
 
@@ -67,4 +69,15 @@ router.post(
   new AuthController().login
 );
 
+// Lesson Request route
+router.post(
+  '/api/register/lessonrequest',
+  new LessonRequestController().create
+);
+
+router.get('/api/get/lessonrequest', new LessonRequestController().getAll);
+
+// Subject route
+router.post('/api/register/subject', new SubjectController().create);
+router.get('/api/get/subject', new SubjectController().getAll);
 export default router;
