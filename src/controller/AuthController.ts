@@ -101,14 +101,7 @@ export class AuthController {
     const { email, password } = req.body;
 
     try {
-      const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const studentRepository = MysqlDataSource.getRepository(Student);
-
-      const user = await AuthService.findUserByEmail(
-        email,
-        tutorRepository,
-        studentRepository
-      );
+      const user = await AuthService.findUserByEmail(email);
       const loginSuccess = 'Login bem-sucedido.';
       const incorrectPassword = 'Senha incorreta.';
 
