@@ -186,4 +186,30 @@ export class TutorController {
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
+
+  async updatePersonalData(req: Request, res: Response) {
+    const { expertise, projectReason, subjects, id } = req.body;
+
+    try {
+      const tutorRepository = MysqlDataSource.getRepository(Tutor);
+      const tutor = await tutorRepository.findOneBy({ id });
+
+      if (expertise) tutor.expertise = expertise;
+      if (projectReason) tutor.projectReason = projectReason;
+
+      tutor.expertise = expertise;
+      tutor.projectReason = projectReason;
+      tutor.subjects = subjects;
+
+      await tutorRepository.save(tutor);
+
+      return res
+        .status(200)
+        .json({ message: 'Tutor atualizado com sucesso', tutor });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Erro ao atualizar o tutor', error });
+    }
+  }
 }
