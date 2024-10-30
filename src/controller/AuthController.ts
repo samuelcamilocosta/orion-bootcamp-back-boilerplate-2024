@@ -1,7 +1,4 @@
 import { Request, Response } from 'express';
-import { Tutor } from '../entity/Tutor';
-import { Student } from '../entity/Student';
-import { MysqlDataSource } from '../config/database';
 import { AuthService } from '../service/AuthService';
 
 export class AuthController {
