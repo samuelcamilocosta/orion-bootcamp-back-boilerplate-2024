@@ -35,4 +35,13 @@ export class Tutor extends User {
     }
   })
   educationLevels: EducationLevel[];
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  expertise: string;
+
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  projectReason: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  photoUrl: string;
 }
