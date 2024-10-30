@@ -182,8 +182,23 @@ export class CommonValidations {
         const educationLevelId = req.body.educationLevelId;
         const educationLevelIds = req.body.educationLevelIds;
 
-        if (!educationLevelId && !educationLevelIds) {
+        if (educationLevelId.length > 1) {
+          throw new Error(
+            'Somente um nível de ensino é permitido para educationLevelId.'
+          );
+        }
+
+        if (
+          (!educationLevelId && !educationLevelIds) ||
+          (educationLevelId.length === 0 && educationLevelIds.length === 0)
+        ) {
           throw new Error('Níveis de ensino são obrigatórios.');
+        }
+
+        if (educationLevelId && educationLevelIds) {
+          throw new Error(
+            'Não é permitido o envio de educationLevelId e educationLevelIds simultaneamente.'
+          );
         }
 
         const educationLevels =

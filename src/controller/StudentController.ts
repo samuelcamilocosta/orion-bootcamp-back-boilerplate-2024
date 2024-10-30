@@ -38,8 +38,10 @@ export class StudentController {
    *                 description: Email address of the student
    *                 example: "nomeestudante@exemplo.com"
    *               educationLevelId:
-   *                 type: integer
-   *                 description: ID of the education level
+   *                 type: array
+   *                 items:
+   *                   type: integer
+   *                 description: List of education level ID
    *                 example: [1]
    *               password:
    *                 type: string
