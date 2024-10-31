@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class InsertSubjects1730416827233 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const tableExists = await queryRunner.hasTable('education_level');
+    const tableExists = await queryRunner.hasTable('subject');
     if (tableExists) {
       await queryRunner.query(`
         INSERT INTO subject (subjectName) VALUES 
