@@ -32,7 +32,7 @@ export class TutorController {
    *                 example: "nometutor"
    *               birthDate:
    *                 type: string
-   *                 description: Birth date in the format YYYY-MM-DD
+   *                 description: Birth date in the format DD/MM/YYYY
    *                 example: "01/01/1990"
    *               email:
    *                 type: string
