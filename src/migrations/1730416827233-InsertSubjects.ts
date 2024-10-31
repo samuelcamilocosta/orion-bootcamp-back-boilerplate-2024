@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class InsertSubjects1643348574000 implements MigrationInterface {
+export class InsertSubjects1730416827233 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tableExists = await queryRunner.hasTable('education_level');
     if (tableExists) {
