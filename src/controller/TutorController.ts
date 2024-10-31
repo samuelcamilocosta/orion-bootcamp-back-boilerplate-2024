@@ -4,6 +4,7 @@ import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
 import { validationResult } from 'express-validator';
 import { In } from 'typeorm';
+import { Subject } from '../entity/Subject';
 
 export class TutorController {
   /**
@@ -188,19 +189,33 @@ export class TutorController {
   }
 
   async updatePersonalData(req: Request, res: Response) {
-    const { expertise, projectReason, subjects, id } = req.body;
+    const { expertise, projectReason, subject: subjectIds, id } = req.body;
 
     try {
       const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const tutor = await tutorRepository.findOneBy({ id });
+      const tutor = await tutorRepository.findOne({
+        where: { id },
+        relations: ['subjects']
+      });
+
+      if (!tutor) {
+        return res.status(404).json({ message: 'Tutor não encontrado' });
+      }
 
       if (expertise) tutor.expertise = expertise;
       if (projectReason) tutor.projectReason = projectReason;
 
-      tutor.expertise = expertise;
-      tutor.projectReason = projectReason;
-      tutor.subjects = subjects;
+      if (subjectIds && Array.isArray(subjectIds)) {
+        const foundSubjects = await MysqlDataSource.getRepository(
+          Subject
+        ).findBy({
+          subjectId: In(subjectIds)
+        });
 
+        if (foundSubjects.length > 0) {
+          tutor.subjects = foundSubjects;
+        }
+      }
       await tutorRepository.save(tutor);
 
       return res
