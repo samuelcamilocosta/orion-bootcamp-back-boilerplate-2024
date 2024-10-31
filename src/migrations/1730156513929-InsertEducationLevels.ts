@@ -10,9 +10,7 @@ export class InsertEducationLevels1730156513929 implements MigrationInterface {
                 (2, 'medio'),
                 (3, 'pre-vestibular');
             `);
-      console.log('Dados inseridos com sucesso!');
     } else {
-      console.log("Table doesn't exist.");
     }
   }
 
