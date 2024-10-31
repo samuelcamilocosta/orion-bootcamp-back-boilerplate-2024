@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../service/AuthService';
+import { UserRepository } from '../repository/UserRepository';
 
 export class AuthController {
   /**
@@ -98,7 +99,7 @@ export class AuthController {
     const { email, password } = req.body;
 
     try {
-      const user = await AuthService.findUserByEmail(email);
+      const user = await UserRepository.findUserByEmail(email);
       const loginSuccess = 'Login bem-sucedido.';
       const incorrectPassword = 'Senha incorreta.';
 
