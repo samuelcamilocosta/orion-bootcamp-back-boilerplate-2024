@@ -165,7 +165,7 @@ export class StudentController {
   async getAll(req: Request, res: Response) {
     try {
       const student = await MysqlDataSource.getRepository(Student).find({
-        select: ['username', 'email', 'fullName']
+        select: ['id', 'username', 'email', 'fullName']
       });
       return res.status(200).json(student);
     } catch (error) {
