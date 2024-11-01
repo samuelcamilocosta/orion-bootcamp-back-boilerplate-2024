@@ -10,7 +10,8 @@ export class CreateSubjectTable1730416775023 implements MigrationInterface {
             name: 'subjectId',
             type: 'int',
             isPrimary: true,
-            isGenerated: true
+            isGenerated: true,
+            generationStrategy: 'increment'
           },
           {
             name: 'subjectName',

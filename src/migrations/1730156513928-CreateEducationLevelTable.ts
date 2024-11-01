@@ -13,7 +13,8 @@ export class CreateEducationLevelTable1730156513928
             name: 'educationId',
             type: 'int',
             isPrimary: true,
-            isGenerated: true
+            isGenerated: true,
+            generationStrategy: 'increment'
           },
           {
             name: 'levelType',

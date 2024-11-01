@@ -5,10 +5,10 @@ export class InsertEducationLevels1730156513929 implements MigrationInterface {
     const tableExists = await queryRunner.hasTable('education_level');
     if (tableExists) {
       await queryRunner.query(`
-                INSERT INTO education_level (educationId, levelType) VALUES
-                (1, 'fundamental'),
-                (2, 'medio'),
-                (3, 'pre-vestibular');
+                INSERT INTO education_level (levelType) VALUES
+                ('fundamental'),
+                ('medio'),
+                ('pre-vestibular');
             `);
     } else {
     }
