@@ -82,15 +82,31 @@ import { LessonRequestRepository } from '../repository/LessonRequestRepository';
  *             schema:
  *               type: object
  *               properties:
- *                 errors:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       msg:
- *                         type: string
- *                       param:
- *                         type: string
+ *                 message:
+ *                   type: object
+ *                   properties:
+ *                     errors:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           type:
+ *                             type: string
+ *                             example: "field"
+ *                           value:
+ *                             type: array
+ *                             items:
+ *                               type: string
+ *                             example: ["wrong reason"]
+ *                           msg:
+ *                             type: string
+ *                             example: "Motivo da aula inválido. Deve conter ao menos um desses: reforço, prova ou trabalho, correção de exercício, outro."
+ *                           path:
+ *                             type: string
+ *                             example: "reason"
+ *                           location:
+ *                             type: string
+ *                             example: "body"
  *       '500':
  *         description: Internal server error
  *         content:
