@@ -6,6 +6,75 @@ import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
 
 export class LessonRequestController {
+  /**
+   * @swagger
+   * /api/lesson-request:
+   *   post:
+   *     summary: Create a new lesson request
+   *     tags: [LessonRequest]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               reason:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                 description: Reasons for the lesson
+   *                 example: ["reforço", "prova ou trabalho"]
+   *               preferredDates:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                 description: Preferred dates for the lesson
+   *                 example: ["01/01/2023 às 10:00"]
+   *               subjectId:
+   *                 type: integer
+   *                 description: ID of the subject
+   *                 example: 1
+   *               additionalInfo:
+   *                 type: string
+   *                 description: Additional information for the lesson request
+   *                 example: "Informações adicionais"
+   *               studentId:
+   *                 type: integer
+   *                 description: ID of the student
+   *                 example: 1
+   *     responses:
+   *       '201':
+   *         description: Lesson request created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Seu pedido de aula foi enviado com sucesso!"
+   *       '404':
+   *         description: Subject or student not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Matéria não encontrada."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async create(req: Request, res: Response) {
     const {
       reason,
@@ -42,9 +111,53 @@ export class LessonRequestController {
         .status(201)
         .json({ message: 'Seu pedido de aula foi enviado com sucesso!' });
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno no servidor' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
+
+  /**
+   * @swagger
+   * /api/lesson-requests:
+   *   get:
+   *     summary: Retrieve all lesson requests
+   *     tags: [LessonRequest]
+   *     responses:
+   *       '200':
+   *         description: A list of lesson requests
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 properties:
+   *                   reason:
+   *                     type: array
+   *                     items:
+   *                       type: string
+   *                   preferredDates:
+   *                     type: array
+   *                     items:
+   *                       type: string
+   *                   status:
+   *                     type: string
+   *                   additionalInfo:
+   *                     type: string
+   *                   subjectId:
+   *                     type: integer
+   *                   studentId:
+   *                     type: integer
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async getAll(req: Request, res: Response) {
     try {
       const lessonRequests = await MysqlDataSource.getRepository(
