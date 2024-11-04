@@ -76,13 +76,8 @@ export class LessonRequestController {
    *                   example: "Erro interno do servidor."
    */
   async create(req: Request, res: Response) {
-    const {
-      reason,
-      preferredDates,
-      subjectId,
-      additionalInfo,
-      studentId
-    } = req.body;
+    const { reason, preferredDates, subjectId, additionalInfo, studentId } =
+      req.body;
 
     const lessonRequest = new LessonRequest();
     lessonRequest.reason = reason;
@@ -92,8 +87,12 @@ export class LessonRequestController {
 
     try {
       const [foundSubject, foundStudent] = await Promise.all([
-        MysqlDataSource.getRepository(Subject).findOne({ where: { subjectId: subjectId } }),
-        MysqlDataSource.getRepository(Student).findOne({ where: { id: studentId } })
+        MysqlDataSource.getRepository(Subject).findOne({
+          where: { subjectId: subjectId }
+        }),
+        MysqlDataSource.getRepository(Student).findOne({
+          where: { id: studentId }
+        })
       ]);
 
       if (!foundSubject) {
@@ -164,6 +163,7 @@ export class LessonRequestController {
         LessonRequest
       ).find({
         select: [
+          'ClassId',
           'reason',
           'preferredDates',
           'status',
@@ -175,6 +175,7 @@ export class LessonRequestController {
       });
 
       const formattedLessonRequests = lessonRequests.map((request) => ({
+        classId: request.ClassId,
         reason: request.reason,
         preferredDates: request.preferredDates,
         status: request.status,
