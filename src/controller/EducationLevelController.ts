@@ -7,7 +7,9 @@ export class EducationLevelController {
     const { levelType } = req.body;
 
     if (!levelType) {
-      return res.status(400).json({ message: 'levelType is required.' });
+      return res
+        .status(400)
+        .json({ message: 'Nível de ensino é obrigatório.' });
     }
 
     const educationLevel = new EducationLevel();
@@ -17,8 +19,9 @@ export class EducationLevelController {
       await MysqlDataSource.getRepository(EducationLevel).save(educationLevel);
       return res.status(201).json(educationLevel);
     } catch (error) {
-      console.error('Error saving education level:', error);
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      return res
+        .status(500)
+        .json({ message: 'Erro interno do servidor.', error });
     }
   }
 
@@ -28,8 +31,7 @@ export class EducationLevelController {
         await MysqlDataSource.getRepository(EducationLevel).find();
       return res.status(200).json(educationLevels);
     } catch (error) {
-      console.error('Error fetching education levels:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }
