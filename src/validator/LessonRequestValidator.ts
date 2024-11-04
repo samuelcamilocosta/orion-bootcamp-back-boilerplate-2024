@@ -1,6 +1,5 @@
 import { body } from 'express-validator';
 import { ReasonName } from '../entity/enum/ReasonName';
-import { StatusName } from '../entity/enum/StatusName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
@@ -46,31 +45,33 @@ export class LessonRequestValidator {
         .isInt()
         .withMessage('O Id da matéria deve ser um número.')
         .notEmpty()
-        .withMessage('Matéria é obrigatória.').custom(async (value) => {
-            const subjectRepository = MysqlDataSource.getRepository(Subject);
-            const subject = await subjectRepository.findOne({
-                where: { subjectId: value }
-            });
+        .withMessage('Matéria é obrigatória.')
+        .custom(async (value) => {
+          const subjectRepository = MysqlDataSource.getRepository(Subject);
+          const subject = await subjectRepository.findOne({
+            where: { subjectId: value }
+          });
 
-            if (!subject) {
-                return Promise.reject('Matéria não encontrada.');
-            }
+          if (!subject) {
+            return Promise.reject('Matéria não encontrada.');
+          }
 
-            return true;
+          return true;
         }),
       body('studentId')
         .isInt()
         .withMessage('O Id do aluno deve ser um número.')
         .notEmpty()
-        .withMessage('Aluno é obrigatório.').custom(async (value) => {
-            const studentRepository = MysqlDataSource.getRepository(Student);
-            const student = await studentRepository.findOne({
-                where: { id: value }
-            });
+        .withMessage('Aluno é obrigatório.')
+        .custom(async (value) => {
+          const studentRepository = MysqlDataSource.getRepository(Student);
+          const student = await studentRepository.findOne({
+            where: { id: value }
+          });
 
-            if (!student) {
-                return Promise.reject('Aluno não encontrado.');
-            }
+          if (!student) {
+            return Promise.reject('Aluno não encontrado.');
+          }
         }),
       body('additionalInfo')
         .optional()

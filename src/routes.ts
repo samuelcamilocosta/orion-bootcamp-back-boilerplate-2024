@@ -7,7 +7,7 @@ import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
 import { LessonRequestController } from './controller/LessonRequestController';
 import { SubjectController } from './controller/SubjectController';
-import { LessonRequestValidator } from 'validator/LessonRequestValidator';
+import { LessonRequestValidator } from './validator/LessonRequestValidator';
 
 const router = Router();
 
