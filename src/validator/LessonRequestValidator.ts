@@ -54,6 +54,12 @@ export class LessonRequestValidator {
         })
         .custom(async (value, { req }) => {
           const studentId = req.body.studentId;
+
+          const uniqueDates = new Set(value);
+          if (uniqueDates.size !== value.length) {
+            throw new Error('Datas preferidas não podem ser duplicadas.');
+          }
+
           const datePromises = value.map(async (date) => {
             const [day, month, yearTime] = date.split('/');
             const [year, time] = yearTime.split(' às ');
