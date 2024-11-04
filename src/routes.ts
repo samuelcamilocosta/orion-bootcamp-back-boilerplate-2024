@@ -5,9 +5,9 @@ import { TutorValidator } from './validator/TutorValidator';
 import { StudentValidator } from './validator/StudentValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
-import { StudentValidator } from './validator/StudentValidator';
 import { LessonRequestController } from './controller/LessonRequestController';
 import { SubjectController } from './controller/SubjectController';
+import { LessonRequestValidator } from 'validator/LessonRequestValidator';
 
 const router = Router();
 
@@ -43,6 +43,7 @@ router.get('/api/get/educationlevel', new EducationLevelController().getAll);
 // Lesson Request route
 router.post(
   '/api/register/lessonrequest',
+  LessonRequestValidator.createLessonRequest(),
   new LessonRequestController().create
 );
 
