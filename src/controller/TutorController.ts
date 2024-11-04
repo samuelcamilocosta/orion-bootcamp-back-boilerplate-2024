@@ -227,4 +227,28 @@ export class TutorController {
         .json({ message: 'Erro ao atualizar o tutor', error });
     }
   }
+
+  async updatePhoto(req: Request, res: Response) {
+    const { id } = req.body;
+    const { photo } = req.file;
+
+
+    try {
+      const tutorRepository = MysqlDataSource.getRepository(Tutor);
+      const tutor = await tutorRepository.findOne({
+        where: { id }
+      });
+      if (!tutor) {
+        return res.status(404).json({ message: 'Tutor não encontrado' });
+      }
+
+      tutor.photoUrl = photo;
+
+      await tutorRepository.save;
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Erro ao atualizar o tutor', error });
+    }
+  }
 }
