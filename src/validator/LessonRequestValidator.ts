@@ -48,6 +48,26 @@ export class LessonRequestValidator {
             const [year, time] = yearTime.split(' às ');
             const formattedDate = `${year}-${month}-${day} ${time}`;
 
+            const lessonDate = new Date(formattedDate);
+            const now = new Date();
+            if (lessonDate < now) {
+              throw new Error(
+                `A data e hora não podem ser no passado: ${date}`
+              );
+            }
+
+            const [hour, minute] = time.split(':');
+            if (
+              parseInt(hour) < 0 ||
+              parseInt(hour) > 23 ||
+              parseInt(minute) < 0 ||
+              parseInt(minute) > 59
+            ) {
+              throw new Error(
+                `A aula não pode ser agendada antes de 00:00 e depois de 23:59. Horário escolhido: ${time}`
+              );
+            }
+
             const existingLesson =
               await LessonRequestRepository.findByPreferredDate(
                 formattedDate,
