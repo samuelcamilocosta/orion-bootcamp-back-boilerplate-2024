@@ -9,13 +9,17 @@ export class LessonRequestValidator {
   static createLessonRequest() {
     return BaseValidator.validationList([
       body('reason')
-        .isArray()
-        .withMessage('Motivo da aula é obrigatório.')
+        .trim()
         .custom((value) => {
           const validReasons = Object.values(ReasonName);
-          value.forEach((reason) => {
-            if (!validReasons.includes(reason)) {
-              throw new Error('Motivo da aula inválido.');
+          const invalidReason = `Motivo da aula inválido. Deve conter ao menos um desses: ${validReasons.join(', ')}`;
+          if (!Array.isArray(value)) {
+            throw new Error(invalidReason);
+          }
+
+          value.forEach((reason: ReasonName) => {
+            if (typeof reason !== 'string' || !validReasons.includes(reason)) {
+              throw new Error(invalidReason);
             }
           });
           return true;
@@ -28,17 +32,21 @@ export class LessonRequestValidator {
         .custom((value) => {
           const dateRegex = /^\d{2}\/\d{2}\/\d{4} às \d{2}:\d{2}$/;
           value.forEach((date) => {
-            if (!dateRegex.test(date)) {
-              throw new Error('Data inválida.');
+            if (typeof date !== 'string' || !dateRegex.test(date)) {
+              throw new Error(
+                'Data inválida. O formato correto é dd/MM/yyyy às HH:mm.'
+              );
             }
           });
           return true;
         })
         .customSanitizer((value) => {
           return value.map((date) => {
-            const [day, month, yearTime] = date.split('/');
-            const [year, time] = yearTime.split(' às ');
-            return `${year}-${month}-${day} ${time}`;
+            if (typeof date === 'string' && date.includes('/')) {
+              const [day, month, yearTime] = date.split('/');
+              const [year, time] = yearTime.split(' às ');
+              return `${year}-${month}-${day} ${time}`;
+            }
           });
         }),
       body('subjectId')
@@ -72,6 +80,8 @@ export class LessonRequestValidator {
           if (!student) {
             return Promise.reject('Aluno não encontrado.');
           }
+
+          return true;
         }),
       body('additionalInfo')
         .optional()
