@@ -80,7 +80,7 @@ export class LessonRequestController {
     }
   }
 
-    /**
+  /**
    * @swagger
    * /api/get/lesson/{id}:
    *   get:
@@ -144,22 +144,24 @@ export class LessonRequestController {
    *                   type: string
    *                   example: "Erro interno do servidor."
    */
-    async getById(req: Request, res: Response) {
-      const { id } = req.params;
-  
-      try {
-        const lesson = await MysqlDataSource.getRepository(LessonRequest).findOne({
+  async getById(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const lesson = await MysqlDataSource.getRepository(LessonRequest).findOne(
+        {
           where: { ClassId: Number(id) },
           relations: ['educationLevels']
-        });
-  
-        if (!lesson) {
-          return res.status(404).json({ message: 'Aula não encontrada.' });
         }
-  
-        return res.status(200).json(lesson);
-      } catch (error) {
-        return res.status(500).json({ message: 'Erro interno do servidor.' });
+      );
+
+      if (!lesson) {
+        return res.status(404).json({ message: 'Aula não encontrada.' });
       }
+
+      return res.status(200).json(lesson);
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
+  }
 }
