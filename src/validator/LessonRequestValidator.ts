@@ -72,7 +72,7 @@ export class LessonRequestValidator {
                 return Promise.reject('Aluno não encontrado.');
             }
         }),
-      body('additionalInformation')
+      body('additionalInfo')
         .optional()
         .isString()
         .withMessage('Informações adicionais devem ser uma string.')
