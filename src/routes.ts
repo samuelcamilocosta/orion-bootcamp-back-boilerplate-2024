@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { HomeController } from './controller/HomeController';
 import { TutorController } from './controller/TutorController';
 import { TutorValidator } from './validator/TutorValidator';
-import { StudentValidator } from './validator/StudentValidator';
 import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
 import { StudentValidator } from './validator/StudentValidator';
@@ -51,6 +50,8 @@ router.post(
 );
 
 router.get('/api/get/lessonrequest', new LessonRequestController().getAll);
+
+router.get('/api/get/lessonrequest/:id', new LessonRequestController().getById);
 
 // Subject route
 router.post('/api/register/subject', new SubjectController().create);
