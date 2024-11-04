@@ -150,8 +150,7 @@ export class LessonRequestController {
     try {
       const lesson = await MysqlDataSource.getRepository(LessonRequest).findOne(
         {
-          where: { ClassId: Number(id) },
-          relations: ['educationLevels']
+          where: { ClassId: Number(id) }
         }
       );
 
