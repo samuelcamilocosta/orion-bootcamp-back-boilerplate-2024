@@ -55,7 +55,26 @@ import { LessonRequestRepository } from '../repository/LessonRequestRepository';
  *                   type: string
  *                   example: "Seu pedido de aula foi enviado com sucesso!"
  *                 lessonRequest:
- *                   $ref: '#/components/schemas/LessonRequest'
+ *                   type: object
+ *                   properties:
+ *                     reason:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     preferredDates:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     status:
+ *                       type: string
+ *                     additionalInfo:
+ *                       type: string
+ *                     subjectId:
+ *                       type: integer
+ *                     studentId:
+ *                       type: integer
+ *                     classId:
+ *                       type: integer
  *       '400':
  *         description: Bad request, validation errors
  *         content:
