@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { StatusName } from '../entity/enum/StatusName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
+import { LessonRequestRepository } from 'repository/LessonRequestRepository';
 
 export class LessonRequestController {
   /**
@@ -104,11 +105,11 @@ export class LessonRequestController {
         return res.status(404).json({ message: 'Aluno não encontrado.' });
       }
       lessonRequest.student = foundStudent;
-      await MysqlDataSource.getRepository(LessonRequest).save(lessonRequest);
+      await LessonRequestRepository.createLessonRequest(lessonRequest);
 
       return res
         .status(201)
-        .json({ message: 'Seu pedido de aula foi enviado com sucesso!' });
+        .json({ message: 'Seu pedido de aula foi enviado com sucesso!', lessonRequest });
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
@@ -159,20 +160,7 @@ export class LessonRequestController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const lessonRequests = await MysqlDataSource.getRepository(
-        LessonRequest
-      ).find({
-        select: [
-          'ClassId',
-          'reason',
-          'preferredDates',
-          'status',
-          'additionalInfo',
-          'subject',
-          'student'
-        ],
-        relations: ['subject', 'student']
-      });
+      const lessonRequests = await LessonRequestRepository.getAllLessonRequests();
 
       const formattedLessonRequests = lessonRequests.map((request) => ({
         classId: request.ClassId,

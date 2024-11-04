@@ -2,9 +2,9 @@ import { body } from 'express-validator';
 import { ReasonName } from '../entity/enum/ReasonName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
-import { LessonRequest } from '../entity/LessonRequest';
 import { MysqlDataSource } from '../config/database';
 import { BaseValidator } from './BaseValidator';
+import { LessonRequestRepository } from 'repository/LessonRequestRepository';
 
 export class LessonRequestValidator {
   static createLessonRequest() {
@@ -48,15 +48,7 @@ export class LessonRequestValidator {
             const [year, time] = yearTime.split(' às ');
             const formattedDate = `${year}-${month}-${day} ${time}`;
 
-            const existingLesson = await MysqlDataSource.getRepository(
-              LessonRequest
-            ).findOne({
-              where: {
-                student: { id: studentId },
-                preferredDates: formattedDate
-              }
-            });
-
+            const existingLesson = await LessonRequestRepository.findByPreferredDate(formattedDate, studentId);
             if (existingLesson) {
               throw new Error(
                 `Já existe uma aula agendada para o aluno nesse horário: ${date}`
