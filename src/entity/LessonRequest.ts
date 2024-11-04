@@ -28,7 +28,7 @@ export class LessonRequest {
   @Column({
     type: 'enum',
     enum: StatusName,
-    default: 'pendente'
+    default: StatusName.PENDENTE
   })
   status: StatusName;
 
