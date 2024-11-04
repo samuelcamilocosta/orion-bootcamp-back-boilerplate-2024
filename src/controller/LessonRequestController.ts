@@ -1,6 +1,7 @@
 import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 import { Request, Response } from 'express';
+import { StatusName } from '../entity/enum/StatusName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
 
@@ -9,8 +10,7 @@ export class LessonRequestController {
     const {
       reason,
       preferredDates,
-      subject,
-      status,
+      subjectId,
       additionalInfo,
       studentId
     } = req.body;
@@ -18,18 +18,18 @@ export class LessonRequestController {
     const lessonRequest = new LessonRequest();
     lessonRequest.reason = reason;
     lessonRequest.preferredDates = preferredDates;
-    lessonRequest.status = status;
     lessonRequest.additionalInfo = additionalInfo;
+    lessonRequest.status = StatusName.PENDENTE;
 
     try {
-      const foundSubjectId = await MysqlDataSource.getRepository(
+      const foundSubject = await MysqlDataSource.getRepository(
         Subject
       ).findOne({
-        where: { subjectId: subject }
+        where: { subjectId: subjectId }
       });
 
-      if (foundSubjectId) {
-        lessonRequest.subject = foundSubjectId;
+      if (foundSubject) {
+        lessonRequest.subject = foundSubject;
       }
       const foundStudent = await MysqlDataSource.getRepository(Student).findOne(
         { where: { id: studentId } }
