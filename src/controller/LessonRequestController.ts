@@ -22,23 +22,20 @@ export class LessonRequestController {
     lessonRequest.status = StatusName.PENDENTE;
 
     try {
-      const foundSubject = await MysqlDataSource.getRepository(
-        Subject
-      ).findOne({
-        where: { subjectId: subjectId }
-      });
+      const [foundSubject, foundStudent] = await Promise.all([
+        MysqlDataSource.getRepository(Subject).findOne({ where: { subjectId: subjectId } }),
+        MysqlDataSource.getRepository(Student).findOne({ where: { id: studentId } })
+      ]);
 
-      if (foundSubject) {
-        lessonRequest.subject = foundSubject;
+      if (!foundSubject) {
+        return res.status(404).json({ message: 'Matéria não encontrada.' });
       }
-      const foundStudent = await MysqlDataSource.getRepository(Student).findOne(
-        { where: { id: studentId } }
-      );
+      lessonRequest.subject = foundSubject;
 
-      if (foundStudent) {
-        lessonRequest.student = foundStudent;
+      if (!foundStudent) {
+        return res.status(404).json({ message: 'Aluno não encontrado.' });
       }
-
+      lessonRequest.student = foundStudent;
       await MysqlDataSource.getRepository(LessonRequest).save(lessonRequest);
 
       return res
