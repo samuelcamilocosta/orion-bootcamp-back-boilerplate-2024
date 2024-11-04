@@ -65,15 +65,36 @@ import { LessonRequestRepository } from '../repository/LessonRequestRepository';
  *                       type: array
  *                       items:
  *                         type: string
- *                     status:
- *                       type: string
  *                     additionalInfo:
  *                       type: string
- *                     subjectId:
- *                       type: integer
- *                     studentId:
- *                       type: integer
- *                     classId:
+ *                     status:
+ *                       type: string
+ *                     subject:
+ *                       type: object
+ *                       properties:
+ *                         subjectId:
+ *                           type: integer
+ *                         subjectName:
+ *                           type: string
+ *                     student:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         username:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         password:
+ *                           type: string
+ *                         salt:
+ *                           type: string
+ *                         fullName:
+ *                           type: string
+ *                         birthDate:
+ *                           type: string
+ *                           format: date
+ *                     ClassId:
  *                       type: integer
  *       '400':
  *         description: Bad request, validation errors
