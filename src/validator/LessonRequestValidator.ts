@@ -2,6 +2,7 @@ import { body } from 'express-validator';
 import { ReasonName } from '../entity/enum/ReasonName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
+import { LessonRequest } from '../entity/LessonRequest';
 import { MysqlDataSource } from '../config/database';
 import { BaseValidator } from './BaseValidator';
 
@@ -38,6 +39,32 @@ export class LessonRequestValidator {
               );
             }
           });
+          return true;
+        })
+        .custom(async (value, { req }) => {
+          const studentId = req.body.studentId;
+          const datePromises = value.map(async (date) => {
+            const [day, month, yearTime] = date.split('/');
+            const [year, time] = yearTime.split(' às ');
+            const formattedDate = `${year}-${month}-${day} ${time}`;
+
+            const existingLesson = await MysqlDataSource.getRepository(
+              LessonRequest
+            ).findOne({
+              where: {
+                student: { id: studentId },
+                preferredDates: formattedDate
+              }
+            });
+
+            if (existingLesson) {
+              throw new Error(
+                `Já existe uma aula agendada para o aluno nesse horário: ${date}`
+              );
+            }
+          });
+
+          await Promise.all(datePromises);
           return true;
         })
         .customSanitizer((value) => {
