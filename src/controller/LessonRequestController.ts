@@ -102,9 +102,14 @@ export class LessonRequestController {
    *             schema:
    *               type: object
    *               properties:
+   *                 ClassId:
+   *                   type: integer
+   *                   example: 1
    *                 reason:
-   *                   type: string
-   *                   example: "Reason for the lesson"
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *                   example: ["reforço"]
    *                 preferredDates:
    *                   type: array
    *                   items:
@@ -113,16 +118,10 @@ export class LessonRequestController {
    *                   example: ["2023-10-01", "2023-10-02"]
    *                 status:
    *                   type: string
-   *                   example: "Pending"
+   *                   example: "pendente"
    *                 additionalInfo:
    *                   type: string
-   *                   example: "Any additional information"
-   *                 subjectId:
-   *                   type: integer
-   *                   example: 1
-   *                 studentId:
-   *                   type: integer
-   *                   example: 1
+   *                   example: "Looking for a tutor with experience in calculus."
    *       '404':
    *         description: Lesson request not found
    *         content:
