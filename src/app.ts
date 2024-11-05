@@ -10,7 +10,8 @@ import connectWithRetry from './config/retryConnection';
 const app = express();
 
 app.use(express.json());
-app.use(cors({ origin: true }));
+app.use(cors());
+app.options('*', cors());
 app.use(routes);
 
 const swaggerSpec = swaggerJSDoc(swaggerConfig);
