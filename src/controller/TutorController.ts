@@ -5,122 +5,11 @@ import { EducationLevel } from '../entity/EducationLevel';
 import { validationResult } from 'express-validator';
 import { In } from 'typeorm';
 import { Subject } from '../entity/Subject';
+import sharp from 'sharp';
+import { randomImgName, s3, bucketName } from '../config/s3Client';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 export class TutorController {
-  /**
-   * @swagger
-   * /api/register/tutor:
-   *   post:
-   *     summary: Creation of a new tutor
-   *     tags: [tutor]
-   *     consumes:
-   *       - application/json
-   *     produces:
-   *       - application/json
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               fullName:
-   *                 type: string
-   *                 description: Full name of the tutor
-   *                 example: "Nome Tutor"
-   *               username:
-   *                 type: string
-   *                 description: Username of the tutor
-   *                 example: "nometutor"
-   *               birthDate:
-   *                 type: string
-   *                 description: Birth date in the format YYYY-MM-DD
-   *                 example: "1990-01-01"
-   *               email:
-   *                 type: string
-   *                 description: Email address of the tutor
-   *                 example: "nometutor@exemplo.com"
-   *               cpf:
-   *                 type: string
-   *                 description: CPF of the tutor
-   *                 example: "123.456.789-10"
-   *               educationLevelIds:
-   *                 type: array
-   *                 items:
-   *                   type: integer
-   *                 description: List of education level IDs
-   *                 example: [1, 2]
-   *               password:
-   *                 type: string
-   *                 description: Password of the tutor
-   *                 example: "P@ssword123"
-   *               confirmPassword:
-   *                 type: string
-   *                 description: Confirmation password of the tutor
-   *                 example: "P@ssword123"
-   *     responses:
-   *       '201':
-   *         description: Tutor successfully created
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 fullName:
-   *                   type: string
-   *                 username:
-   *                   type: string
-   *                 birthDate:
-   *                   type: string
-   *                 email:
-   *                   type: string
-   *                 cpf:
-   *                   type: string
-   *                 educationLevel:
-   *                   type: array
-   *                   items:
-   *                     type: integer
-   *                 tutorId:
-   *                   type: integer
-   *       '400':
-   *         description: Validation error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 errors:
-   *                   type: array
-   *                   items:
-   *                     type: object
-   *                     properties:
-   *                       type:
-   *                         type: string
-   *                         example: "field"
-   *                       value:
-   *                         type: string
-   *                         example: "117.629.360-54"
-   *                       msg:
-   *                         type: string
-   *                         example: "CPF já cadastrado."
-   *                       path:
-   *                         type: string
-   *                         example: "cpf"
-   *                       location:
-   *                         type: string
-   *                         example: "body"
-   *       '500':
-   *         description: Server error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                 error:
-   *                   type: string
-   */
   async create(req: Request, res: Response) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -180,7 +69,7 @@ export class TutorController {
   async getAll(req: Request, res: Response) {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: ['username', 'email', 'fullName']
+        select: ['username', 'email', 'fullName', 'photoUrl']
       });
       return res.status(200).json(tutor);
     } catch (error) {
@@ -202,25 +91,23 @@ export class TutorController {
         return res.status(404).json({ message: 'Tutor não encontrado' });
       }
 
-      if (expertise) tutor.expertise = expertise;
-      if (projectReason) tutor.projectReason = projectReason;
+      tutor.expertise = expertise ?? tutor.expertise;
+      tutor.projectReason = projectReason ?? tutor.projectReason;
 
-      if (subjectIds && Array.isArray(subjectIds)) {
+      if (Array.isArray(subjectIds) && subjectIds.length > 0) {
         const foundSubjects = await MysqlDataSource.getRepository(
           Subject
         ).findBy({
           subjectId: In(subjectIds)
         });
 
-        if (foundSubjects.length > 0) {
-          tutor.subjects = foundSubjects;
-        }
+        tutor.subjects =
+          foundSubjects.length > 0 ? foundSubjects : tutor.subjects;
       }
+
       await tutorRepository.save(tutor);
 
-      return res
-        .status(200)
-        .json({ message: 'Tutor atualizado com sucesso', tutor });
+      return res.status(200).json({ message: 'Tutor atualizado com sucesso' });
     } catch (error) {
       return res
         .status(500)
@@ -230,25 +117,50 @@ export class TutorController {
 
   async updatePhoto(req: Request, res: Response) {
     const { id } = req.body;
-    const { photo } = req.file;
 
+    let buffer: Buffer;
 
     try {
-      const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const tutor = await tutorRepository.findOne({
-        where: { id }
-      });
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado' });
-      }
-
-      tutor.photoUrl = photo;
-
-      await tutorRepository.save;
+      buffer = await sharp(req.file.buffer)
+        .resize({
+          height: 300,
+          width: 300,
+          fit: 'cover'
+        })
+        .toBuffer();
     } catch (error) {
       return res
         .status(500)
-        .json({ message: 'Erro ao atualizar o tutor', error });
+        .json({ message: 'Erro ao processar a imagem', error });
+    }
+
+    try {
+      const randomName = randomImgName();
+      const params = {
+        Bucket: bucketName,
+        Key: randomName,
+        Body: buffer,
+        ContentType: req.file.mimetype
+      };
+
+      const command = new PutObjectCommand(params);
+      await s3.send(command);
+
+      const tutorRepository = MysqlDataSource.getRepository(Tutor);
+      const tutor = await tutorRepository.findOne({ where: { id } });
+
+      if (!tutor) {
+        return res.status(404).json({ message: 'Tutor não encontrado' });
+      }
+      const photoUrl = `https://orion-photos.s3.sa-east-1.amazonaws.com/${randomName}`;
+      tutor.photoUrl = photoUrl;
+      await tutorRepository.save(tutor);
+
+      return res.status(200).json({ message: 'Foto atualizada com sucesso' });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: 'Erro ao atualizar a foto', error });
     }
   }
 }
