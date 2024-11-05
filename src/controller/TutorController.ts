@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
-import { validationResult } from 'express-validator';
 import { In } from 'typeorm';
 
 export class TutorController {
@@ -33,8 +32,8 @@ export class TutorController {
    *                 example: "nometutor"
    *               birthDate:
    *                 type: string
-   *                 description: Birth date in the format YYYY-MM-DD
-   *                 example: "1990-01-01"
+   *                 description: Birth date in the format DD/MM/YYYY
+   *                 example: "01/01/1990"
    *               email:
    *                 type: string
    *                 description: Email address of the tutor
@@ -117,15 +116,11 @@ export class TutorController {
    *               properties:
    *                 message:
    *                   type: string
+   *                   example: "Erro interno do servidor."
    *                 error:
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const {
       fullName,
       username,
@@ -179,7 +174,7 @@ export class TutorController {
   async getAll(req: Request, res: Response) {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: ['username', 'email', 'fullName']
+        select: ['id', 'cpf', 'username', 'email', 'fullName']
       });
       return res.status(200).json(tutor);
     } catch (error) {

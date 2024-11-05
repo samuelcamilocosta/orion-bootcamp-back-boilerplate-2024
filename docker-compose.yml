@@ -16,8 +16,11 @@ services:
       SERVER_PORT: 4444
       DB_DATABASE: orion-constellation
       DB_CONNECTION_STRING: mysql://orion_constellation_root:j5m966qp7jiypfda@orion-constellation-mysql:3306
+      JWT_SECRET: ${JWT_SECRET}
     networks:
       - orion-constellation-connect
+    env_file:
+      - .env
     depends_on:
       orion-constellation-mysql:
         condition: service_healthy
