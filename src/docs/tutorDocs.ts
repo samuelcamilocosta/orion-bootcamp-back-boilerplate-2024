@@ -25,8 +25,8 @@
  *                 example: "nometutor"
  *               birthDate:
  *                 type: string
- *                 description: Birth date in the format YYYY-MM-DD
- *                 example: "1990-01-01"
+ *                 description: Birth date in the format DD/MM/YYYY
+ *                 example: "01/01/1990"
  *               email:
  *                 type: string
  *                 description: Email address of the tutor
@@ -109,6 +109,7 @@
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: "Erro interno do servidor."
  *                 error:
  *                   type: string
  */

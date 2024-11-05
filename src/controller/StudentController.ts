@@ -1,16 +1,10 @@
 import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { EducationLevel } from '../entity/EducationLevel';
-import { validationResult } from 'express-validator';
 import { Student } from '../entity/Student';
 
 export class StudentController {
   async create(req: Request, res: Response) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { fullName, username, birthDate, password, email, educationLevelId } =
       req.body;
 
@@ -55,7 +49,7 @@ export class StudentController {
   async getAll(req: Request, res: Response) {
     try {
       const student = await MysqlDataSource.getRepository(Student).find({
-        select: ['username', 'email', 'fullName']
+        select: ['id', 'username', 'email', 'fullName']
       });
       return res.status(200).json(student);
     } catch (error) {

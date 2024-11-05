@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
-import { validationResult } from 'express-validator';
 import { In } from 'typeorm';
 import { Subject } from '../entity/Subject';
 import sharp from 'sharp';
@@ -11,11 +10,6 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 export class TutorController {
   async create(req: Request, res: Response) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const {
       fullName,
       username,
@@ -69,7 +63,7 @@ export class TutorController {
   async getAll(req: Request, res: Response) {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: ['username', 'email', 'fullName', 'photoUrl']
+        select: ['id', 'cpf', 'username', 'email', 'fullName', 'photoUrl']
       });
       return res.status(200).json(tutor);
     } catch (error) {
