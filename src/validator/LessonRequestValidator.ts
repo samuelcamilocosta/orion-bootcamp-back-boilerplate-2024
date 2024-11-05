@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { ReasonName } from '../entity/enum/ReasonName';
+import { EnumReasonName } from '../entity/enum/EnumReasonName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
@@ -12,13 +12,13 @@ export class LessonRequestValidator {
       body('reason')
         .trim()
         .custom((value) => {
-          const validReasons = Object.values(ReasonName);
+          const validReasons = Object.values(EnumReasonName);
           const invalidReason = `Motivo da aula inválido. Deve conter ao menos um desses: ${validReasons.join(', ')}`;
           if (!Array.isArray(value)) {
             throw new Error(invalidReason);
           }
 
-          value.forEach((reason: ReasonName) => {
+          value.forEach((reason: EnumReasonName) => {
             if (typeof reason !== 'string' || !validReasons.includes(reason)) {
               throw new Error(invalidReason);
             }

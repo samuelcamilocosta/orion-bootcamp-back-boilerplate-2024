@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { LevelName } from './enum/LevelName';
+import { EnumLevelName } from './enum/EnumLevelName';
 
 @Entity()
 export class EducationLevel {
   @PrimaryGeneratedColumn()
   educationId: number;
 
-  @Column({ type: 'enum', enum: LevelName, nullable: false })
-  levelType: LevelName;
+  @Column({ type: 'enum', enum: EnumLevelName, nullable: false })
+  levelType: EnumLevelName;
 }

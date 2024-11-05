@@ -1,7 +1,7 @@
 import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 import { Request, Response } from 'express';
-import { StatusName } from '../entity/enum/StatusName';
+import { EnumStatusName } from '../entity/enum/EnumStatusName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
@@ -148,7 +148,7 @@ export class LessonRequestController {
     lessonRequest.reason = reason;
     lessonRequest.preferredDates = preferredDates;
     lessonRequest.additionalInfo = additionalInfo;
-    lessonRequest.status = StatusName.PENDENTE;
+    lessonRequest.status = EnumStatusName.PENDENTE;
 
     try {
       const [foundSubject, foundStudent] = await Promise.all([
