@@ -54,6 +54,7 @@ export class LessonRequestController {
         LessonRequest
       ).find({
         select: [
+          'ClassId',
           'reason',
           'preferredDates',
           'status',
@@ -65,6 +66,7 @@ export class LessonRequestController {
       });
 
       const formattedLessonRequests = lessonRequests.map((request) => ({
+        id: request.ClassId,
         reason: request.reason,
         preferredDates: request.preferredDates,
         status: request.status,
@@ -77,6 +79,89 @@ export class LessonRequestController {
     } catch (error) {
       console.error('Error fetching lesson request:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }
+
+  /**
+   * @swagger
+   * /api/get/lesson/{id}:
+   *   get:
+   *     summary: Retrieve a lesson request by ID
+   *     tags: [lesson]
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         description: ID of the lesson request to retrieve
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     responses:
+   *       '200':
+   *         description: A lesson request object
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 ClassId:
+   *                   type: integer
+   *                   example: 1
+   *                 reason:
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *                   example: ["reforço"]
+   *                 preferredDates:
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *                     format: date
+   *                   example: ["2023-10-01", "2023-10-02"]
+   *                 status:
+   *                   type: string
+   *                   example: "pendente"
+   *                 additionalInfo:
+   *                   type: string
+   *                   example: "Looking for a tutor with experience in calculus."
+   *       '404':
+   *         description: Lesson request not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula não encontrada."
+   *       '500':
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
+  async getById(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const lesson = await MysqlDataSource.getRepository(LessonRequest).findOne(
+        {
+          where: { ClassId: Number(id) }
+        }
+      );
+
+      if (!lesson) {
+        return res.status(404).json({ message: 'Aula não encontrada.' });
+      }
+
+      return res.status(200).json(lesson);
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }
