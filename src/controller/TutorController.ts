@@ -150,10 +150,10 @@ export class TutorController {
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
 
-      const token = AuthService.generateToken(tutor.id, tutor.email, "tutor");
+      const token = AuthService.generateToken(tutor.id, tutor.email, 'tutor');
 
       return res.status(201).json({
-        message: "Tutor criado com sucesso.",
+        message: 'Tutor criado com sucesso.',
         tutorId: tutor.id,
         token: token
       });

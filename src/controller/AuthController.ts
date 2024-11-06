@@ -101,7 +101,8 @@ export class AuthController {
     try {
       const user = await UserRepository.findUserByEmail(email);
       const loginSuccess = 'Login bem-sucedido.';
-      const incorrectCredentials = 'Email ou senha incorretos. Tente novamente.';
+      const incorrectCredentials =
+        'Email ou senha incorretos. Tente novamente.';
 
       if (!user) {
         return res.status(404).json({ message: incorrectCredentials });

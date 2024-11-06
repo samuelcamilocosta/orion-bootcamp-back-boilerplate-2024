@@ -165,7 +165,9 @@ export class CommonValidations {
         });
 
         if (existingTutor || existingStudent) {
-          return Promise.reject('Não foi possível concluir o cadastro. Verifique os dados inseridos.');
+          return Promise.reject(
+            'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
+          );
         }
 
         return true;

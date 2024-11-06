@@ -79,9 +79,24 @@ router.post(
   new LessonRequestController().create
 );
 
-router.get('/api/get/lessonrequest', cors(), authMiddleware(), new LessonRequestController().getAll);
+router.get(
+  '/api/get/lessonrequest',
+  cors(),
+  authMiddleware(),
+  new LessonRequestController().getAll
+);
 
 // Subject route
-router.post('/api/register/subject', cors(), authMiddleware(), new SubjectController().create);
-router.get('/api/get/subject', cors(), authMiddleware(),new SubjectController().getAll);
+router.post(
+  '/api/register/subject',
+  cors(),
+  authMiddleware(),
+  new SubjectController().create
+);
+router.get(
+  '/api/get/subject',
+  cors(),
+  authMiddleware(),
+  new SubjectController().getAll
+);
 export default router;

@@ -137,10 +137,14 @@ export class StudentController {
 
       await MysqlDataSource.getRepository(Student).save(student);
 
-      const token = AuthService.generateToken(student.id, student.email, "student");
+      const token = AuthService.generateToken(
+        student.id,
+        student.email,
+        'student'
+      );
 
       return res.status(201).json({
-        message: "Aluno criado com sucesso.",
+        message: 'Aluno criado com sucesso.',
         id: student.id,
         token: token
       });
