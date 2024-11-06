@@ -3,6 +3,7 @@ import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { EducationLevel } from '../entity/EducationLevel';
 import { In } from 'typeorm';
+import { AuthService } from '../service/AuthService';
 
 export class TutorController {
   /**
@@ -64,22 +65,16 @@ export class TutorController {
    *             schema:
    *               type: object
    *               properties:
-   *                 fullName:
+   *                 message:
    *                   type: string
-   *                 username:
-   *                   type: string
-   *                 birthDate:
-   *                   type: string
-   *                 email:
-   *                   type: string
-   *                 cpf:
-   *                   type: string
-   *                 educationLevel:
-   *                   type: array
-   *                   items:
-   *                     type: integer
+   *                   example: "Tutor criado com sucesso."
    *                 tutorId:
    *                   type: integer
+   *                   example: 123
+   *                 token:
+   *                   type: string
+   *                   description: Token JWT para autenticação
+   *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
    *       '400':
    *         description: Validation error
    *         content:
@@ -155,14 +150,12 @@ export class TutorController {
 
       await MysqlDataSource.getRepository(Tutor).save(tutor);
 
+      const token = AuthService.generateToken(tutor.id, tutor.email, "tutor");
+
       return res.status(201).json({
-        fullName: tutor.fullName,
-        username: tutor.username,
-        birthDate: tutor.birthDate,
-        email: tutor.email,
-        educationLevels: tutor.educationLevels,
-        cpf: tutor.cpf,
-        id: tutor.id
+        message: "Tutor criado com sucesso.",
+        tutorId: tutor.id,
+        token: token
       });
     } catch (error) {
       return res

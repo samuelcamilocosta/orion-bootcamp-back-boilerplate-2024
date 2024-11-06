@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { EducationLevel } from '../entity/EducationLevel';
 import { Student } from '../entity/Student';
+import { AuthService } from '../service/AuthService';
 
 export class StudentController {
   /**
@@ -59,27 +60,16 @@ export class StudentController {
    *             schema:
    *               type: object
    *               properties:
-   *                 fullName:
+   *                 message:
    *                   type: string
-   *                   example: "Nome do Estudante"
-   *                 username:
-   *                   type: string
-   *                   example: "nomeestudante"
-   *                 birthDate:
-   *                   type: string
-   *                   example: "2000-01-01"
-   *                 email:
-   *                   type: string
-   *                   example: "nomeestudante@exemplo.com"
-   *                 educationLevel:
-   *                   type: object
-   *                   properties:
-   *                     educationId:
-   *                       type: integer
-   *                       example: 1
+   *                   example: "Aluno criado com sucesso."
    *                 studentId:
    *                   type: integer
    *                   example: 123
+   *                 token:
+   *                   type: string
+   *                   description: Token JWT para autenticação
+   *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
    *       '400':
    *         description: Validation error
    *         content:
@@ -147,13 +137,12 @@ export class StudentController {
 
       await MysqlDataSource.getRepository(Student).save(student);
 
+      const token = AuthService.generateToken(student.id, student.email, "student");
+
       return res.status(201).json({
-        fullName: student.fullName,
-        username: student.username,
-        birthDate: student.birthDate,
-        email: student.email,
-        educationLevel: student.educationLevel,
-        id: student.id
+        message: "Aluno criado com sucesso.",
+        id: student.id,
+        token: token
       });
     } catch (error) {
       return res
