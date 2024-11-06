@@ -32,6 +32,13 @@ router.get(
   new TutorController().getAll
 );
 
+router.get(
+  '/api/get/tutor/:id',
+  cors(),
+  authMiddleware(),
+  new TutorController().getById
+);
+
 // Students routes
 router.get(
   '/api/get/student',
