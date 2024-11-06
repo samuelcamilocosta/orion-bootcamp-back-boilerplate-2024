@@ -1,7 +1,8 @@
-import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { Subject } from './Subject';
 import { EducationLevel } from './EducationLevel';
 import { User } from './User';
+import { LessonRequest } from './LessonRequest';
 
 @Entity()
 export class Tutor extends User {
@@ -35,4 +36,7 @@ export class Tutor extends User {
     }
   })
   educationLevels: EducationLevel[];
+
+  @OneToMany(() => LessonRequest, (lessonRequest) => lessonRequest.tutor)
+  lessonRequests: LessonRequest[];
 }
