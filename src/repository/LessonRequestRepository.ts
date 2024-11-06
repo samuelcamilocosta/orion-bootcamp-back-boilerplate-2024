@@ -24,4 +24,10 @@ export class LessonRequestRepository {
       relations: ['subject', 'student']
     });
   }
+
+  static async getLessonRequestById(id: number): Promise<LessonRequest | null> {
+    return await MysqlDataSource.getRepository(LessonRequest).findOne({
+      where: { ClassId: id }
+    });
+  }
 }
