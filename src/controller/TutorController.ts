@@ -270,7 +270,8 @@ export class TutorController {
           'educationLevels',
           'lessonRequests',
           'subjects'
-        ]
+        ],
+        relations: ['educationLevels', 'lessonRequests', 'subjects']
       });
       return res.status(200).json(tutor);
     } catch (error) {
@@ -398,7 +399,7 @@ export class TutorController {
           'lessonRequests',
           'subjects'
         ],
-        relations: ['educationLevels']
+        relations: ['educationLevels', 'lessonRequests', 'subjects']
       });
 
       if (!tutor) {
