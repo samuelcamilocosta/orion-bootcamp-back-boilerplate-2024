@@ -178,7 +178,7 @@ export class TutorController {
    *     tags: [tutor]
    *     responses:
    *       '200':
-   *         description: A list of tutors
+   *         description: Successfully retrieved the list of tutors
    *         content:
    *           application/json:
    *             schema:
@@ -186,17 +186,69 @@ export class TutorController {
    *               items:
    *                 type: object
    *                 properties:
+   *                   id:
+   *                     type: integer
+   *                     example: 1
    *                   username:
    *                     type: string
-   *                     example: "nometutor"
+   *                     example: "usuario_tutor01"
    *                   email:
    *                     type: string
-   *                     example: "usuario_tutor@exemplo.com"
+   *                     example: "usuario_tutor01@exemplo.com"
    *                   fullName:
    *                     type: string
-   *                     example: "Nome Tutor"
+   *                     example: "nome_tutor01"
+   *                   cpf:
+   *                     type: string
+   *                     example: "63806240078"
+   *                   educationLevels:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         educationId:
+   *                           type: integer
+   *                           example: 1
+   *                         levelType:
+   *                           type: string
+   *                           example: "Fundamental"
+   *                   lessonRequests:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         ClassId:
+   *                           type: integer
+   *                           example: 14
+   *                         reason:
+   *                           type: array
+   *                           items:
+   *                             type: string
+   *                             example: "reforço"
+   *                         preferredDates:
+   *                           type: array
+   *                           items:
+   *                             type: string
+   *                             example: "29/12/2025 às 23:45"
+   *                         status:
+   *                           type: string
+   *                           example: "pendente"
+   *                         additionalInfo:
+   *                           type: string
+   *                           example: "Looking for a tutor with experience in calculus."
+   *                   subjects:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         subjectId:
+   *                           type: integer
+   *                           example: 1
+   *                         subjectName:
+   *                           type: string
+   *                           example: "Biologia"
    *       '500':
-   *         description: Server error
+   *         description: Internal server error
    *         content:
    *           application/json:
    *             schema:
@@ -209,7 +261,16 @@ export class TutorController {
   async getAll(req: Request, res: Response) {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: ['id', 'cpf', 'username', 'email', 'fullName']
+        select: [
+          'id',
+          'cpf',
+          'username',
+          'email',
+          'fullName',
+          'educationLevels',
+          'lessonRequests',
+          'subjects'
+        ]
       });
       return res.status(200).json(tutor);
     } catch (error) {
@@ -233,7 +294,7 @@ export class TutorController {
    *           example: 1
    *     responses:
    *       '200':
-   *         description: A tutor object
+   *         description: Successfully retrieved the tutor
    *         content:
    *           application/json:
    *             schema:
@@ -244,13 +305,16 @@ export class TutorController {
    *                   example: 1
    *                 username:
    *                   type: string
-   *                   example: "nometutor"
+   *                   example: "usuario_tutor01"
    *                 email:
    *                   type: string
-   *                   example: "usuario_tutor@exemplo.com"
+   *                   example: "usuario_tutor01@exemplo.com"
    *                 fullName:
    *                   type: string
-   *                   example: "Nome Tutor"
+   *                   example: "nome_tutor01"
+   *                 cpf:
+   *                   type: string
+   *                   example: "63806240078"
    *                 educationLevels:
    *                   type: array
    *                   items:
@@ -262,6 +326,41 @@ export class TutorController {
    *                       levelType:
    *                         type: string
    *                         example: "Fundamental"
+   *                 lessonRequests:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       ClassId:
+   *                         type: integer
+   *                         example: 14
+   *                       reason:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "reforço"
+   *                       preferredDates:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "29/12/2025 às 23:45"
+   *                       status:
+   *                         type: string
+   *                         example: "pendente"
+   *                       additionalInfo:
+   *                         type: string
+   *                         example: "Looking for a tutor with experience in calculus."
+   *                 subjects:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       subjectId:
+   *                         type: integer
+   *                         example: 1
+   *                       subjectName:
+   *                         type: string
+   *                         example: "Mathematics"
    *       '404':
    *         description: Tutor not found
    *         content:
@@ -273,7 +372,7 @@ export class TutorController {
    *                   type: string
    *                   example: "Tutor não encontrado."
    *       '500':
-   *         description: Server error
+   *         description: Internal server error
    *         content:
    *           application/json:
    *             schema:
@@ -289,6 +388,16 @@ export class TutorController {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).findOne({
         where: { id: Number(id) },
+        select: [
+          'id',
+          'cpf',
+          'username',
+          'email',
+          'fullName',
+          'educationLevels',
+          'lessonRequests',
+          'subjects'
+        ],
         relations: ['educationLevels']
       });
 

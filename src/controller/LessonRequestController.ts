@@ -54,6 +54,7 @@ export class LessonRequestController {
         LessonRequest
       ).find({
         select: [
+          'ClassId',
           'reason',
           'preferredDates',
           'status',
@@ -65,6 +66,7 @@ export class LessonRequestController {
       });
 
       const formattedLessonRequests = lessonRequests.map((request) => ({
+        id: request.ClassId,
         reason: request.reason,
         preferredDates: request.preferredDates,
         status: request.status,
