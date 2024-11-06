@@ -81,7 +81,7 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Email não encontrado."
+   *                   example: "Email ou senha incorretos. Tente novamente."
    *       '500':
    *         description: Server error
    *         content:
@@ -101,10 +101,10 @@ export class AuthController {
     try {
       const user = await UserRepository.findUserByEmail(email);
       const loginSuccess = 'Login bem-sucedido.';
-      const incorrectPassword = 'Senha incorreta.';
+      const incorrectCredentials = 'Email ou senha incorretos. Tente novamente.';
 
       if (!user) {
-        return res.status(404).json({ message: 'Email não encontrado.' });
+        return res.status(404).json({ message: incorrectCredentials });
       }
 
       const { isMatch, role } = await AuthService.verifyPassword(
@@ -112,7 +112,7 @@ export class AuthController {
         password
       );
       if (!isMatch) {
-        return res.status(400).json({ message: incorrectPassword });
+        return res.status(400).json({ message: incorrectCredentials });
       }
 
       const token = AuthService.generateToken(user.id, user.email, role);

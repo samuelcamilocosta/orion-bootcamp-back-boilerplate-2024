@@ -42,7 +42,7 @@ export class TutorValidator extends CommonValidations {
           });
 
           if (existingTutor) {
-            return Promise.reject('CPF já cadastrado.');
+            return Promise.reject('Não foi possível concluir o cadastro. Verifique os dados inseridos.');
           }
 
           return true;
