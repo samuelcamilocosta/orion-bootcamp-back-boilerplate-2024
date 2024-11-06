@@ -42,7 +42,7 @@ export class CommonValidations {
         });
 
         if (existingTutor || existingStudent) {
-          return Promise.reject('Usuário já cadastrado com essas informações.');
+          return Promise.reject('Nome de usuário já cadastrado.');
         }
 
         return true;
