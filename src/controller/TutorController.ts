@@ -54,16 +54,26 @@ export class TutorController {
         id: tutor.id
       });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error });
+      console.error('Error saving tutor:', error);
+      return res.status(500).json({ message: 'Internal Server Error', error });
     }
   }
 
   async getAll(req: Request, res: Response) {
     try {
       const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: ['id', 'cpf', 'username', 'email', 'fullName', 'photoUrl']
+        select: [
+          'id',
+          'cpf',
+          'username',
+          'email',
+          'fullName',
+          'photoUrl',
+          'educationLevels',
+          'lessonRequests',
+          'subjects'
+        ],
+        relations: ['educationLevels', 'lessonRequests', 'subjects']
       });
       return res.status(200).json(tutor);
     } catch (error) {
@@ -155,6 +165,35 @@ export class TutorController {
       return res
         .status(500)
         .json({ message: 'Erro ao atualizar a foto', error });
+    }
+  }
+
+  async getById(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const tutor = await MysqlDataSource.getRepository(Tutor).findOne({
+        where: { id: Number(id) },
+        select: [
+          'id',
+          'cpf',
+          'username',
+          'email',
+          'fullName',
+          'educationLevels',
+          'lessonRequests',
+          'subjects'
+        ],
+        relations: ['educationLevels', 'lessonRequests', 'subjects']
+      });
+
+      if (!tutor) {
+        return res.status(404).json({ message: 'Tutor não encontrado.' });
+      }
+
+      return res.status(200).json(tutor);
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }

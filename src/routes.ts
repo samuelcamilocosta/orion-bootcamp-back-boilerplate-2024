@@ -48,6 +48,13 @@ router.post(
   new TutorController().updatePhoto
 );
 
+router.get(
+  '/api/get/tutor/:id',
+  cors(),
+  authMiddleware(),
+  new TutorController().getById
+);
+
 // Students routes
 router.get(
   '/api/get/student',
@@ -62,6 +69,8 @@ router.post(
   StudentValidator.createStudent(),
   new StudentController().create
 );
+
+router.get('/api/get/student/:id', new StudentController().getById);
 
 // Education Level routes
 router.post(
@@ -92,6 +101,8 @@ router.post(
 );
 
 router.get('/api/get/lessonrequest', new LessonRequestController().getAll);
+
+router.get('/api/get/lessonrequest/:id', new LessonRequestController().getById);
 
 // Subject route
 router.post('/api/register/subject', new SubjectController().create);

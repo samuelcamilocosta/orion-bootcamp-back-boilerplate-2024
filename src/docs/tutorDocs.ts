@@ -113,3 +113,195 @@
  *                 error:
  *                   type: string
  */
+/**
+ * @swagger
+ * /api/get/tutor:
+ *   get:
+ *     summary: Retrieve a list of all tutors
+ *     tags: [tutor]
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved the list of tutors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   username:
+ *                     type: string
+ *                     example: "usuario_tutor01"
+ *                   email:
+ *                     type: string
+ *                     example: "usuario_tutor01@exemplo.com"
+ *                   fullName:
+ *                     type: string
+ *                     example: "nome_tutor01"
+ *                   cpf:
+ *                     type: string
+ *                     example: "63806240078"
+ *                   educationLevels:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         educationId:
+ *                           type: integer
+ *                           example: 1
+ *                         levelType:
+ *                           type: string
+ *                           example: "Fundamental"
+ *                   lessonRequests:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         ClassId:
+ *                           type: integer
+ *                           example: 14
+ *                         reason:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                             example: "reforço"
+ *                         preferredDates:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                             example: "29/12/2025 às 23:45"
+ *                         status:
+ *                           type: string
+ *                           example: "pendente"
+ *                         additionalInfo:
+ *                           type: string
+ *                           example: "Looking for a tutor with experience in calculus."
+ *                   subjects:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         subjectId:
+ *                           type: integer
+ *                           example: 1
+ *                         subjectName:
+ *                           type: string
+ *                           example: "Biologia"
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Erro interno do servidor."
+ */
+/**
+ * @swagger
+ * /api/get/tutor/{id}:
+ *   get:
+ *     summary: Retrieve a tutor by ID
+ *     tags: [tutor]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the tutor to retrieve
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved the tutor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 username:
+ *                   type: string
+ *                   example: "usuario_tutor01"
+ *                 email:
+ *                   type: string
+ *                   example: "usuario_tutor01@exemplo.com"
+ *                 fullName:
+ *                   type: string
+ *                   example: "nome_tutor01"
+ *                 cpf:
+ *                   type: string
+ *                   example: "63806240078"
+ *                 educationLevels:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       educationId:
+ *                         type: integer
+ *                         example: 1
+ *                       levelType:
+ *                         type: string
+ *                         example: "Fundamental"
+ *                 lessonRequests:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       ClassId:
+ *                         type: integer
+ *                         example: 14
+ *                       reason:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                           example: "reforço"
+ *                       preferredDates:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                           example: "29/12/2025 às 23:45"
+ *                       status:
+ *                         type: string
+ *                         example: "pendente"
+ *                       additionalInfo:
+ *                         type: string
+ *                         example: "Looking for a tutor with experience in calculus."
+ *                 subjects:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       subjectId:
+ *                         type: integer
+ *                         example: 1
+ *                       subjectName:
+ *                         type: string
+ *                         example: "Mathematics"
+ *       '404':
+ *         description: Tutor not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Tutor não encontrado."
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Erro interno do servidor."
+ */
