@@ -41,7 +41,7 @@ router.patch(
   new TutorController().updatePersonalData
 );
 
-router.post(
+router.patch(
   '/api/update/photo',
   upload.single('image'),
   UploadPhotoValidator,
