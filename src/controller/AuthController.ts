@@ -96,7 +96,7 @@ export class AuthController {
    *                   type: string
    */
   public login = async (req: Request, res: Response): Promise<Response> => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     try {
       const user = await UserRepository.findUserByEmail(email);
@@ -107,12 +107,16 @@ export class AuthController {
         return res.status(404).json({ message: 'Email não encontrado.' });
       }
 
-      const { isMatch, role } = await AuthService.verifyPassword(
+      const { isMatch, roleFound } = await AuthService.verifyPassword(
         user,
         password
       );
       if (!isMatch) {
         return res.status(400).json({ message: incorrectPassword });
+      }
+
+      if (role !== roleFound) {
+        return res.status(400).json({ message: 'Tipo de usuário inválido.' });
       }
 
       const token = AuthService.generateToken(user.id, user.email, role);

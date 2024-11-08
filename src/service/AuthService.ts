@@ -12,8 +12,8 @@ export class AuthService {
 
   static async verifyPassword(user: Tutor | Student, password: string) {
     const isMatch = await bcrypt.compare(password, user.password);
-    const role = user instanceof Tutor ? 'tutor' : 'student';
-    return { isMatch, role };
+    const roleFound = user instanceof Tutor ? 'tutor' : 'student';
+    return { isMatch, roleFound };
   }
 
   static verifyToken(token: string) {
