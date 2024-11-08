@@ -9,8 +9,14 @@ import connectWithRetry from './config/retryConnection';
 
 const app = express();
 
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+  })
+);
+
 app.use(express.json());
-app.use(cors());
 app.options('*', cors());
 app.use(routes);
 
