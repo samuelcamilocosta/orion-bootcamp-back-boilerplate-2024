@@ -8,7 +8,6 @@ import { StudentController } from './controller/StudentController';
 import { EducationLevelController } from './controller/EducationLevelController';
 import { AuthController } from './controller/AuthController';
 import { authMiddleware } from './middleware/AuthMiddleware';
-import cors from 'cors';
 import { LessonRequestController } from './controller/LessonRequestController';
 import { SubjectController } from './controller/SubjectController';
 import { upload } from './config/s3Client';
@@ -23,17 +22,11 @@ router.get('/', new HomeController().hello);
 // Tutor routes
 router.post(
   '/api/register/tutor',
-  cors(),
   TutorValidator.createTutor(),
   new TutorController().create
 );
 
-router.get(
-  '/api/get/tutor',
-  cors(),
-  authMiddleware(),
-  new TutorController().getAll
-);
+router.get('/api/get/tutor', authMiddleware(), new TutorController().getAll);
 
 router.patch(
   '/api/update/tutor',
@@ -50,7 +43,6 @@ router.patch(
 
 router.get(
   '/api/get/tutor/:id',
-  cors(),
   authMiddleware(),
   new TutorController().getById
 );
@@ -58,14 +50,12 @@ router.get(
 // Students routes
 router.get(
   '/api/get/student',
-  cors(),
   authMiddleware(),
   new StudentController().getAll
 );
 
 router.post(
   '/api/register/student',
-  cors(),
   StudentValidator.createStudent(),
   new StudentController().create
 );
@@ -75,24 +65,14 @@ router.get('/api/get/student/:id', new StudentController().getById);
 // Education Level routes
 router.post(
   '/api/register/educationlevel',
-  cors(),
   authMiddleware(),
   new EducationLevelController().create
 );
 
-router.get(
-  '/api/get/educationlevel',
-  cors(),
-  new EducationLevelController().getAll
-);
+router.get('/api/get/educationlevel', new EducationLevelController().getAll);
 
 // Login route
-router.post(
-  '/api/login',
-  cors(),
-  AuthValidator.login(),
-  new AuthController().login
-);
+router.post('/api/login', AuthValidator.login(), new AuthController().login);
 
 // Lesson Request route
 router.post(
