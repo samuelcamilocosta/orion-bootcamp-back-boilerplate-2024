@@ -78,7 +78,6 @@ router.post('/api/login', AuthValidator.login(), new AuthController().login);
 // Lesson Request route
 router.post(
   '/api/register/lessonrequest',
-  cors(),
   authMiddleware(),
   LessonRequestValidator.createLessonRequest(),
   new LessonRequestController().create
@@ -86,7 +85,6 @@ router.post(
 
 router.get(
   '/api/get/lessonrequest',
-  cors(),
   authMiddleware(),
   new LessonRequestController().getAll
 );
@@ -96,13 +94,11 @@ router.get('/api/get/lessonrequest/:id', new LessonRequestController().getById);
 // Subject route
 router.post(
   '/api/register/subject',
-  cors(),
   authMiddleware(),
   new SubjectController().create
 );
 router.get(
   '/api/get/subject',
-  cors(),
   authMiddleware(),
   new SubjectController().getAll
 );
