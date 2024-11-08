@@ -11,6 +11,9 @@ import { authMiddleware } from './middleware/AuthMiddleware';
 import cors from 'cors';
 import { LessonRequestController } from './controller/LessonRequestController';
 import { SubjectController } from './controller/SubjectController';
+import { upload } from './config/s3Client';
+import { UpdatePersonalDataValidator } from './validator/UpdatePersonalDataValidator';
+import { UploadPhotoValidator } from './validator/UploadPhotoValidator';
 
 const router = Router();
 
@@ -30,6 +33,19 @@ router.get(
   cors(),
   authMiddleware(),
   new TutorController().getAll
+);
+
+router.patch(
+  '/api/update/tutor',
+  UpdatePersonalDataValidator,
+  new TutorController().updatePersonalData
+);
+
+router.patch(
+  '/api/update/photo',
+  upload.single('image'),
+  UploadPhotoValidator,
+  new TutorController().updatePhoto
 );
 
 router.get(
@@ -91,4 +107,5 @@ router.get('/api/get/lessonrequest/:id', new LessonRequestController().getById);
 // Subject route
 router.post('/api/register/subject', new SubjectController().create);
 router.get('/api/get/subject', new SubjectController().getAll);
+
 export default router;
