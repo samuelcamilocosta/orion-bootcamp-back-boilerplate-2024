@@ -83,19 +83,31 @@ export class CommonValidations {
           throw new Error(dateErrorMessage);
         }
 
-        const inputDate = new Date(year, month - 1, day);
-        const currentDate = new Date();
-        if (inputDate > currentDate) {
-          throw new Error(dateErrorMessage);
+        const now = new Date();
+        const offset = now.getTimezoneOffset();
+
+        const inputDate = new Date(Date.UTC(year, month - 1, day));
+        const currentDate = new Date(
+          Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
+        );
+
+        inputDate.setMinutes(inputDate.getMinutes() + offset);
+        currentDate.setMinutes(currentDate.getMinutes() + offset);
+
+        if (inputDate >= currentDate) {
+          throw new Error('Data de nascimento não pode ser uma data futura.');
         }
 
         return true;
       })
       .customSanitizer((value: string): Date => {
         const [day, month, year] = value.split('/');
-        const newBirthDate = new Date(`${year}-${month}-${day}`);
-
-        return newBirthDate;
+        const date = new Date(
+          Date.UTC(Number(year), Number(month) - 1, Number(day))
+        );
+        const offset = date.getTimezoneOffset();
+        date.setMinutes(date.getMinutes() + offset);
+        return date;
       });
   }
 
