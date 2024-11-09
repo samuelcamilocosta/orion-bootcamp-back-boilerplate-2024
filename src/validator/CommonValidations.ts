@@ -83,12 +83,9 @@ export class CommonValidations {
           throw new Error(dateErrorMessage);
         }
 
+        const inputDate = new Date(year, month - 1, day);
         const currentDate = new Date();
-        if (
-          day > currentDate.getDay() &&
-          month > currentDate.getMonth() + 1 &&
-          year > currentDate.getFullYear()
-        ) {
+        if (inputDate > currentDate) {
           throw new Error(dateErrorMessage);
         }
 
