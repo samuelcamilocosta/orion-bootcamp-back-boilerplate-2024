@@ -1,11 +1,4 @@
 import { Request, Response } from 'express';
-import { MysqlDataSource } from '../config/database';
-import { Tutor } from '../entity/Tutor';
-import { In } from 'typeorm';
-import { Subject } from '../entity/Subject';
-import sharp from 'sharp';
-import { randomImgName, s3, bucketName } from '../config/s3Client';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { TutorService } from '../service/TutorService';
 import { TutorRepository } from '../repository/TutorRepository';
 
@@ -273,19 +266,23 @@ export class TutorController {
    *               id:
    *                 type: integer
    *                 description: Tutor ID
+   *                 example: 1
    *               expertise:
    *                 type: string
    *                 maxLength: 50
    *                 description: Tutor's area of expertise
+   *                 example: "Matemática"
    *               projectReason:
    *                 type: string
    *                 maxLength: 200
    *                 description: Reason for joining the project
+   *                 example: "Ajudar os alunos a entender melhor os conceitos matemáticos"
    *               subject:
    *                 type: array
    *                 items:
    *                   type: integer
    *                 description: Array of subject IDs
+   *                 example: [1, 2]
    *     responses:
    *       '200':
    *         description: Tutor updated successfully
