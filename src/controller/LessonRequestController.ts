@@ -12,7 +12,9 @@ export class LessonRequestController {
    * /api/register/lessonrequest:
    *   post:
    *     summary: Create a new lesson request
-   *     tags: [LessonRequest]
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
    *     requestBody:
    *       required: true
    *       content:
