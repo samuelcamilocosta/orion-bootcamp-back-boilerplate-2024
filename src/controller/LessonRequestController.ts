@@ -40,7 +40,8 @@ export class LessonRequestController {
    *                 example: 1
    *               additionalInfo:
    *                 type: string
-   *                 description: Additional information for the lesson request
+   *                 description: Additional information
+   *                 maxLength: 200
    *                 example: "Informações adicionais"
    *               studentId:
    *                 type: integer
@@ -131,6 +132,16 @@ export class LessonRequestController {
    *                           location:
    *                             type: string
    *                             example: "body"
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -187,10 +198,12 @@ export class LessonRequestController {
    * /api/get/lessonrequest:
    *   get:
    *     summary: Retrieve all lesson requests
-   *     tags: [LessonRequest]
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
    *     responses:
    *       '200':
-   *         description: A list of lesson requests
+   *         description: List of lesson requests retrieved successfully
    *         content:
    *           application/json:
    *             schema:
@@ -198,6 +211,8 @@ export class LessonRequestController {
    *               items:
    *                 type: object
    *                 properties:
+   *                   classId:
+   *                     type: integer
    *                   reason:
    *                     type: array
    *                     items:
@@ -214,6 +229,16 @@ export class LessonRequestController {
    *                     type: integer
    *                   studentId:
    *                     type: integer
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -248,21 +273,23 @@ export class LessonRequestController {
 
   /**
    * @swagger
-   * /api/get/lesson/{id}:
+   * /api/get/lessonrequest/{id}:
    *   get:
    *     summary: Retrieve a lesson request by ID
-   *     tags: [lesson]
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
    *     parameters:
    *       - name: id
    *         in: path
    *         required: true
-   *         description: ID of the lesson request to retrieve
+   *         description: ID of the lesson request
    *         schema:
    *           type: integer
    *           example: 1
    *     responses:
    *       '200':
-   *         description: A lesson request object
+   *         description: Lesson request retrieved successfully
    *         content:
    *           application/json:
    *             schema:
@@ -288,7 +315,17 @@ export class LessonRequestController {
    *                 additionalInfo:
    *                   type: string
    *                   example: "Looking for a tutor with experience in calculus."
-   *       '404':
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *      '404':
    *         description: Lesson request not found
    *         content:
    *           application/json:
