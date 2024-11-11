@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
 import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
-import { EducationLevel } from '../entity/EducationLevel';
 import { In } from 'typeorm';
-import { AuthService } from '../service/AuthService';
 import { Subject } from '../entity/Subject';
 import sharp from 'sharp';
 import { randomImgName, s3, bucketName } from '../config/s3Client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { TutorService } from '../service/TutorService';
 
 export class TutorController {
   /**
@@ -126,50 +125,20 @@ export class TutorController {
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const {
-      fullName,
-      username,
-      birthDate,
-      email,
-      cpf,
-      educationLevelIds,
-      password
-    } = req.body;
-
-    const { hashedPassword, salt } = password;
-
-    const tutor = new Tutor();
-    tutor.fullName = fullName;
-    tutor.username = username;
-    tutor.birthDate = birthDate;
-    tutor.password = hashedPassword;
-    tutor.email = email;
-    tutor.cpf = cpf;
-    tutor.salt = salt;
-
     try {
-      const foundEducationLevel = await MysqlDataSource.getRepository(
-        EducationLevel
-      ).find({
-        where: { educationId: In(educationLevelIds) }
-      });
-
-      if (foundEducationLevel) {
-        tutor.educationLevels = foundEducationLevel;
-      }
-
-      await MysqlDataSource.getRepository(Tutor).save(tutor);
-
-      const token = AuthService.generateToken(tutor.id, tutor.email, 'tutor');
+      const { user: savedTutor, token } = await TutorService.createTutor(
+        req.body
+      );
 
       return res.status(201).json({
         message: 'Tutor criado com sucesso.',
-        tutorId: tutor.id,
+        tutorId: savedTutor.id,
         token: token
       });
     } catch (error) {
-      console.error('Error saving tutor:', error);
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      return res
+        .status(500)
+        .json({ message: 'Erro interno do servidor.', error });
     }
   }
 
@@ -278,21 +247,8 @@ export class TutorController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: [
-          'id',
-          'cpf',
-          'username',
-          'email',
-          'fullName',
-          'photoUrl',
-          'educationLevels',
-          'lessonRequests',
-          'subjects'
-        ],
-        relations: ['educationLevels', 'lessonRequests', 'subjects']
-      });
-      return res.status(200).json(tutor);
+      const tutors = await TutorService.getAllTutors();
+      return res.status(200).json(tutors);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }

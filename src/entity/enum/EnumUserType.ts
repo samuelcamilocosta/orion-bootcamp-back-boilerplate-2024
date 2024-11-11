@@ -1,4 +1,4 @@
 export enum EnumUserType {
-    TUTOR = 'tutor',
-    STUDENT = 'student'
-  }
+  TUTOR = 'tutor',
+  STUDENT = 'student'
+}
