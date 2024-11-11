@@ -1,6 +1,6 @@
-import { Subject } from '../entity/Subject';
-import { MysqlDataSource } from '../config/database';
 import { Request, Response } from 'express';
+import { SubjectService } from '../service/SubjectService';
+import { SubjectRepository } from '../repository/SubjectRepository';
 
 export class SubjectController {
   /**
@@ -57,14 +57,14 @@ export class SubjectController {
   async create(req: Request, res: Response) {
     const { subjectName } = req.body;
 
-    const subject = new Subject();
-    subject.subjectName = subjectName;
-
     try {
-      await MysqlDataSource.getRepository(Subject).save(subject);
+      await SubjectService.createSubject(subjectName);
 
       return res.status(201).json({ message: 'Matéria criada com sucesso!' });
     } catch (error) {
+      if (error.message === 'Nome da matéria é obrigatório.') {
+        return res.status(400).json({ message: error.message });
+      }
       return res.status(500).json({ message: 'Erro interno no servidor' });
     }
   }
@@ -116,10 +116,8 @@ export class SubjectController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const subject = await MysqlDataSource.getRepository(Subject).find({
-        select: ['subjectId', 'subjectName']
-      });
-      return res.status(200).json(subject);
+      const subjects = await SubjectRepository.findAllSubjects();
+      return res.status(200).json(subjects);
     } catch (error) {
       console.error('Error fetching students:', error);
       return res.status(500).json({ message: 'Internal Server Error' });
