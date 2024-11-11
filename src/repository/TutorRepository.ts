@@ -26,7 +26,26 @@ export class TutorRepository extends UserRepository {
     });
   }
 
-  static async update(tutor: Tutor): Promise<Tutor> {
+  static async findTutorById(id: number) {
+    const repository = MysqlDataSource.getRepository(Tutor);
+    return await repository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'cpf',
+        'username',
+        'email',
+        'fullName',
+        'educationLevels',
+        'photoUrl',
+        'lessonRequests',
+        'subjects'
+      ],
+      relations: ['educationLevels', 'lessonRequests', 'subjects']
+    });
+  }
+
+  static async updateTutor(tutor: Tutor): Promise<Tutor> {
     const repository = MysqlDataSource.getRepository(Tutor);
     return await repository.save(tutor);
   }

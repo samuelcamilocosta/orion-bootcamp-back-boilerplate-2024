@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import { randomImgName, s3, bucketName } from '../config/s3Client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { TutorService } from '../service/TutorService';
+import { TutorRepository } from '../repository/TutorRepository';
 
 export class TutorController {
   /**
@@ -323,31 +324,17 @@ export class TutorController {
     const { expertise, projectReason, subject: subjectIds, id } = req.body;
 
     try {
-      const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const tutor = await tutorRepository.findOne({
-        where: { id },
-        relations: ['subjects']
-      });
-
+      const tutor = await TutorRepository.findTutorById(id);
       if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado' });
+        return res.status(404).json({ message: 'Tutor não encontrado.' });
       }
 
-      tutor.expertise = expertise ?? tutor.expertise;
-      tutor.projectReason = projectReason ?? tutor.projectReason;
-
-      if (Array.isArray(subjectIds) && subjectIds.length > 0) {
-        const foundSubjects = await MysqlDataSource.getRepository(
-          Subject
-        ).findBy({
-          subjectId: In(subjectIds)
-        });
-
-        tutor.subjects =
-          foundSubjects.length > 0 ? foundSubjects : tutor.subjects;
-      }
-
-      await tutorRepository.save(tutor);
+      await TutorService.updateTutorPersonalData(
+        tutor,
+        expertise,
+        projectReason,
+        subjectIds
+      );
 
       return res.status(200).json({ message: 'Tutor atualizado com sucesso' });
     } catch (error) {
@@ -401,49 +388,18 @@ export class TutorController {
   async updatePhoto(req: Request, res: Response) {
     const { id } = req.body;
 
-    let buffer: Buffer;
-
-    try {
-      buffer = await sharp(req.file.buffer)
-        .resize({
-          height: 300,
-          width: 300,
-          fit: 'cover'
-        })
-        .toBuffer();
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro ao processar a imagem', error });
+    const tutor = await TutorRepository.findTutorById(id);
+    if (!tutor) {
+      return res.status(404).json({ message: 'Tutor não encontrado.' });
     }
 
     try {
-      const randomName = randomImgName();
-      const params = {
-        Bucket: bucketName,
-        Key: randomName,
-        Body: buffer,
-        ContentType: req.file.mimetype
-      };
-
-      const command = new PutObjectCommand(params);
-      await s3.send(command);
-
-      const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const tutor = await tutorRepository.findOne({ where: { id } });
-
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado' });
-      }
-      const photoUrl = `https://orion-photos.s3.sa-east-1.amazonaws.com/${randomName}`;
-      tutor.photoUrl = photoUrl;
-      await tutorRepository.save(tutor);
-
+      await TutorService.updateTutorPhoto(tutor, req.file);
       return res.status(200).json({ message: 'Foto atualizada com sucesso' });
     } catch (error) {
       return res
         .status(500)
-        .json({ message: 'Erro ao atualizar a foto', error });
+        .json({ message: 'Erro ao processar a imagem', error });
     }
   }
 
@@ -570,21 +526,7 @@ export class TutorController {
     const { id } = req.params;
 
     try {
-      const tutor = await MysqlDataSource.getRepository(Tutor).findOne({
-        where: { id: Number(id) },
-        select: [
-          'id',
-          'cpf',
-          'username',
-          'email',
-          'fullName',
-          'educationLevels',
-          'photoUrl',
-          'lessonRequests',
-          'subjects'
-        ],
-        relations: ['educationLevels', 'lessonRequests', 'subjects']
-      });
+      const tutor = await TutorRepository.findTutorById(Number(id));
 
       if (!tutor) {
         return res.status(404).json({ message: 'Tutor não encontrado.' });

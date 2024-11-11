@@ -5,6 +5,10 @@ import { UserService } from './UserService';
 import { In } from 'typeorm';
 import { EducationLevel } from '../entity/EducationLevel';
 import { EnumUserType } from '../entity/enum/EnumUserType';
+import sharp from 'sharp';
+import { bucketName, randomImgName, s3 } from '../config/s3Client';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { Subject } from '../entity/Subject';
 
 export class TutorService extends UserService {
   static async createTutor(tutorData) {
@@ -44,5 +48,47 @@ export class TutorService extends UserService {
 
   static async getAllTutors() {
     return await TutorRepository.findAllTutors();
+  }
+
+  static async updateTutorPhoto(tutor: Tutor, file: Express.Multer.File) {
+    const buffer = await sharp(file.buffer)
+      .resize({
+        height: 300,
+        width: 300,
+        fit: 'cover'
+      })
+      .toBuffer();
+
+    const randomName = randomImgName();
+    const params = {
+      Bucket: bucketName,
+      Key: randomName,
+      Body: buffer,
+      ContentType: file.mimetype
+    };
+
+    const command = new PutObjectCommand(params);
+    await s3.send(command);
+
+    const photoUrl = `https://orion-photos.s3.sa-east-1.amazonaws.com/${randomName}`;
+
+    tutor.photoUrl = photoUrl;
+    return await TutorRepository.updateTutor(tutor);
+  }
+
+  static async updateTutorPersonalData(
+    tutor: Tutor,
+    expertise: string,
+    projectReason: string,
+    subjectIds: number[]
+  ) {
+    tutor.expertise = expertise;
+    tutor.projectReason = projectReason;
+    const foundSubjects = await MysqlDataSource.getRepository(Subject).find({
+      where: { subjectId: In(subjectIds) }
+    });
+
+    tutor.subjects = foundSubjects;
+    return await TutorRepository.updateTutor(tutor);
   }
 }
