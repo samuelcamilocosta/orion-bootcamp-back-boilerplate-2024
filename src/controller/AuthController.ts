@@ -96,10 +96,10 @@ export class AuthController {
    *                   type: string
    */
   public login = async (req: Request, res: Response): Promise<Response> => {
-    const { email, password, role } = req.body;
+    const { email, password, role, userType } = req.body;
 
     try {
-      const user = await UserRepository.findUserByEmail(email);
+      const user = await UserRepository.findUserByEmail(email, userType);
       const loginSuccess = 'Login bem-sucedido.';
       const incorrectCredentials =
         'Email ou senha incorretos. Tente novamente.';
