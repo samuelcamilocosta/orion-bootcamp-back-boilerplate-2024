@@ -3,7 +3,7 @@ import { Tutor } from '../entity/Tutor';
 import { UserRepository } from './UserRepository';
 
 export class TutorRepository extends UserRepository {
-  static async createTutor(tutor: Tutor): Promise<Tutor> {
+  static async saveTutor(tutor: Tutor): Promise<Tutor> {
     const repository = MysqlDataSource.getRepository(Tutor);
     return await repository.save(tutor);
   }
@@ -43,10 +43,5 @@ export class TutorRepository extends UserRepository {
       ],
       relations: ['educationLevels', 'lessonRequests', 'subjects']
     });
-  }
-
-  static async updateTutor(tutor: Tutor): Promise<Tutor> {
-    const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.save(tutor);
   }
 }

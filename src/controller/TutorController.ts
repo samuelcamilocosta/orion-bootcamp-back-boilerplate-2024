@@ -241,7 +241,7 @@ export class TutorController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const tutors = await TutorService.getAllTutors();
+      const tutors = await TutorRepository.findAllTutors();
       return res.status(200).json(tutors);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });

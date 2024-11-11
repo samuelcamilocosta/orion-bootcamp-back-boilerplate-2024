@@ -42,12 +42,8 @@ export class TutorService extends UserService {
       tutor.educationLevels = foundEducationLevel;
     }
 
-    const savedTutor = await TutorRepository.createTutor(tutor);
+    const savedTutor = await TutorRepository.saveTutor(tutor);
     return UserService.generateUserResponse(savedTutor, EnumUserType.TUTOR);
-  }
-
-  static async getAllTutors() {
-    return await TutorRepository.findAllTutors();
   }
 
   static async updateTutorPhoto(tutor: Tutor, file: Express.Multer.File) {
@@ -73,7 +69,7 @@ export class TutorService extends UserService {
     const photoUrl = `https://orion-photos.s3.sa-east-1.amazonaws.com/${randomName}`;
 
     tutor.photoUrl = photoUrl;
-    return await TutorRepository.updateTutor(tutor);
+    return await TutorRepository.saveTutor(tutor);
   }
 
   static async updateTutorPersonalData(
@@ -89,6 +85,6 @@ export class TutorService extends UserService {
     });
 
     tutor.subjects = foundSubjects;
-    return await TutorRepository.updateTutor(tutor);
+    return await TutorRepository.saveTutor(tutor);
   }
 }
