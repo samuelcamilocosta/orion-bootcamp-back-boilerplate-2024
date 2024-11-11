@@ -14,15 +14,4 @@ export class UserRepository {
         : MysqlDataSource.getRepository(Student);
     return await repository.findOne({ where: { email } });
   }
-
-  static async findUserById(
-    id: number,
-    userType: EnumUserType.TUTOR | EnumUserType.STUDENT
-  ) {
-    const repository =
-      userType === EnumUserType.TUTOR
-        ? MysqlDataSource.getRepository(Tutor)
-        : MysqlDataSource.getRepository(Student);
-    return await repository.findOne({ where: { id } });
-  }
 }
