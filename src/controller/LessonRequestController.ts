@@ -1,10 +1,5 @@
-import { MysqlDataSource } from '../config/database';
-import { LessonRequest } from '../entity/LessonRequest';
 import { Request, Response } from 'express';
-import { EnumStatusName } from '../entity/enum/EnumStatusName';
-import { Subject } from '../entity/Subject';
-import { Student } from '../entity/Student';
-import { LessonRequestRepository } from '../repository/LessonRequestRepository';
+import { LessonRequestService } from '../service/LessonRequestService';
 
 export class LessonRequestController {
   /**
@@ -154,41 +149,20 @@ export class LessonRequestController {
    *                   example: "Erro interno do servidor."
    */
   async create(req: Request, res: Response) {
-    const { reason, preferredDates, subjectId, additionalInfo, studentId } =
-      req.body;
-
-    const lessonRequest = new LessonRequest();
-    lessonRequest.reason = reason;
-    lessonRequest.preferredDates = preferredDates;
-    lessonRequest.additionalInfo = additionalInfo;
-    lessonRequest.status = EnumStatusName.PENDENTE;
-
     try {
-      const [foundSubject, foundStudent] = await Promise.all([
-        MysqlDataSource.getRepository(Subject).findOne({
-          where: { subjectId: subjectId }
-        }),
-        MysqlDataSource.getRepository(Student).findOne({
-          where: { id: studentId }
-        })
-      ]);
-
-      if (!foundSubject) {
-        return res.status(404).json({ message: 'Matéria não encontrada.' });
-      }
-      lessonRequest.subject = foundSubject;
-
-      if (!foundStudent) {
-        return res.status(404).json({ message: 'Aluno não encontrado.' });
-      }
-      lessonRequest.student = foundStudent;
-      await LessonRequestRepository.createLessonRequest(lessonRequest);
+      await LessonRequestService.createLessonRequest(req.body);
 
       return res.status(201).json({
         message: 'Seu pedido de aula foi enviado com sucesso!',
-        lessonRequest
+        lessonRequest: req.body
       });
     } catch (error) {
+      if (error.message === 'Matéria não encontrada.') {
+        return res.status(404).json({ message: 'Matéria não encontrada.' });
+      }
+      if (error.message === 'Aluno não encontrado.') {
+        return res.status(404).json({ message: 'Aluno não encontrado.' });
+      }
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
@@ -252,20 +226,9 @@ export class LessonRequestController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const lessonRequests =
-        await LessonRequestRepository.getAllLessonRequests();
+      const lessonRequests = await LessonRequestService.getAllLessonRequests();
 
-      const formattedLessonRequests = lessonRequests.map((request) => ({
-        classId: request.ClassId,
-        reason: request.reason,
-        preferredDates: request.preferredDates,
-        status: request.status,
-        additionalInfo: request.additionalInfo,
-        subjectId: request.subject?.subjectId,
-        studentId: request.student?.id
-      }));
-
-      return res.status(200).json(formattedLessonRequests);
+      return res.status(200).json(lessonRequests);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
@@ -350,16 +313,15 @@ export class LessonRequestController {
     const { id } = req.params;
 
     try {
-      const lesson = await LessonRequestRepository.getLessonRequestById(
+      const lesson = await LessonRequestService.getLessonRequestById(
         Number(id)
       );
 
-      if (!lesson) {
-        return res.status(404).json({ message: 'Aula não encontrada.' });
-      }
-
       return res.status(200).json(lesson);
     } catch (error) {
+      if (error.message === 'Aula não encontrada.') {
+        return res.status(404).json({ message: 'Aula não encontrada.' });
+      }
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }

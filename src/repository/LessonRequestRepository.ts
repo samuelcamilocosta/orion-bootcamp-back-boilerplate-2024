@@ -2,32 +2,34 @@ import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 
 export class LessonRequestRepository {
-  static async createLessonRequest(
+  static async saveLessonRequest(
     lessonRequest: LessonRequest
   ): Promise<LessonRequest> {
-    return await MysqlDataSource.getRepository(LessonRequest).save(
-      lessonRequest
-    );
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.save(lessonRequest);
   }
 
   static async findByPreferredDate(
     preferredDate: string,
     studentId: number
   ): Promise<LessonRequest | null> {
-    return await MysqlDataSource.getRepository(LessonRequest).findOne({
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.findOne({
       where: { preferredDates: preferredDate, student: { id: studentId } }
     });
   }
 
   static async getAllLessonRequests(): Promise<LessonRequest[]> {
-    return await MysqlDataSource.getRepository(LessonRequest).find({
-      relations: ['subject', 'student']
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.find({
+      relations: ['subject', 'student', 'tutor']
     });
   }
 
   static async getLessonRequestById(id: number): Promise<LessonRequest | null> {
     return await MysqlDataSource.getRepository(LessonRequest).findOne({
-      where: { ClassId: id }
+      where: { ClassId: id },
+      relations: ['subject', 'student', 'tutor']
     });
   }
 }
