@@ -6,21 +6,30 @@ export const UploadPhotoValidator = (
   next: NextFunction
 ) => {
   const { id } = req.body;
-  console.log(id);
-  if (!id) {
+
+  if (!id || typeof id !== 'number') {
     return res
       .status(400)
-      .json({ message: 'ID do tutor inválido ou não informado' });
+      .json({ message: 'ID do tutor é obrigatório e deve ser um número.' });
   }
 
-  if (!req.file || req.file.mimetype !== 'image/jpeg') {
-    return res.status(400).json({ message: 'A imagem deve ser do tipo jpg' });
+  if (!req.file) {
+    return res.status(400).json({
+      message: 'Arquivo de foto é obrigatório.'
+    });
+  }
+
+  if (req.file.mimetype !== 'image/jpeg') {
+    return res.status(400).json({
+      message: 'A imagem deve ser do tipo jpg.'
+    });
   }
 
   if (req.file.size > 5 * 1024 * 1024) {
-    return res.status(400).json({ message: 'A imagem deve ter no máximo 5MB' });
+    return res.status(400).json({
+      message: 'A imagem deve ter no máximo 5MB.'
+    });
   }
 
-  console.log('Entrei');
   next();
 };

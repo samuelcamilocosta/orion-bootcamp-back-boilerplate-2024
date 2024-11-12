@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { StudentService } from '../service/StudentService';
-import { StudentRepository } from '../repository/StudentRepository';
 
 export class StudentController {
   /**
@@ -106,6 +105,16 @@ export class StudentController {
    *                       location:
    *                         type: string
    *                         example: "body"
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Nível de ensino não encontrado."
    *       '500':
    *         description: Server error
    *         content:
@@ -131,6 +140,9 @@ export class StudentController {
         token: token
       });
     } catch (error) {
+      if (error.message === 'Nível de ensino não encontrado.') {
+        return res.status(404).json({ message: error.message });
+      }
       return res
         .status(500)
         .json({ message: 'Erro interno do servidor.', error });
@@ -223,12 +235,7 @@ export class StudentController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const students = await StudentRepository.findAllStudents();
-      if (!students) {
-        return res
-          .status(404)
-          .json({ message: 'Nenhum estudante encontrado.' });
-      }
+      const students = await StudentService.getAllStudents();
 
       return res.status(200).json(students);
     } catch (error) {
@@ -330,14 +337,13 @@ export class StudentController {
     try {
       const { id } = req.params;
 
-      const student = await StudentRepository.findStudentById(Number(id));
-
-      if (!student) {
-        return res.status(404).json({ message: 'Estudante não encontrado.' });
-      }
+      const student = await StudentService.getStudentById(Number(id));
 
       return res.status(200).json(student);
     } catch (error) {
+      if (error.message === 'Aluno não encontrado.') {
+        return res.status(404).json({ message: error.message });
+      }
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }

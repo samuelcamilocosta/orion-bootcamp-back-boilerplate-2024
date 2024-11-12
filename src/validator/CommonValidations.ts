@@ -27,14 +27,18 @@ export class CommonValidations {
       .notEmpty()
       .withMessage('Nome de usuário é obrigatório.')
       .custom(async (value: string): Promise<boolean> => {
-        const existingUser =
-          await UserRepository.findExistingUserByUsername(value);
+        try {
+          const existingUser =
+            await UserRepository.findExistingUserByUsername(value);
 
-        if (existingUser) {
-          return Promise.reject('Nome de usuário já cadastrado.');
+          if (existingUser) {
+            return Promise.reject('Nome de usuário já cadastrado.');
+          }
+
+          return Promise.resolve(true);
+        } catch (error) {
+          return Promise.reject('Erro interno do servidor.');
         }
-
-        return true;
       });
   }
 
@@ -45,9 +49,9 @@ export class CommonValidations {
       .withMessage('Data de nascimento inválida.')
       .notEmpty()
       .withMessage('Data de nascimento é obrigatória.')
-      .custom((value: string): boolean => {
+      .custom((value: string): Promise<boolean> => {
         if (!birthDateRegex.test(value)) {
-          throw new Error(
+          return Promise.reject(
             'Data de nascimento deve estar no formato DD/MM/YYYY.'
           );
         }
@@ -62,14 +66,14 @@ export class CommonValidations {
               ? true
               : false;
           if (day > 29 || (day === 29 && !isLeapYear)) {
-            throw new Error(dateErrorMessage);
+            return Promise.reject(dateErrorMessage);
           }
         } else if (month === 4 || month === 6 || month === 9 || month === 11) {
           if (day > 30) {
-            throw new Error(dateErrorMessage);
+            return Promise.reject(dateErrorMessage);
           }
         } else if (day > 31) {
-          throw new Error(dateErrorMessage);
+          return Promise.reject(dateErrorMessage);
         }
 
         const now = new Date();
@@ -84,10 +88,12 @@ export class CommonValidations {
         currentDate.setMinutes(currentDate.getMinutes() + offset);
 
         if (inputDate >= currentDate) {
-          throw new Error('Data de nascimento não pode ser uma data futura.');
+          return Promise.reject(
+            'Data de nascimento não pode ser uma data futura.'
+          );
         }
 
-        return true;
+        return Promise.resolve(true);
       })
       .customSanitizer((value: string): Date => {
         const [day, month, year] = value.split('/');
@@ -109,7 +115,7 @@ export class CommonValidations {
       .withMessage('Confirmação de senha é obrigatória.')
       .custom((value, { req }) => {
         if (value !== req.body.password) {
-          throw new Error('As senhas não correspondem.');
+          return Promise.reject('As senhas não coincidem.');
         }
         return true;
       });
@@ -126,7 +132,7 @@ export class CommonValidations {
       .withMessage('Senha deve ter no mínimo 6 caracteres.')
       .custom((value) => {
         if (!passwordRegex.test(value)) {
-          throw new Error(
+          return Promise.reject(
             'A senha deve ter ao menos 1 letra maiúscula, 1 número e 1 caractere especial.'
           );
         }
@@ -151,16 +157,20 @@ export class CommonValidations {
       .isEmail()
       .withMessage('Email inválido.')
       .custom(async (value: string): Promise<boolean> => {
-        const existingUser =
-          await UserRepository.findExistingUserByEmail(value);
+        try {
+          const existingUser =
+            await UserRepository.findExistingUserByEmail(value);
 
-        if (existingUser) {
-          return Promise.reject(
-            'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
-          );
+          if (existingUser) {
+            return Promise.reject(
+              'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
+            );
+          }
+
+          return Promise.resolve(true);
+        } catch (error) {
+          return Promise.reject('Erro interno do servidor.');
         }
-
-        return true;
       });
   }
 
@@ -168,40 +178,49 @@ export class CommonValidations {
     return body(['educationLevelId', 'educationLevelIds'])
       .trim()
       .custom(async (value, { req }) => {
-        const educationLevelId = req.body.educationLevelId;
-        const educationLevelIds = req.body.educationLevelIds;
+        try {
+          const educationLevelId = req.body.educationLevelId;
+          const educationLevelIds = req.body.educationLevelIds;
 
-        if (educationLevelId.length > 1) {
-          throw new Error(
-            'Somente um nível de ensino é permitido para educationLevelId.'
-          );
+          if (educationLevelId.length > 1) {
+            return Promise.reject(
+              'Somente um nível de ensino é permitido para educationLevelId.'
+            );
+          }
+
+          if (
+            (!educationLevelId && !educationLevelIds) ||
+            (educationLevelId.length === 0 && educationLevelIds.length === 0)
+          ) {
+            return Promise.reject('Níveis de ensino são obrigatórios.');
+          }
+
+          if (educationLevelId && educationLevelIds) {
+            return Promise.reject(
+              'Não é permitido o envio de educationLevelId e educationLevelIds simultaneamente.'
+            );
+          }
+
+          const educationLevels =
+            educationLevelIds || (educationLevelId ? [educationLevelId] : []);
+
+          const parsedValues = educationLevels.map((id: string) => Number(id));
+          const existingEducationLevels =
+            await EducationLevelRepository.findEducationLevelsByIds(
+              parsedValues
+            );
+
+          if (existingEducationLevels.length !== parsedValues.length) {
+            return Promise.reject('Um ou mais níveis de ensino não existem.');
+          }
+
+          return Promise.resolve(true);
+        } catch (error) {
+          if (error instanceof Error) {
+            return Promise.reject(error.message);
+          }
+          return Promise.reject('Erro interno do servidor.');
         }
-
-        if (
-          (!educationLevelId && !educationLevelIds) ||
-          (educationLevelId.length === 0 && educationLevelIds.length === 0)
-        ) {
-          throw new Error('Níveis de ensino são obrigatórios.');
-        }
-
-        if (educationLevelId && educationLevelIds) {
-          throw new Error(
-            'Não é permitido o envio de educationLevelId e educationLevelIds simultaneamente.'
-          );
-        }
-
-        const educationLevels =
-          educationLevelIds || (educationLevelId ? [educationLevelId] : []);
-
-        const parsedValues = educationLevels.map((id: string) => Number(id));
-        const existingEducationLevels =
-          await EducationLevelRepository.findEducationLevelsByIds(parsedValues);
-
-        if (existingEducationLevels.length !== parsedValues.length) {
-          throw new Error('Um ou mais níveis de ensino não existem.');
-        }
-
-        return true;
       });
   }
 }

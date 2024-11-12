@@ -138,6 +138,16 @@ export class LessonRequestController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aluno não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:

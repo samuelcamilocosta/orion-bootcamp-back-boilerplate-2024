@@ -10,12 +10,12 @@ export const UpdatePersonalDataValidator = (
   if (expertise && expertise.length > 50) {
     return res
       .status(400)
-      .json({ message: 'Quantidade inválida de caracteres' });
+      .json({ message: 'Quantidade inválida de caracteres.' });
   }
 
   if (projectReason && projectReason.length > 200) {
     return res.status(400).json({
-      message: 'Quantidade inválida de caracteres'
+      message: 'Quantidade inválida de caracteres.'
     });
   }
 

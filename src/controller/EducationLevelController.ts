@@ -76,8 +76,10 @@ export class EducationLevelController {
     try {
       const educationLevel =
         await EducationLevelService.createEducationLevel(levelType);
-
-      return res.status(201).json(educationLevel);
+      return res.status(201).json({
+        educationLevel,
+        message: 'Nível de ensino criado com sucesso!'
+      });
     } catch (error) {
       if (
         error.message === 'Nível de ensino é obrigatório.' ||
@@ -85,9 +87,7 @@ export class EducationLevelController {
       ) {
         return res.status(400).json({ message: error.message });
       }
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 

@@ -43,7 +43,7 @@ describe('updatePersonalData', () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Tutor atualizado com sucesso'
+        message: 'Tutor atualizado com sucesso!'
       })
     );
   });
@@ -59,7 +59,7 @@ describe('updatePersonalData', () => {
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Tutor não encontrado'
+      message: 'Tutor não encontrado.'
     });
   });
 
@@ -76,8 +76,7 @@ describe('updatePersonalData', () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Erro ao atualizar o tutor',
-      error: expect.any(Error)
+      message: 'Erro interno do servidor.'
     });
   });
 });

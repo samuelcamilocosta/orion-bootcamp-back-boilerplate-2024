@@ -114,9 +114,7 @@ export class AuthController {
           message: 'Email ou senha incorretos. Tente novamente.'
         });
       }
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error: errorMessage });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   };
 }

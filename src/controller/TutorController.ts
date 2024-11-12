@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { TutorService } from '../service/TutorService';
-import { TutorRepository } from '../repository/TutorRepository';
 
 export class TutorController {
   /**
@@ -105,6 +104,16 @@ export class TutorController {
    *                       location:
    *                         type: string
    *                         example: "body"
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Um ou mais níveis de ensino não encontrados."
    *       '500':
    *         description: Server error
    *         content:
@@ -130,6 +139,9 @@ export class TutorController {
         token: token
       });
     } catch (error) {
+      if (error.message === 'Um ou mais níveis de ensino não encontrados.') {
+        return res.status(404).json({ message: error.message });
+      }
       return res
         .status(500)
         .json({ message: 'Erro interno do servidor.', error });
@@ -228,6 +240,16 @@ export class TutorController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Nenhum tutor encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -241,9 +263,12 @@ export class TutorController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const tutors = await TutorRepository.findAllTutors();
+      const tutors = await TutorService.getAllTutors();
       return res.status(200).json(tutors);
     } catch (error) {
+      if (error.message === 'Nenhum tutor encontrado.') {
+        return res.status(404).json({ message: error.message });
+      }
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
@@ -306,6 +331,14 @@ export class TutorController {
    *                   example: "Token inválido."
    *       '404':
    *         description: Tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Tutor não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -321,10 +354,7 @@ export class TutorController {
     const { expertise, projectReason, subject: subjectIds, id } = req.body;
 
     try {
-      const tutor = await TutorRepository.findTutorById(id);
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado.' });
-      }
+      const tutor = await TutorService.getTutorById(id);
 
       await TutorService.updateTutorPersonalData(
         tutor,
@@ -335,6 +365,9 @@ export class TutorController {
 
       return res.status(200).json({ message: 'Tutor atualizado com sucesso' });
     } catch (error) {
+      if (error.message === 'Tutor não encontrado.') {
+        return res.status(404).json({ message: error.message });
+      }
       return res
         .status(500)
         .json({ message: 'Erro ao atualizar o tutor', error });
@@ -361,6 +394,17 @@ export class TutorController {
    *     responses:
    *       '200':
    *         description: Photo updated successfully
+   *         example: "Foto atualizada com sucesso!"
+   *       '400':
+   *         description: Bad request, missing or invalid data
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Arquivo de foto é obrigatório."
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -371,6 +415,16 @@ export class TutorController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
+   *       '404':
+   *         description: Tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Tutor não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -385,18 +439,19 @@ export class TutorController {
   async updatePhoto(req: Request, res: Response) {
     const { id } = req.body;
 
-    const tutor = await TutorRepository.findTutorById(id);
-    if (!tutor) {
-      return res.status(404).json({ message: 'Tutor não encontrado.' });
-    }
-
     try {
+      const tutor = await TutorService.getTutorById(id);
+
       await TutorService.updateTutorPhoto(tutor, req.file);
-      return res.status(200).json({ message: 'Foto atualizada com sucesso' });
+      return res.status(200).json({ message: 'Foto atualizada com sucesso!' });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro ao processar a imagem', error });
+      if (error.message === 'Arquivo de foto é obrigatório.') {
+        return res.status(400).json({ message: error.message });
+      }
+      if (error.message === 'Tutor não encontrado.') {
+        return res.status(404).json({ message: error.message });
+      }
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 
@@ -523,14 +578,24 @@ export class TutorController {
     const { id } = req.params;
 
     try {
-      const tutor = await TutorRepository.findTutorById(Number(id));
+      const tutor = await TutorService.getTutorById(Number(id));
 
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado.' });
-      }
-
-      return res.status(200).json(tutor);
+      const formattedTutor = {
+        id: tutor.id,
+        username: tutor.username,
+        email: tutor.email,
+        fullName: tutor.fullName,
+        cpf: tutor.cpf,
+        photoUrl: tutor.photoUrl,
+        educationLevels: tutor.educationLevels,
+        lessonRequests: tutor.lessonRequests,
+        subjects: tutor.subjects
+      };
+      return res.status(200).json(formattedTutor);
     } catch (error) {
+      if (error.message === 'Tutor não encontrado.') {
+        return res.status(404).json({ message: error.message });
+      }
       return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }

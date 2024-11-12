@@ -40,7 +40,7 @@ describe('UpdatePersonalDataValidator', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Quantidade inválida de caracteres'
+      message: 'Quantidade inválida de caracteres.'
     });
     expect(next).not.toHaveBeenCalled();
   });
@@ -55,7 +55,7 @@ describe('UpdatePersonalDataValidator', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Quantidade inválida de caracteres'
+      message: 'Quantidade inválida de caracteres.'
     });
     expect(next).not.toHaveBeenCalled();
   });

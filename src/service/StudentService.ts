@@ -25,7 +25,28 @@ export class StudentService extends UserService {
       student.educationLevel = foundEducationLevel;
     }
 
+    if (!foundEducationLevel) {
+      throw new Error('Nível de ensino não encontrado.');
+    }
+
     const savedStudent = await StudentRepository.saveStudent(student);
     return UserService.generateUserResponse(savedStudent, EnumUserType.STUDENT);
+  }
+
+  static async getStudentById(id: number) {
+    const student = await StudentRepository.findStudentById(id);
+
+    if (!student) {
+      throw new Error('Aluno não encontrado.');
+    }
+    return student;
+  }
+
+  static async getAllStudents() {
+    const students = await StudentRepository.findAllStudents();
+    if (!students) {
+      throw new Error('Nenhum aluno encontrado.');
+    }
+    return students;
   }
 }
