@@ -1,10 +1,9 @@
 import { body } from 'express-validator';
 import { EnumReasonName } from '../entity/enum/EnumReasonName';
-import { Subject } from '../entity/Subject';
-import { Student } from '../entity/Student';
-import { MysqlDataSource } from '../config/database';
 import { BaseValidator } from './BaseValidator';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
+import { StudentRepository } from '../repository/StudentRepository';
+import { SubjectRepository } from '../repository/SubjectRepository';
 
 export class LessonRequestValidator {
   static createLessonRequest() {
@@ -115,10 +114,7 @@ export class LessonRequestValidator {
         .notEmpty()
         .withMessage('Matéria é obrigatória.')
         .custom(async (value) => {
-          const subjectRepository = MysqlDataSource.getRepository(Subject);
-          const subject = await subjectRepository.findOne({
-            where: { subjectId: value }
-          });
+          const subject = await SubjectRepository.findSubjectById(value);
 
           if (!subject) {
             return Promise.reject('Matéria não encontrada.');
@@ -132,10 +128,7 @@ export class LessonRequestValidator {
         .notEmpty()
         .withMessage('Aluno é obrigatório.')
         .custom(async (value) => {
-          const studentRepository = MysqlDataSource.getRepository(Student);
-          const student = await studentRepository.findOne({
-            where: { id: value }
-          });
+          const student = await StudentRepository.findStudentById(value);
 
           if (!student) {
             return Promise.reject('Aluno não encontrado.');
