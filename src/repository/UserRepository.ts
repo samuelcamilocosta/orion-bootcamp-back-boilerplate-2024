@@ -12,6 +12,17 @@ export class UserRepository {
       userType === EnumUserType.TUTOR
         ? MysqlDataSource.getRepository(Tutor)
         : MysqlDataSource.getRepository(Student);
-    return await repository.findOne({ where: { email } });
+    return await repository.findOne({
+      where: { email },
+      select: [
+        'id',
+        'email',
+        'username',
+        'fullName',
+        'password',
+        'lessonRequests'
+      ],
+      relations: ['lessonRequests']
+    });
   }
 }

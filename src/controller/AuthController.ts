@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../service/AuthService';
-import { UserRepository } from '../repository/UserRepository';
 
 export class AuthController {
   /**
@@ -39,7 +38,10 @@ export class AuthController {
    *                 message:
    *                   type: string
    *                   example: "Login bem-sucedido."
-   *                 user:
+   *                 userId:
+   *                   type: integer
+   *                   example: 1
+   *                 role:
    *                   type: string
    *                   example: "aluno"
    *                 token:
@@ -99,36 +101,34 @@ export class AuthController {
     const { email, password, role, userType } = req.body;
 
     try {
-      const user = await UserRepository.findUserByEmail(email, userType);
-      const loginSuccess = 'Login bem-sucedido.';
-      const incorrectCredentials =
-        'Email ou senha incorretos. Tente novamente.';
+      const {
+        userId,
+        token,
+        role: userRole
+      } = await AuthService.login(email, password, role, userType);
 
-      if (!user) {
-        return res.status(404).json({ message: incorrectCredentials });
-      }
-
-      const { isMatch, roleFound } = await AuthService.verifyPassword(
-        user,
-        password
-      );
-      if (!isMatch) {
-        return res.status(400).json({ message: incorrectCredentials });
-      }
-
-      if (role !== roleFound) {
-        return res.status(400).json({ message: 'Tipo de usuário inválido.' });
-      }
-
-      const token = AuthService.generateToken(user.id, user.email, role);
-
-      return res
-        .status(200)
-        .json({ message: loginSuccess, role: role, token: token });
+      return res.status(200).json({
+        message: 'Login bem-sucedido.',
+        userId: userId,
+        role: userRole,
+        token: token
+      });
     } catch (error) {
+      const errorMessage = error.message;
+
+      if (errorMessage === 'Credenciais inválidas.') {
+        return res.status(400).json({
+          message: 'Email ou senha incorretos. Tente novamente.'
+        });
+      }
+      if (errorMessage === 'Usuário não encontrado.') {
+        return res.status(404).json({
+          message: 'Email ou senha incorretos. Tente novamente.'
+        });
+      }
       return res
         .status(500)
-        .json({ message: 'Erro interno do servidor.', error: error.message });
+        .json({ message: 'Erro interno do servidor.', error: errorMessage });
     }
   };
 }
