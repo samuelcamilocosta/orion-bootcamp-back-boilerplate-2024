@@ -6,20 +6,15 @@ import { UserRepository } from '../repository/UserRepository';
 import { EnumUserType } from '../entity/enum/EnumUserType';
 
 export class AuthService {
-  static async login(
-    email: string,
-    password: string,
-    role: string,
-    userType: string
-  ) {
+  static async login(email: string, password: string, role: string) {
     const invalidCredentials = 'Credenciais inválidas.';
-    if (!email || !password || !role || !userType) {
+    if (!email || !password || !role) {
       throw new Error(invalidCredentials);
     }
 
     const user = await UserRepository.findUserByEmail(
       email,
-      userType as EnumUserType
+      role as EnumUserType
     );
     if (!user) {
       throw new Error('Usuário não encontrado.');

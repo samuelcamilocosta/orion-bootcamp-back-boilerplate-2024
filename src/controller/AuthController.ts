@@ -98,14 +98,14 @@ export class AuthController {
    *                   type: string
    */
   public login = async (req: Request, res: Response): Promise<Response> => {
-    const { email, password, role, userType } = req.body;
+    const { email, password, role } = req.body;
 
     try {
       const {
         userId,
         token,
         role: userRole
-      } = await AuthService.login(email, password, role, userType);
+      } = await AuthService.login(email, password, role);
 
       return res.status(200).json({
         message: 'Login bem-sucedido.',
