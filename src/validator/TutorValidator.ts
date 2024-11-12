@@ -1,10 +1,9 @@
 import { body } from 'express-validator';
 import { cpf } from 'cpf-cnpj-validator';
-import { Tutor } from '../entity/Tutor';
-import { MysqlDataSource } from '../config/database';
 import { CommonValidations } from './CommonValidations';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
+import { TutorRepository } from '../repository/TutorRepository';
 
 export class TutorValidator extends CommonValidations {
   /**
@@ -35,11 +34,8 @@ export class TutorValidator extends CommonValidations {
           return true;
         })
         .custom(async (value: string): Promise<boolean> => {
-          const tutorRepository = MysqlDataSource.getRepository(Tutor);
           const cleanCpf = value.replace(/\D/g, '');
-          const existingTutor = await tutorRepository.findOne({
-            where: { cpf: cleanCpf }
-          });
+          const existingTutor = await TutorRepository.findTutorByCpf(cleanCpf);
 
           if (existingTutor) {
             return Promise.reject(

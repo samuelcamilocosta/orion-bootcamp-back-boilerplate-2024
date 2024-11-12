@@ -8,6 +8,11 @@ export class TutorRepository extends UserRepository {
     return await repository.save(tutor);
   }
 
+  static async findTutorByCpf(cpf: string) {
+    const repository = MysqlDataSource.getRepository(Tutor);
+    return await repository.findOne({ where: { cpf } });
+  }
+
   static async findAllTutors() {
     const repository = MysqlDataSource.getRepository(Tutor);
     return await repository.find({
