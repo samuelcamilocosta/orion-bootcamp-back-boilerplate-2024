@@ -8,15 +8,20 @@ export class UserRepository {
     const tutorRepository = MysqlDataSource.getRepository(Tutor);
     const studentRepository = MysqlDataSource.getRepository(Student);
 
-    const existingTutor = await tutorRepository.findOne({
-      where: { username: username }
-    });
+    return (
+      (await tutorRepository.findOne({ where: { username } })) ||
+      (await studentRepository.findOne({ where: { username } }))
+    );
+  }
 
-    const existingStudent = await studentRepository.findOne({
-      where: { username: username }
-    });
+  static async findExistingUserByEmail(email: string) {
+    const tutorRepository = MysqlDataSource.getRepository(Tutor);
+    const studentRepository = MysqlDataSource.getRepository(Student);
 
-    return existingStudent || existingTutor;
+    return (
+      (await tutorRepository.findOne({ where: { email } })) ||
+      (await studentRepository.findOne({ where: { email } }))
+    );
   }
 
   static async findUserByEmail(

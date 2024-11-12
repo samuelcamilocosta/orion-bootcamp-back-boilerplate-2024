@@ -1,11 +1,7 @@
 import { body } from 'express-validator';
 import * as bcrypt from 'bcrypt';
-import { MysqlDataSource } from '../config/database';
-import { EducationLevel } from '../entity/EducationLevel';
-import { Student } from '../entity/Student';
-import { Tutor } from '../entity/Tutor';
-import { In } from 'typeorm';
 import { UserRepository } from '../repository/UserRepository';
+import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 
 const birthDateRegex =
   /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -155,18 +151,10 @@ export class CommonValidations {
       .isEmail()
       .withMessage('Email inválido.')
       .custom(async (value: string): Promise<boolean> => {
-        const tutorRepository = MysqlDataSource.getRepository(Tutor);
-        const studentRepository = MysqlDataSource.getRepository(Student);
+        const existingUser =
+          await UserRepository.findExistingUserByEmail(value);
 
-        const existingTutor = await tutorRepository.findOne({
-          where: { email: value }
-        });
-
-        const existingStudent = await studentRepository.findOne({
-          where: { email: value }
-        });
-
-        if (existingTutor || existingStudent) {
+        if (existingUser) {
           return Promise.reject(
             'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
           );
@@ -180,9 +168,6 @@ export class CommonValidations {
     return body(['educationLevelId', 'educationLevelIds'])
       .trim()
       .custom(async (value, { req }) => {
-        const educationLevelRepository =
-          MysqlDataSource.getRepository(EducationLevel);
-
         const educationLevelId = req.body.educationLevelId;
         const educationLevelIds = req.body.educationLevelIds;
 
@@ -209,9 +194,8 @@ export class CommonValidations {
           educationLevelIds || (educationLevelId ? [educationLevelId] : []);
 
         const parsedValues = educationLevels.map((id: string) => Number(id));
-        const existingEducationLevels = await educationLevelRepository.find({
-          where: { educationId: In(parsedValues) }
-        });
+        const existingEducationLevels =
+          await EducationLevelRepository.findEducationLevelById(parsedValues);
 
         if (existingEducationLevels.length !== parsedValues.length) {
           throw new Error('Um ou mais níveis de ensino não existem.');

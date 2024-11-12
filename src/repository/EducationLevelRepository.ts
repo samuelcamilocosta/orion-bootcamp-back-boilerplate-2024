@@ -1,3 +1,4 @@
+import { In } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { EducationLevel } from '../entity/EducationLevel';
 
@@ -12,5 +13,10 @@ export class EducationLevelRepository {
   static async findAllEducationLevels() {
     const repository = MysqlDataSource.getRepository(EducationLevel);
     return await repository.find();
+  }
+
+  static async findEducationLevelById(ids: number[]) {
+    const repository = MysqlDataSource.getRepository(EducationLevel);
+    return await repository.find({ where: { educationId: In(ids) } });
   }
 }
