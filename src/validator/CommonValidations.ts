@@ -31,7 +31,8 @@ export class CommonValidations {
       .notEmpty()
       .withMessage('Nome de usuário é obrigatório.')
       .custom(async (value: string): Promise<boolean> => {
-        const existingUser = await UserRepository.findUserByUsername(value);
+        const existingUser =
+          await UserRepository.findExistingUserByUsername(value);
 
         if (existingUser) {
           return Promise.reject('Nome de usuário já cadastrado.');

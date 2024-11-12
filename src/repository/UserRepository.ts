@@ -4,7 +4,7 @@ import { MysqlDataSource } from '../config/database';
 import { EnumUserType } from '../entity/enum/EnumUserType';
 
 export class UserRepository {
-  static async findUserByUsername(username: string) {
+  static async findExistingUserByUsername(username: string) {
     const tutorRepository = MysqlDataSource.getRepository(Tutor);
     const studentRepository = MysqlDataSource.getRepository(Student);
 
