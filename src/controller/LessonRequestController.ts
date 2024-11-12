@@ -150,11 +150,13 @@ export class LessonRequestController {
    */
   async create(req: Request, res: Response) {
     try {
-      await LessonRequestService.createLessonRequest(req.body);
+      const lessonRequest = await LessonRequestService.createLessonRequest(
+        req.body
+      );
 
       return res.status(201).json({
         message: 'Seu pedido de aula foi enviado com sucesso!',
-        lessonRequest: req.body
+        lessonRequest
       });
     } catch (error) {
       if (error.message === 'Matéria não encontrada.') {
