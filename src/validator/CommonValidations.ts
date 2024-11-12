@@ -5,6 +5,7 @@ import { EducationLevel } from '../entity/EducationLevel';
 import { Student } from '../entity/Student';
 import { Tutor } from '../entity/Tutor';
 import { In } from 'typeorm';
+import { UserRepository } from '../repository/UserRepository';
 
 const birthDateRegex =
   /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -30,18 +31,9 @@ export class CommonValidations {
       .notEmpty()
       .withMessage('Nome de usuário é obrigatório.')
       .custom(async (value: string): Promise<boolean> => {
-        const tutorRepository = MysqlDataSource.getRepository(Tutor);
-        const studentRepository = MysqlDataSource.getRepository(Student);
+        const existingUser = await UserRepository.findUserByUsername(value);
 
-        const existingTutor = await tutorRepository.findOne({
-          where: { username: value }
-        });
-
-        const existingStudent = await studentRepository.findOne({
-          where: { username: value }
-        });
-
-        if (existingTutor || existingStudent) {
+        if (existingUser) {
           return Promise.reject('Nome de usuário já cadastrado.');
         }
 
