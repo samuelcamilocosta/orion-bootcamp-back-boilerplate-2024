@@ -36,6 +36,9 @@ export class EducationLevelController {
    *                 levelType:
    *                   type: string
    *                   example: "Fundamental"
+   *                 message:
+   *                   type: string
+   *                   example: "Nível de ensino criado com sucesso!"
    *       '400':
    *         description: Level type is required
    *         content:
@@ -108,8 +111,10 @@ export class EducationLevelController {
    *                 properties:
    *                   educationId:
    *                     type: integer
+   *                     example: 1
    *                   levelType:
    *                     type: string
+   *                     example: "Fundamental"
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:

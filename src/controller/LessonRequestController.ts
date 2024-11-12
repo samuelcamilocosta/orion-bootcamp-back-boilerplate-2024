@@ -21,8 +21,8 @@ export class LessonRequestController {
    *                 type: array
    *                 items:
    *                   type: string
-   *                 description: Reasons for the lesson
-   *                 example: ["reforço", "prova ou trabalho"]
+   *                   enum: ['reforço', 'prova ou trabalho', 'correção de exercício', 'outro']
+   *                 example: ["reforço"]
    *               preferredDates:
    *                 type: array
    *                 items:
@@ -60,6 +60,7 @@ export class LessonRequestController {
    *                       type: array
    *                       items:
    *                         type: string
+   *                       example: ["reforço"]
    *                     preferredDates:
    *                       type: array
    *                       items:
@@ -189,16 +190,20 @@ export class LessonRequestController {
    *                 properties:
    *                   classId:
    *                     type: integer
+   *                     example: 1
    *                   reason:
    *                     type: array
    *                     items:
    *                       type: string
+   *                     example: ["reforço"]
    *                   preferredDates:
    *                     type: array
    *                     items:
    *                       type: string
+   *                     example: ["29/12/2025 às 23:45"]
    *                   status:
    *                     type: string
+   *                     example: "pendente"
    *                   additionalInfo:
    *                     type: string
    *                   subjectId:
@@ -240,7 +245,7 @@ export class LessonRequestController {
    * @swagger
    * /api/get/lessonrequest/{id}:
    *   get:
-   *     summary: Retrieve a lesson request by ID
+   *     summary: Get lesson request by ID
    *     tags: [Lesson Request]
    *     security:
    *       - BearerAuth: []
@@ -260,20 +265,19 @@ export class LessonRequestController {
    *             schema:
    *               type: object
    *               properties:
-   *                 ClassId:
+   *                 classId:
    *                   type: integer
    *                   example: 1
    *                 reason:
    *                   type: array
    *                   items:
    *                     type: string
-   *                   example: ["reforço"]
+   *                     example: ["reforço"]
    *                 preferredDates:
    *                   type: array
    *                   items:
    *                     type: string
-   *                     format: date
-   *                   example: ["2023-10-01", "2023-10-02"]
+   *                     example: ["29/12/2025 às 23:45"]
    *                 status:
    *                   type: string
    *                   example: "pendente"
@@ -301,7 +305,7 @@ export class LessonRequestController {
    *                   type: string
    *                   example: "Aula não encontrada."
    *       '500':
-   *         description: Server error
+   *         description: Internal server error
    *         content:
    *           application/json:
    *             schema:

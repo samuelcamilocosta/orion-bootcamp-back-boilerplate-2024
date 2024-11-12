@@ -33,6 +33,16 @@ export class SubjectController {
    *                 message:
    *                   type: string
    *                   example: "Matéria criada com sucesso!"
+   *       '400':
+   *         description: Subject name is required
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Nome da matéria é obrigatório."
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -52,7 +62,7 @@ export class SubjectController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Erro interno no servidor"
+   *                   example: "Erro interno do servidor."
    */
   async create(req: Request, res: Response) {
     const { subjectName } = req.body;
@@ -65,7 +75,7 @@ export class SubjectController {
       if (error.message === 'Nome da matéria é obrigatório.') {
         return res.status(400).json({ message: error.message });
       }
-      return res.status(500).json({ message: 'Erro interno no servidor' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 
@@ -112,15 +122,14 @@ export class SubjectController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Internal Server Error"
+   *                   example: "Erro interno do servidor."
    */
   async getAll(req: Request, res: Response) {
     try {
       const subjects = await SubjectRepository.findAllSubjects();
       return res.status(200).json(subjects);
     } catch (error) {
-      console.error('Error fetching students:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 }

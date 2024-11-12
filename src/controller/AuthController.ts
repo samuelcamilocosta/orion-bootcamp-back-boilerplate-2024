@@ -27,6 +27,11 @@ export class AuthController {
    *                 type: string
    *                 description: Password of the user
    *                 example: "senhA@123"
+   *               role:
+   *                 type: string
+   *                 enum: [tutor, student]
+   *                 description: Role of the user
+   *                 example: "tutor"
    *     responses:
    *       '200':
    *         description: Login successful
@@ -48,32 +53,15 @@ export class AuthController {
    *                   type: string
    *                   description: JWT token for authenticated requests
    *       '400':
-   *         description: Invalid credentials or validation error
+   *         description: Invalid credentials
    *         content:
    *           application/json:
    *             schema:
    *               type: object
    *               properties:
-   *                    errors:
-   *                     type: array
-   *                     items:
-   *                      type: object
-   *                      properties:
-   *                        type:
-   *                          type: string
-   *                          example: "field"
-   *                        value:
-   *                          type: string
-   *                          example: ""
-   *                        msg:
-   *                          type: string
-   *                          example: "Email é obrigatório."
-   *                        path:
-   *                          type: string
-   *                          example: "email"
-   *                        location:
-   *                          type: string
-   *                          example: "body"
+   *                 message:
+   *                   type: string
+   *                   example: "Email ou senha incorretos. Tente novamente."
    *       '404':
    *         description: Email not found
    *         content:
