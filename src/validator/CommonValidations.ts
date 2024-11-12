@@ -195,7 +195,7 @@ export class CommonValidations {
 
         const parsedValues = educationLevels.map((id: string) => Number(id));
         const existingEducationLevels =
-          await EducationLevelRepository.findEducationLevelById(parsedValues);
+          await EducationLevelRepository.findEducationLevelsByIds(parsedValues);
 
         if (existingEducationLevels.length !== parsedValues.length) {
           throw new Error('Um ou mais níveis de ensino não existem.');

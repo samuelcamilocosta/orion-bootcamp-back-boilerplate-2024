@@ -15,7 +15,12 @@ export class EducationLevelRepository {
     return await repository.find();
   }
 
-  static async findEducationLevelById(ids: number[]) {
+  static async findEducationLevelById(id: number) {
+    const repository = MysqlDataSource.getRepository(EducationLevel);
+    return await repository.findOne({ where: { educationId: id } });
+  }
+
+  static async findEducationLevelsByIds(ids: number[]) {
     const repository = MysqlDataSource.getRepository(EducationLevel);
     return await repository.find({ where: { educationId: In(ids) } });
   }

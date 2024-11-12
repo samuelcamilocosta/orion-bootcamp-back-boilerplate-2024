@@ -1,14 +1,12 @@
-import { MysqlDataSource } from '../config/database';
 import { Tutor } from '../entity/Tutor';
 import { TutorRepository } from '../repository/TutorRepository';
 import { UserService } from './UserService';
-import { In } from 'typeorm';
-import { EducationLevel } from '../entity/EducationLevel';
 import { EnumUserType } from '../entity/enum/EnumUserType';
 import sharp from 'sharp';
 import { bucketName, randomImgName, s3 } from '../config/s3Client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { Subject } from '../entity/Subject';
+import { SubjectRepository } from '../repository/SubjectRepository';
+import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 
 export class TutorService extends UserService {
   static async createTutor(tutorData) {
@@ -32,14 +30,11 @@ export class TutorService extends UserService {
     tutor.email = email;
     tutor.cpf = cpf;
     tutor.salt = salt;
-    const foundEducationLevel = await MysqlDataSource.getRepository(
-      EducationLevel
-    ).find({
-      where: { educationId: In(educationLevelIds) }
-    });
+    const foundEducationLevels =
+      await EducationLevelRepository.findEducationLevelsByIds(educationLevelIds);
 
-    if (foundEducationLevel) {
-      tutor.educationLevels = foundEducationLevel;
+    if (foundEducationLevels) {
+      tutor.educationLevels = foundEducationLevels;
     }
 
     const savedTutor = await TutorRepository.saveTutor(tutor);
@@ -80,9 +75,7 @@ export class TutorService extends UserService {
   ) {
     tutor.expertise = expertise;
     tutor.projectReason = projectReason;
-    const foundSubjects = await MysqlDataSource.getRepository(Subject).find({
-      where: { subjectId: In(subjectIds) }
-    });
+    const foundSubjects = await SubjectRepository.findSubjectByIds(subjectIds);
 
     tutor.subjects = foundSubjects;
     return await TutorRepository.saveTutor(tutor);
