@@ -31,7 +31,9 @@ export class TutorService extends UserService {
     tutor.cpf = cpf;
     tutor.salt = salt;
     const foundEducationLevels =
-      await EducationLevelRepository.findEducationLevelsByIds(educationLevelIds);
+      await EducationLevelRepository.findEducationLevelsByIds(
+        educationLevelIds
+      );
 
     if (foundEducationLevels) {
       tutor.educationLevels = foundEducationLevels;

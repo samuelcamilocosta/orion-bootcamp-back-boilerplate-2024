@@ -1,9 +1,8 @@
-import { MysqlDataSource } from '../config/database';
 import { EnumUserType } from '../entity/enum/EnumUserType';
 import { Student } from '../entity/Student';
 import { StudentRepository } from '../repository/StudentRepository';
 import { UserService } from './UserService';
-import { EducationLevel } from '../entity/EducationLevel';
+import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 
 export class StudentService extends UserService {
   static async createStudent(studentData) {
@@ -19,9 +18,8 @@ export class StudentService extends UserService {
     student.email = email;
     student.salt = salt;
 
-    const foundEducationLevel = await MysqlDataSource.getRepository(
-      EducationLevel
-    ).findOne({ where: { educationId: educationLevelId } });
+    const foundEducationLevel =
+      await EducationLevelRepository.findEducationLevelById(educationLevelId);
 
     if (foundEducationLevel) {
       student.educationLevel = foundEducationLevel;
