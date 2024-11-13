@@ -351,7 +351,6 @@ export class TutorController {
 
     try {
       const tutor = await TutorService.getTutorById(id);
-
       await TutorService.updateTutorPersonalData(
         tutor,
         expertise,
@@ -568,19 +567,7 @@ export class TutorController {
     try {
       const { id } = req.params;
       const tutor = await TutorService.getTutorById(Number(id));
-
-      const formattedTutor = {
-        id: tutor.id,
-        username: tutor.username,
-        email: tutor.email,
-        fullName: tutor.fullName,
-        cpf: tutor.cpf,
-        photoUrl: tutor.photoUrl,
-        educationLevels: tutor.educationLevels,
-        lessonRequests: tutor.lessonRequests,
-        subjects: tutor.subjects
-      };
-      return res.status(200).json(formattedTutor);
+      return res.status(200).json(tutor);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });

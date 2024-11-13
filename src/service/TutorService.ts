@@ -10,6 +10,21 @@ import { AppError } from '../error/AppError';
 import { handleError } from '../utils/ErrorHandler';
 
 export class TutorService extends UserService {
+  private static formatTutor(tutor: Tutor) {
+    return {
+      id: tutor.id,
+      username: tutor.username,
+      fullName: tutor.fullName,
+      photoUrl: tutor.photoUrl,
+      birthDate: tutor.birthDate,
+      expertise: tutor.expertise,
+      projectReason: tutor.projectReason,
+      educationLevels: tutor.educationLevels,
+      lessonRequests: tutor.lessonRequests,
+      subjects: tutor.subjects
+    };
+  }
+
   static async createTutor(tutorData) {
     try {
       const {
@@ -54,7 +69,7 @@ export class TutorService extends UserService {
     }
   }
 
-  static async updateTutorPhoto(tutor: Tutor, file: Express.Multer.File) {
+  static async updateTutorPhoto(tutor, file: Express.Multer.File) {
     try {
       if (!tutor) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
@@ -75,7 +90,7 @@ export class TutorService extends UserService {
   }
 
   static async updateTutorPersonalData(
-    tutor: Tutor,
+    tutor,
     expertise: string,
     projectReason: string,
     subjectIds: number[]
@@ -109,7 +124,8 @@ export class TutorService extends UserService {
       if (!tutor) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
-      return tutor;
+
+      return TutorService.formatTutor(tutor);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -122,7 +138,8 @@ export class TutorService extends UserService {
       if (!tutors) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
-      return tutors;
+
+      return tutors.map(TutorService.formatTutor);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);

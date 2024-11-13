@@ -6,9 +6,7 @@ export class TutorRepository extends UserRepository {
   private static relations = ['educationLevels', 'lessonRequests', 'subjects'];
   private static selectFields = [
     'id',
-    'cpf',
     'username',
-    'email',
     'fullName',
     'photoUrl',
     'birthDate',
