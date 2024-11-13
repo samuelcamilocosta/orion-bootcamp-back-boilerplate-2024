@@ -67,7 +67,7 @@ export class LessonRequestService {
       );
 
       if (!lesson) {
-        throw new AppError(EnumErrorMessages.LESSON_NOT_FOUND, 404);
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
       return lesson;
     } catch (error) {
