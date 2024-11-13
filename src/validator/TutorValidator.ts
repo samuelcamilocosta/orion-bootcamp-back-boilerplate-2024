@@ -27,15 +27,15 @@ export class TutorValidator extends CommonValidations {
         .withMessage(EnumErrorMessages.CPF_INVALID)
         .notEmpty()
         .withMessage(EnumErrorMessages.CPF_REQUIRED)
-        .custom((value: string): Promise<boolean> => {
+        .custom((value: string): boolean => {
           try {
             const cleanCpf = value.replace(/\D/g, '');
             if (!cpf.isValid(cleanCpf)) {
-              return Promise.reject(EnumErrorMessages.CPF_INVALID);
+              throw new Error(EnumErrorMessages.CPF_INVALID);
             }
-            return Promise.resolve(true);
+            return true;
           } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .custom(async (value: string): Promise<boolean> => {
@@ -45,12 +45,12 @@ export class TutorValidator extends CommonValidations {
               await TutorRepository.findTutorByCpf(cleanCpf);
 
             if (existingTutor) {
-              return Promise.reject(EnumErrorMessages.CPF_ALREADY_EXISTS);
+              throw new Error(EnumErrorMessages.CPF_ALREADY_EXISTS);
             }
 
             return true;
           } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .customSanitizer((value: string): string => {

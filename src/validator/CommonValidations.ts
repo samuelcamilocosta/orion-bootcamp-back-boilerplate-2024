@@ -33,12 +33,12 @@ export class CommonValidations {
             await UserRepository.findExistingUserByUsername(value);
 
           if (existingUser) {
-            return Promise.reject(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
+            throw new Error(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
           }
 
-          return Promise.resolve(true);
+          return true;
         } catch (error) {
-          return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
@@ -50,9 +50,9 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.BIRTH_DATE_INVALID)
       .notEmpty()
       .withMessage(EnumErrorMessages.BIRTH_DATE_REQUIRED)
-      .custom((value: string): Promise<boolean> => {
+      .custom((value: string): boolean => {
         if (!birthDateRegex.test(value)) {
-          return Promise.reject(EnumErrorMessages.BIRTH_DATE_FORMAT);
+          throw new Error(EnumErrorMessages.BIRTH_DATE_FORMAT);
         }
 
         const [day, month, year] = value.split('/').map(Number);
@@ -63,14 +63,14 @@ export class CommonValidations {
               ? true
               : false;
           if (day > 29 || (day === 29 && !isLeapYear)) {
-            return Promise.reject(EnumErrorMessages.BIRTH_DATE_INCORRECT);
+            throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (month === 4 || month === 6 || month === 9 || month === 11) {
           if (day > 30) {
-            return Promise.reject(EnumErrorMessages.BIRTH_DATE_INCORRECT);
+            throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (day > 31) {
-          return Promise.reject(EnumErrorMessages.BIRTH_DATE_INCORRECT);
+          throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
         }
 
         const now = new Date();
@@ -85,10 +85,10 @@ export class CommonValidations {
         currentDate.setMinutes(currentDate.getMinutes() + offset);
 
         if (inputDate >= currentDate) {
-          return Promise.reject(EnumErrorMessages.BIRTH_DATE_FUTURE);
+          throw new Error(EnumErrorMessages.BIRTH_DATE_FUTURE);
         }
 
-        return Promise.resolve(true);
+        return true;
       })
       .customSanitizer((value: string): Date => {
         const [day, month, year] = value.split('/');
@@ -108,11 +108,11 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_INVALID)
       .notEmpty()
       .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_REQUIRED)
-      .custom((value, { req }) => {
+      .custom((value, { req }): boolean => {
         if (value !== req.body.password) {
-          return Promise.reject(EnumErrorMessages.PASSWORDS_NOT_MATCH);
+          throw new Error(EnumErrorMessages.PASSWORDS_NOT_MATCH);
         }
-        return Promise.resolve(true);
+        return true;
       });
   }
 
@@ -125,17 +125,17 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.PASSWORD_REQUIRED)
       .isLength({ min: 6 })
       .withMessage(EnumErrorMessages.PASSWORD_MIN_LENGTH)
-      .custom((value) => {
+      .custom((value): boolean => {
         if (!passwordRegex.test(value)) {
-          return Promise.reject(EnumErrorMessages.PASSWORD_REQUIREMENTS);
+          throw new Error(EnumErrorMessages.PASSWORD_REQUIREMENTS);
         }
-        return Promise.resolve(true);
+        return true;
       })
       .customSanitizer(
         async (value: string): Promise<{ hashedPassword; salt }> => {
           const salt = await bcrypt.genSalt(10);
           const hashedPassword = await bcrypt.hash(value, salt);
-          return Promise.resolve({ hashedPassword, salt });
+          return { hashedPassword, salt };
         }
       );
   }
@@ -155,12 +155,12 @@ export class CommonValidations {
             await UserRepository.findExistingUserByEmail(value);
 
           if (existingUser) {
-            return Promise.reject(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
+            throw new Error(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
           }
 
-          return Promise.resolve(true);
+          return true;
         } catch (error) {
-          return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
@@ -174,18 +174,18 @@ export class CommonValidations {
           const educationLevelIds = req.body.educationLevelIds;
 
           if (educationLevelId.length > 1) {
-            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
           }
 
           if (
             (!educationLevelId && !educationLevelIds) ||
             (educationLevelId.length === 0 && educationLevelIds.length === 0)
           ) {
-            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
           }
 
           if (educationLevelId && educationLevelIds) {
-            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
           }
 
           const educationLevels =
@@ -198,15 +198,15 @@ export class CommonValidations {
             );
 
           if (existingEducationLevels.length !== parsedValues.length) {
-            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);
           }
 
-          return Promise.resolve(true);
+          return true;
         } catch (error) {
           if (error instanceof Error) {
-            return Promise.reject(error.message);
+            throw new Error(error.message);
           }
-          return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }

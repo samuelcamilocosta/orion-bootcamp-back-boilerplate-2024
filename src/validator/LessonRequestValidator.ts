@@ -11,57 +11,49 @@ export class LessonRequestValidator {
     return BaseValidator.validationList([
       body('reason')
         .trim()
-        .custom((value) => {
-          try {
-            const validReasons = Object.values(EnumReasonName);
-            const invalidReason = EnumErrorMessages.REASON_INVALID.replace(
-              '${validReasons}',
-              validReasons.join(', ')
-            );
+        .custom((value): boolean => {
+          const validReasons = Object.values(EnumReasonName);
+          const invalidReason = EnumErrorMessages.REASON_INVALID.replace(
+            '${validReasons}',
+            validReasons.join(', ')
+          );
 
-            if (!Array.isArray(value)) {
-              return Promise.reject(invalidReason);
-            }
-
-            for (const reason of value) {
-              if (
-                typeof reason !== 'string' ||
-                !validReasons.includes(reason as EnumReasonName)
-              ) {
-                return Promise.reject(invalidReason);
-              }
-            }
-            return Promise.resolve(true);
-          } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+          if (!Array.isArray(value)) {
+            throw new Error(invalidReason);
           }
+
+          for (const reason of value) {
+            if (
+              typeof reason !== 'string' ||
+              !validReasons.includes(reason as EnumReasonName)
+            ) {
+              throw new Error(invalidReason);
+            }
+          }
+          return true;
         }),
       body('preferredDates')
         .isArray({ min: 1, max: 3 })
         .withMessage(EnumErrorMessages.PREFERRED_DATES_REQUIRED)
-        .custom((value) => {
-          try {
-            const dateRegex =
-              /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} às \d{2}:\d{2}$/;
-            for (const date of value) {
-              if (typeof date !== 'string' || !dateRegex.test(date)) {
-                return Promise.reject(EnumErrorMessages.DATE_FORMAT_INVALID);
-              }
-              const [day, month, yearTime] = date.split('/');
-              const [year] = yearTime.split(' às ');
-              const dateObject = new Date(`${year}-${month}-${day}`);
-              if (
-                dateObject.getFullYear() !== parseInt(year) ||
-                dateObject.getMonth() + 1 !== parseInt(month) ||
-                dateObject.getDate() !== parseInt(day)
-              ) {
-                return Promise.reject(EnumErrorMessages.DATE_INVALID);
-              }
+        .custom((value): boolean => {
+          const dateRegex =
+            /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} às \d{2}:\d{2}$/;
+          for (const date of value) {
+            if (typeof date !== 'string' || !dateRegex.test(date)) {
+              throw new Error(EnumErrorMessages.DATE_FORMAT_INVALID);
             }
-            return Promise.resolve(true);
-          } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+            const [day, month, yearTime] = date.split('/');
+            const [year] = yearTime.split(' às ');
+            const dateObject = new Date(`${year}-${month}-${day}`);
+            if (
+              dateObject.getFullYear() !== parseInt(year) ||
+              dateObject.getMonth() + 1 !== parseInt(month) ||
+              dateObject.getDate() !== parseInt(day)
+            ) {
+              throw new Error(EnumErrorMessages.DATE_INVALID);
+            }
           }
+          return true;
         })
         .custom(async (value, { req }) => {
           try {
@@ -69,9 +61,7 @@ export class LessonRequestValidator {
 
             const uniqueDates = new Set(value);
             if (uniqueDates.size !== value.length) {
-              return Promise.reject(
-                EnumErrorMessages.DUPLICATE_PREFERRED_DATES
-              );
+              throw new Error(EnumErrorMessages.DUPLICATE_PREFERRED_DATES);
             }
 
             await Promise.all(
@@ -83,7 +73,7 @@ export class LessonRequestValidator {
                 const lessonDate = new Date(formattedDate);
                 const now = new Date();
                 if (lessonDate < now) {
-                  return Promise.reject(
+                  throw new Error(
                     EnumErrorMessages.PAST_DATE_ERROR.replace('${date}', date)
                   );
                 }
@@ -95,7 +85,7 @@ export class LessonRequestValidator {
                   parseInt(minute) < 0 ||
                   parseInt(minute) > 59
                 ) {
-                  return Promise.reject(
+                  throw new Error(
                     EnumErrorMessages.TIME_INVALID.replace('${time}', time)
                   );
                 }
@@ -106,15 +96,15 @@ export class LessonRequestValidator {
                     studentId
                   );
                 if (existingLesson) {
-                  return Promise.reject(
+                  throw new Error(
                     EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
                   );
                 }
               })
             );
-            return Promise.resolve(true);
+            return true;
           } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .customSanitizer((value) => {
@@ -135,11 +125,11 @@ export class LessonRequestValidator {
           try {
             const subject = await SubjectRepository.findSubjectById(value);
             if (!subject) {
-              return Promise.reject(EnumErrorMessages.SUBJECT_NOT_FOUND);
+              throw new Error(EnumErrorMessages.SUBJECT_NOT_FOUND);
             }
-            return Promise.resolve(true);
+            return true;
           } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('studentId')
@@ -151,11 +141,11 @@ export class LessonRequestValidator {
           try {
             const student = await StudentRepository.findStudentById(value);
             if (!student) {
-              return Promise.reject(EnumErrorMessages.STUDENT_NOT_FOUND);
+              throw new Error(EnumErrorMessages.STUDENT_NOT_FOUND);
             }
-            return Promise.resolve(true);
+            return true;
           } catch (error) {
-            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('additionalInfo')
