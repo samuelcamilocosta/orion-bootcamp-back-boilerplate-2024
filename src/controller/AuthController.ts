@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../service/AuthService';
 import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class AuthController {
   /**
@@ -43,7 +44,8 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Login bem-sucedido."
+   *                   example: "Login realizado com sucesso!"
+   *                   enum: [EnumSuccessMessages.LOGIN_SUCCESS]
    *                 userId:
    *                   type: integer
    *                   example: 1
@@ -62,7 +64,8 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Email ou senha incorretos. Tente novamente."
+   *                   example: "Credenciais inválidas."
+   *                   enum: [EnumErrorMessages.INVALID_CREDENTIALS]
    *       '404':
    *         description: Email not found
    *         content:
@@ -72,7 +75,8 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Email ou senha incorretos. Tente novamente."
+   *                   example: "Credenciais inválidas."
+   *                   enum: [EnumErrorMessages.INVALID_CREDENTIALS]
    *       '500':
    *         description: Server error
    *         content:
@@ -83,6 +87,7 @@ export class AuthController {
    *                 message:
    *                   type: string
    *                   example: "Erro interno do servidor."
+   *                   enum: [EnumErrorMessages.INTERNAL_SERVER]
    *                 error:
    *                   type: string
    */
@@ -97,7 +102,7 @@ export class AuthController {
       } = await AuthService.login(email, password, role);
 
       return res.status(200).json({
-        message: 'Login bem-sucedido.',
+        message: EnumSuccessMessages.LOGIN_SUCCESS,
         userId: userId,
         role: userRole,
         token: token

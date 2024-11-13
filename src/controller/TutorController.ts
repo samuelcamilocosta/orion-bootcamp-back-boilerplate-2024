@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { TutorService } from '../service/TutorService';
 import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class TutorController {
   /**
@@ -135,7 +136,7 @@ export class TutorController {
       );
 
       return res.status(201).json({
-        message: 'Tutor criado com sucesso.',
+        message: EnumSuccessMessages.TUTOR_CREATED,
         tutorId: savedTutor.id,
         token: token
       });
@@ -358,14 +359,12 @@ export class TutorController {
         subjectIds
       );
 
-      return res.status(200).json({ message: 'Tutor atualizado com sucesso' });
-    } catch (error) {
-      if (error.message === 'Tutor não encontrado.') {
-        return res.status(404).json({ message: error.message });
-      }
       return res
-        .status(500)
-        .json({ message: 'Erro ao atualizar o tutor', error });
+        .status(200)
+        .json({ message: EnumSuccessMessages.TUTOR_UPDATED });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -438,7 +437,7 @@ export class TutorController {
       await TutorService.updateTutorPhoto(tutor, req.file);
 
       return res.status(200).json({
-        message: 'Foto atualizada com sucesso!'
+        message: EnumSuccessMessages.PHOTO_UPDATED
       });
     } catch (error) {
       const { statusCode, message } = handleError(error);

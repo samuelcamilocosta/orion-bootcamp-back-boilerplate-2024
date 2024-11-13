@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { StudentService } from '../service/StudentService';
 import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class StudentController {
   /**
@@ -136,7 +137,7 @@ export class StudentController {
       );
 
       return res.status(201).json({
-        message: 'Aluno criado com sucesso.',
+        message: EnumSuccessMessages.STUDENT_CREATED,
         id: savedStudent.id,
         token: token
       });

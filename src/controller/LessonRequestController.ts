@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { LessonRequestService } from '../service/LessonRequestService';
 import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class LessonRequestController {
   /**
@@ -167,7 +168,7 @@ export class LessonRequestController {
       );
 
       return res.status(201).json({
-        message: 'Seu pedido de aula foi enviado com sucesso!',
+        message: EnumSuccessMessages.LESSON_REQUEST_CREATED,
         lessonRequest
       });
     } catch (error) {

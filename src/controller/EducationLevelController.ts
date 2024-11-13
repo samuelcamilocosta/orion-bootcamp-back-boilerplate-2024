@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { EducationLevelService } from '../service/EducationLevelService';
 import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class EducationLevelController {
   /**
@@ -78,7 +79,7 @@ export class EducationLevelController {
         await EducationLevelService.createEducationLevel(levelType);
       return res.status(201).json({
         educationLevel,
-        message: 'Nível de ensino criado com sucesso!'
+        message: EnumSuccessMessages.EDUCATION_LEVEL_CREATED
       });
     } catch (error) {
       const { statusCode, message } = handleError(error);

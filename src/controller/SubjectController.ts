@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { SubjectService } from '../service/SubjectService';
 import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class SubjectController {
   /**
@@ -69,7 +70,9 @@ export class SubjectController {
 
     try {
       await SubjectService.createSubject(subjectName);
-      return res.status(201).json({ message: 'Matéria criada com sucesso!' });
+      return res
+        .status(201)
+        .json({ message: EnumSuccessMessages.SUBJECT_CREATED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });
