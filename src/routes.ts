@@ -84,6 +84,11 @@ router.get('/api/get/lessonrequest', new LessonRequestController().getAll);
 
 router.get('/api/get/lessonrequest/:id', new LessonRequestController().getById);
 
+router.delete(
+  '/api/delete/lessonrequest/:id',
+  new LessonRequestController().DeleteById
+);
+
 // Subject route
 router.post('/api/register/subject', new SubjectController().create);
 router.get('/api/get/subject', new SubjectController().getAll);
