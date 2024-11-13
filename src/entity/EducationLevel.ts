@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { EnumLevelName } from './enum/EnumLevelName';
+import { EnumLevelName } from '../enum/enum/EnumLevelName';
 
 @Entity()
 export class EducationLevel {

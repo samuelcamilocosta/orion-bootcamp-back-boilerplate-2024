@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 import { BaseValidator } from './BaseValidator';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class AuthValidator extends BaseValidator {
   /**

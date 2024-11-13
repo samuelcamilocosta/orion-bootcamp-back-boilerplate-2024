@@ -1,7 +1,7 @@
 import { Subject } from '../entity/Subject';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class SubjectService {
   static async createSubject(subjectName: string) {

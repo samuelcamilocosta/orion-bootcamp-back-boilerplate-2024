@@ -1,11 +1,11 @@
 import { Tutor } from '../entity/Tutor';
 import { TutorRepository } from '../repository/TutorRepository';
 import { UserService } from './UserService';
-import { EnumUserType } from '../entity/enum/EnumUserType';
+import { EnumUserType } from '../enum/EnumUserType';
 import { S3Service } from './S3Service';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { AppError } from '../error/AppError';
 import { handleError } from '../utils/ErrorHandler';
 

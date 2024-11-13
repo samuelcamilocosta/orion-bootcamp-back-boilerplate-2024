@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { TutorController } from '../controller/TutorController';
 import { MysqlDataSource } from '../config/database';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 jest.mock('../config/database');
 const updatePersonalData = TutorController.prototype.updatePersonalData;

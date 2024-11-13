@@ -1,8 +1,8 @@
-import { EnumLevelName } from '../entity/enum/EnumLevelName';
+import { EnumLevelName } from '../enum/EnumLevelName';
 import { EducationLevel } from '../entity/EducationLevel';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { handleError } from '../utils/ErrorHandler';
 
 export class EducationLevelService {

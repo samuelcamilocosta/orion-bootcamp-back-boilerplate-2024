@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
-import { EnumLevelName } from '../entity/enum/EnumLevelName';
+import { EnumLevelName } from '../enum/enum/EnumLevelName';
 
 export class CreateEducationLevelTable1730156513928
   implements MigrationInterface

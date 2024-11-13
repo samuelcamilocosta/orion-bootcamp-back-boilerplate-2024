@@ -1,10 +1,10 @@
 import { LessonRequest } from '../entity/LessonRequest';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
-import { EnumStatusName } from '../entity/enum/EnumStatusName';
+import { EnumStatusName } from '../enum/EnumStatusName';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { StudentRepository } from '../repository/StudentRepository';
 import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class LessonRequestService {
   static async createLessonRequest(lessonRequestData) {

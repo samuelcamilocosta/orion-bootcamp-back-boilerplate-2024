@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export const UploadPhotoValidator = (
   req: Request,

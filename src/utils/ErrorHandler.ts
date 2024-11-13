@@ -1,5 +1,5 @@
 import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export const handleError = (error: Error) => {
   if (error instanceof AppError) {

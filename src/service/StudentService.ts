@@ -1,11 +1,11 @@
-import { EnumUserType } from '../entity/enum/EnumUserType';
+import { EnumUserType } from '../enum/EnumUserType';
 import { Student } from '../entity/Student';
 import { StudentRepository } from '../repository/StudentRepository';
 import { UserService } from './UserService';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 import { handleError } from '../utils/ErrorHandler';
 import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class StudentService extends UserService {
   static async createStudent(studentData) {

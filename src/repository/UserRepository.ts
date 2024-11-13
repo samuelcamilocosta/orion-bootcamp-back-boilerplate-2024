@@ -1,7 +1,7 @@
 import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { MysqlDataSource } from '../config/database';
-import { EnumUserType } from '../entity/enum/EnumUserType';
+import { EnumUserType } from '../enum/enum/EnumUserType';
 
 export class UserRepository {
   static async findExistingUserByUsername(username: string) {

@@ -4,7 +4,7 @@ import { CommonValidations } from './CommonValidations';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
 import { TutorRepository } from '../repository/TutorRepository';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class TutorValidator extends CommonValidations {
   /**

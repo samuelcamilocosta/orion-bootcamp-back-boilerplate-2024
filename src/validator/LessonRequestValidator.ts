@@ -1,10 +1,10 @@
 import { body } from 'express-validator';
-import { EnumReasonName } from '../entity/enum/EnumReasonName';
+import { EnumReasonName } from '../enum/EnumReasonName';
 import { BaseValidator } from './BaseValidator';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
 import { StudentRepository } from '../repository/StudentRepository';
 import { SubjectRepository } from '../repository/SubjectRepository';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class LessonRequestValidator {
   static createLessonRequest() {

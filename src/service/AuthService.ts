@@ -3,9 +3,9 @@ import * as bcrypt from 'bcrypt';
 import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { UserRepository } from '../repository/UserRepository';
-import { EnumUserType } from '../entity/enum/EnumUserType';
+import { EnumUserType } from '../enum/EnumUserType';
 import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class AuthService {
   static async login(email: string, password: string, role: string) {

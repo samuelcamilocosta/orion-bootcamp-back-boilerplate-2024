@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../repository/UserRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 const birthDateRegex =
   /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;

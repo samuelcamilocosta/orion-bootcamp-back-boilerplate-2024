@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UpdatePersonalDataValidator } from '../validator/UpdatePersonalDataValidator';
-import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 describe('UpdatePersonalDataValidator', () => {
   let req: Partial<Request>;
