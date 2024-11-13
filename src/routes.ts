@@ -69,6 +69,12 @@ router.get(
   new StudentController().getById
 );
 
+router.get(
+  '/api/get/student-pending/:id',
+  authMiddleware(),
+  new StudentController().getPendingLessonByStudentId
+);
+
 // Education Level routes
 router.post(
   '/api/register/educationlevel',

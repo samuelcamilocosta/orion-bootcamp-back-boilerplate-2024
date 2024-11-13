@@ -1,6 +1,7 @@
 import { MysqlDataSource } from '../config/database';
 import { Student } from '../entity/Student';
 import { UserRepository } from './UserRepository';
+import { EnumStatusName } from '../enum/EnumStatusName';
 
 export class StudentRepository extends UserRepository {
   static async saveStudent(student: Student): Promise<Student> {
@@ -33,9 +34,43 @@ export class StudentRepository extends UserRepository {
         'email',
         'fullName',
         'educationLevel',
+        'birthDate',
         'lessonRequests'
       ],
       relations: ['educationLevel', 'lessonRequests']
     });
+  }
+
+  static async findPendingLessonByStudentId(id: number) {
+    const repository = MysqlDataSource.getRepository(Student);
+    const rawResults = await repository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .where('student.id = :id', { id })
+      .andWhere('lessonRequest.status = :status', {
+        status: EnumStatusName.PENDENTE
+      })
+      .select([
+        'lessonRequest.ClassId as classId',
+        'lessonRequest.reason as reason',
+        'lessonRequest.preferredDates as preferredDates',
+        'lessonRequest.status as status',
+        'lessonRequest.additionalInfo as additionalInfo',
+        'lessonRequest.subject.subjectId as subjectId',
+        'lessonRequest.student.id as studentId',
+        'lessonRequest.tutor.id as tutorId'
+      ])
+      .getRawMany();
+
+    return rawResults.map((result) => ({
+      classId: result.classId,
+      reason: result.reason,
+      preferredDates: result.preferredDates,
+      status: result.status,
+      additionalInfo: result.additionalInfo,
+      subjectId: result.subjectId,
+      studentId: result.studentId,
+      tutorId: result.tutorId
+    }));
   }
 }
