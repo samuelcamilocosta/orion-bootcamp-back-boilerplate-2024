@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum EnumErrorMessages {
   // System errors
   INTERNAL_SERVER = 'Erro interno do servidor.',
@@ -28,7 +29,6 @@ export enum EnumErrorMessages {
   // Tutor errors
   TUTOR_NOT_FOUND = 'Tutor não encontrado.',
   TUTOR_ID_REQUIRED = 'ID do tutor é obrigatório e deve ser um número.',
-  TUTOR_REGISTRATION_ERROR = 'Não foi possível concluir o cadastro. Verifique os dados inseridos.',
   CPF_ALREADY_EXISTS = 'Não foi possível concluir o cadastro. Verifique os dados inseridos.',
   CPF_REQUIRED = 'CPF é obrigatório.',
   CPF_INVALID = 'CPF inválido.',
@@ -84,3 +84,4 @@ export enum EnumErrorMessages {
   // Character length validation errors
   INVALID_CHAR_LENGTH = 'Quantidade inválida de caracteres.'
 }
+/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
