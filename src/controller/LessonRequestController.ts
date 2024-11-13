@@ -3,6 +3,7 @@ import { LessonRequest } from '../entity/LessonRequest';
 import { Request, Response } from 'express';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
+import { DeleteLessonRequestService } from '../service/DeleteLessonRequestService';
 
 export class LessonRequestController {
   async create(req: Request, res: Response) {
@@ -162,6 +163,80 @@ export class LessonRequestController {
       return res.status(200).json(lesson);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
+  }
+
+  /**
+   * @swagger
+   * /api/delete/lessonrequest/{id}:
+   *   delete:
+   *     summary: Delete a lesson request by ID
+   *     tags: [lesson]
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         description: ID of the lesson request to delete
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     responses:
+   *       '204':
+   *         description: Lesson request deleted successfully
+   *       '400':
+   *         description: Invalid parameter
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Parâmetro inválido"
+   *       '404':
+   *         description: Lesson request not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Pedido de aula não existe"
+   *       '500':
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno no servidor"
+   */
+
+  async DeleteById(req: Request, res: Response) {
+    const classId = Number(req.params.id);
+
+    if (isNaN(classId) || classId <= 0) {
+      return res.status(400).json({ message: 'Parâmetro inválido' });
+    }
+
+    const service = new DeleteLessonRequestService();
+
+    try {
+      const result = await service.execute(Number(classId));
+
+      if (result instanceof Error) {
+        return res.status(404).json({ message: result.message });
+      }
+
+      return res
+        .status(204)
+        .end()
+        .json({ message: 'Pedido de aula deletado com sucesso' });
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro interno no servidor' });
     }
   }
 }
