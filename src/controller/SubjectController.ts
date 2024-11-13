@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { SubjectService } from '../service/SubjectService';
-import { SubjectRepository } from '../repository/SubjectRepository';
+import { handleError } from '../utils/ErrorHandler';
 
 export class SubjectController {
   /**
@@ -69,13 +69,10 @@ export class SubjectController {
 
     try {
       await SubjectService.createSubject(subjectName);
-
       return res.status(201).json({ message: 'Matéria criada com sucesso!' });
     } catch (error) {
-      if (error.message === 'Nome da matéria é obrigatório.') {
-        return res.status(400).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -126,10 +123,11 @@ export class SubjectController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const subjects = await SubjectRepository.findAllSubjects();
+      const subjects = await SubjectService.getAllSubjects();
       return res.status(200).json(subjects);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

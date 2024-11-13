@@ -2,6 +2,7 @@ import { body } from 'express-validator';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../repository/UserRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 const birthDateRegex =
   /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -14,30 +15,30 @@ export class CommonValidations {
     return body('fullName')
       .trim()
       .isString()
-      .withMessage('Nome completo inválido.')
+      .withMessage(EnumErrorMessages.FULL_NAME_INVALID)
       .notEmpty()
-      .withMessage('Nome completo é obrigatório.');
+      .withMessage(EnumErrorMessages.FULL_NAME_REQUIRED);
   }
 
   protected username() {
     return body('username')
       .trim()
       .isString()
-      .withMessage('Nome de usuário inválido.')
+      .withMessage(EnumErrorMessages.USERNAME_INVALID)
       .notEmpty()
-      .withMessage('Nome de usuário é obrigatório.')
+      .withMessage(EnumErrorMessages.USERNAME_REQUIRED)
       .custom(async (value: string): Promise<boolean> => {
         try {
           const existingUser =
             await UserRepository.findExistingUserByUsername(value);
 
           if (existingUser) {
-            return Promise.reject('Nome de usuário já cadastrado.');
+            return Promise.reject(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
           }
 
           return Promise.resolve(true);
         } catch (error) {
-          return Promise.reject('Erro interno do servidor.');
+          return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
@@ -46,19 +47,15 @@ export class CommonValidations {
     return body('birthDate')
       .trim()
       .isString()
-      .withMessage('Data de nascimento inválida.')
+      .withMessage(EnumErrorMessages.BIRTH_DATE_INVALID)
       .notEmpty()
-      .withMessage('Data de nascimento é obrigatória.')
+      .withMessage(EnumErrorMessages.BIRTH_DATE_REQUIRED)
       .custom((value: string): Promise<boolean> => {
         if (!birthDateRegex.test(value)) {
-          return Promise.reject(
-            'Data de nascimento deve estar no formato DD/MM/YYYY.'
-          );
+          return Promise.reject(EnumErrorMessages.BIRTH_DATE_FORMAT);
         }
 
         const [day, month, year] = value.split('/').map(Number);
-        const dateErrorMessage =
-          'Data de nascimento incorreta, verifique a data inserida.';
 
         if (month === 2) {
           const isLeapYear =
@@ -66,14 +63,14 @@ export class CommonValidations {
               ? true
               : false;
           if (day > 29 || (day === 29 && !isLeapYear)) {
-            return Promise.reject(dateErrorMessage);
+            return Promise.reject(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (month === 4 || month === 6 || month === 9 || month === 11) {
           if (day > 30) {
-            return Promise.reject(dateErrorMessage);
+            return Promise.reject(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (day > 31) {
-          return Promise.reject(dateErrorMessage);
+          return Promise.reject(EnumErrorMessages.BIRTH_DATE_INCORRECT);
         }
 
         const now = new Date();
@@ -88,9 +85,7 @@ export class CommonValidations {
         currentDate.setMinutes(currentDate.getMinutes() + offset);
 
         if (inputDate >= currentDate) {
-          return Promise.reject(
-            'Data de nascimento não pode ser uma data futura.'
-          );
+          return Promise.reject(EnumErrorMessages.BIRTH_DATE_FUTURE);
         }
 
         return Promise.resolve(true);
@@ -110,14 +105,14 @@ export class CommonValidations {
     return body('confirmPassword')
       .trim()
       .isString()
-      .withMessage('Confirmação de senha inválida.')
+      .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_INVALID)
       .notEmpty()
-      .withMessage('Confirmação de senha é obrigatória.')
+      .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_REQUIRED)
       .custom((value, { req }) => {
         if (value !== req.body.password) {
-          return Promise.reject('As senhas não coincidem.');
+          return Promise.reject(EnumErrorMessages.PASSWORDS_NOT_MATCH);
         }
-        return true;
+        return Promise.resolve(true);
       });
   }
 
@@ -125,18 +120,16 @@ export class CommonValidations {
     return body('password')
       .trim()
       .isString()
-      .withMessage('Senha inválida.')
+      .withMessage(EnumErrorMessages.PASSWORD_INVALID)
       .notEmpty()
-      .withMessage('Senha é obrigatória.')
+      .withMessage(EnumErrorMessages.PASSWORD_REQUIRED)
       .isLength({ min: 6 })
-      .withMessage('Senha deve ter no mínimo 6 caracteres.')
+      .withMessage(EnumErrorMessages.PASSWORD_MIN_LENGTH)
       .custom((value) => {
         if (!passwordRegex.test(value)) {
-          return Promise.reject(
-            'A senha deve ter ao menos 1 letra maiúscula, 1 número e 1 caractere especial.'
-          );
+          return Promise.reject(EnumErrorMessages.PASSWORD_REQUIREMENTS);
         }
-        return true;
+        return Promise.resolve(true);
       })
       .customSanitizer(
         async (value: string): Promise<{ hashedPassword; salt }> => {
@@ -151,25 +144,23 @@ export class CommonValidations {
     return body('email')
       .trim()
       .isString()
-      .withMessage('Email inválido.')
+      .withMessage(EnumErrorMessages.EMAIL_INVALID)
       .notEmpty()
-      .withMessage('Email é obrigatório.')
+      .withMessage(EnumErrorMessages.EMAIL_REQUIRED)
       .isEmail()
-      .withMessage('Email inválido.')
+      .withMessage(EnumErrorMessages.EMAIL_INVALID)
       .custom(async (value: string): Promise<boolean> => {
         try {
           const existingUser =
             await UserRepository.findExistingUserByEmail(value);
 
           if (existingUser) {
-            return Promise.reject(
-              'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
-            );
+            return Promise.reject(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
           }
 
           return Promise.resolve(true);
         } catch (error) {
-          return Promise.reject('Erro interno do servidor.');
+          return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
@@ -183,22 +174,18 @@ export class CommonValidations {
           const educationLevelIds = req.body.educationLevelIds;
 
           if (educationLevelId.length > 1) {
-            return Promise.reject(
-              'Somente um nível de ensino é permitido para educationLevelId.'
-            );
+            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
           }
 
           if (
             (!educationLevelId && !educationLevelIds) ||
             (educationLevelId.length === 0 && educationLevelIds.length === 0)
           ) {
-            return Promise.reject('Níveis de ensino são obrigatórios.');
+            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
           }
 
           if (educationLevelId && educationLevelIds) {
-            return Promise.reject(
-              'Não é permitido o envio de educationLevelId e educationLevelIds simultaneamente.'
-            );
+            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
           }
 
           const educationLevels =
@@ -211,7 +198,7 @@ export class CommonValidations {
             );
 
           if (existingEducationLevels.length !== parsedValues.length) {
-            return Promise.reject('Um ou mais níveis de ensino não existem.');
+            return Promise.reject(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);
           }
 
           return Promise.resolve(true);
@@ -219,7 +206,7 @@ export class CommonValidations {
           if (error instanceof Error) {
             return Promise.reject(error.message);
           }
-          return Promise.reject('Erro interno do servidor.');
+          return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }

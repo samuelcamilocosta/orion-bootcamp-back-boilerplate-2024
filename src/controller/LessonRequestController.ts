@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { LessonRequestService } from '../service/LessonRequestService';
+import { handleError } from '../utils/ErrorHandler';
 
 export class LessonRequestController {
   /**
@@ -170,13 +171,8 @@ export class LessonRequestController {
         lessonRequest
       });
     } catch (error) {
-      if (error.message === 'Matéria não encontrada.') {
-        return res.status(404).json({ message: 'Matéria não encontrada.' });
-      }
-      if (error.message === 'Aluno não encontrado.') {
-        return res.status(404).json({ message: 'Aluno não encontrado.' });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -244,10 +240,10 @@ export class LessonRequestController {
   async getAll(req: Request, res: Response) {
     try {
       const lessonRequests = await LessonRequestService.getAllLessonRequests();
-
       return res.status(200).json(lessonRequests);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -335,10 +331,8 @@ export class LessonRequestController {
 
       return res.status(200).json(lesson);
     } catch (error) {
-      if (error.message === 'Aula não encontrada.') {
-        return res.status(404).json({ message: 'Aula não encontrada.' });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

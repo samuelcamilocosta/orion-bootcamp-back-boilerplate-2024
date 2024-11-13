@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 export const UpdatePersonalDataValidator = (
   req: Request,
@@ -10,12 +11,12 @@ export const UpdatePersonalDataValidator = (
   if (expertise && expertise.length > 50) {
     return res
       .status(400)
-      .json({ message: 'Quantidade inválida de caracteres.' });
+      .json({ message: EnumErrorMessages.EXPERTISE_LENGTH_EXCEEDED });
   }
 
   if (projectReason && projectReason.length > 200) {
     return res.status(400).json({
-      message: 'Quantidade inválida de caracteres.'
+      message: EnumErrorMessages.PROJECT_REASON_LENGTH_EXCEEDED
     });
   }
 

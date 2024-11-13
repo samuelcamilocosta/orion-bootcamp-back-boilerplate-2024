@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UpdatePersonalDataValidator } from '../validator/UpdatePersonalDataValidator';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 describe('UpdatePersonalDataValidator', () => {
   let req: Partial<Request>;
@@ -40,7 +41,7 @@ describe('UpdatePersonalDataValidator', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Quantidade inválida de caracteres.'
+      message: EnumErrorMessages.EXPERTISE_LENGTH_EXCEEDED
     });
     expect(next).not.toHaveBeenCalled();
   });
@@ -55,7 +56,7 @@ describe('UpdatePersonalDataValidator', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Quantidade inválida de caracteres.'
+      message: EnumErrorMessages.PROJECT_REASON_LENGTH_EXCEEDED
     });
     expect(next).not.toHaveBeenCalled();
   });

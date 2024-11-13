@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { TutorService } from '../service/TutorService';
+import { handleError } from '../utils/ErrorHandler';
 
 export class TutorController {
   /**
@@ -139,12 +140,8 @@ export class TutorController {
         token: token
       });
     } catch (error) {
-      if (error.message === 'Um ou mais níveis de ensino não encontrados.') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -266,10 +263,8 @@ export class TutorController {
       const tutors = await TutorService.getAllTutors();
       return res.status(200).json(tutors);
     } catch (error) {
-      if (error.message === 'Nenhum tutor encontrado.') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -437,21 +432,17 @@ export class TutorController {
    *                   example: "Erro interno do servidor."
    */
   async updatePhoto(req: Request, res: Response) {
-    const { id } = req.body;
-
     try {
+      const { id } = req.body;
       const tutor = await TutorService.getTutorById(id);
-
       await TutorService.updateTutorPhoto(tutor, req.file);
-      return res.status(200).json({ message: 'Foto atualizada com sucesso!' });
+
+      return res.status(200).json({
+        message: 'Foto atualizada com sucesso!'
+      });
     } catch (error) {
-      if (error.message === 'Arquivo de foto é obrigatório.') {
-        return res.status(400).json({ message: error.message });
-      }
-      if (error.message === 'Tutor não encontrado.') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -575,9 +566,8 @@ export class TutorController {
    *                   example: "Erro interno do servidor."
    */
   async getById(req: Request, res: Response) {
-    const { id } = req.params;
-
     try {
+      const { id } = req.params;
       const tutor = await TutorService.getTutorById(Number(id));
 
       const formattedTutor = {
@@ -593,10 +583,8 @@ export class TutorController {
       };
       return res.status(200).json(formattedTutor);
     } catch (error) {
-      if (error.message === 'Tutor não encontrado.') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

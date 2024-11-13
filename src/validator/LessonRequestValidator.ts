@@ -4,6 +4,7 @@ import { BaseValidator } from './BaseValidator';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
 import { StudentRepository } from '../repository/StudentRepository';
 import { SubjectRepository } from '../repository/SubjectRepository';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 export class LessonRequestValidator {
   static createLessonRequest() {
@@ -13,7 +14,10 @@ export class LessonRequestValidator {
         .custom((value) => {
           try {
             const validReasons = Object.values(EnumReasonName);
-            const invalidReason = `Motivo da aula inválido. Deve conter ao menos um desses: ${validReasons.join(', ')}`;
+            const invalidReason = EnumErrorMessages.REASON_INVALID.replace(
+              '${validReasons}',
+              validReasons.join(', ')
+            );
 
             if (!Array.isArray(value)) {
               return Promise.reject(invalidReason);
@@ -27,25 +31,21 @@ export class LessonRequestValidator {
                 return Promise.reject(invalidReason);
               }
             }
-            return true;
+            return Promise.resolve(true);
           } catch (error) {
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('preferredDates')
         .isArray({ min: 1, max: 3 })
-        .withMessage(
-          'Datas preferidas são obrigatórias. Mínimo de 1 e máximo de 3.'
-        )
+        .withMessage(EnumErrorMessages.PREFERRED_DATES_REQUIRED)
         .custom((value) => {
           try {
             const dateRegex =
               /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} às \d{2}:\d{2}$/;
             for (const date of value) {
               if (typeof date !== 'string' || !dateRegex.test(date)) {
-                return Promise.reject(
-                  'Data inválida. O formato correto é dd/MM/yyyy às HH:mm.'
-                );
+                return Promise.reject(EnumErrorMessages.DATE_FORMAT_INVALID);
               }
               const [day, month, yearTime] = date.split('/');
               const [year] = yearTime.split(' às ');
@@ -55,14 +55,12 @@ export class LessonRequestValidator {
                 dateObject.getMonth() + 1 !== parseInt(month) ||
                 dateObject.getDate() !== parseInt(day)
               ) {
-                return Promise.reject(
-                  'Data inválida. Verifique se a data existe.'
-                );
+                return Promise.reject(EnumErrorMessages.DATE_INVALID);
               }
             }
-            return true;
+            return Promise.resolve(true);
           } catch (error) {
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .custom(async (value, { req }) => {
@@ -72,7 +70,7 @@ export class LessonRequestValidator {
             const uniqueDates = new Set(value);
             if (uniqueDates.size !== value.length) {
               return Promise.reject(
-                'Datas preferidas não podem ser duplicadas.'
+                EnumErrorMessages.DUPLICATE_PREFERRED_DATES
               );
             }
 
@@ -86,7 +84,7 @@ export class LessonRequestValidator {
                 const now = new Date();
                 if (lessonDate < now) {
                   return Promise.reject(
-                    `A data e hora não podem ser no passado: ${date}`
+                    EnumErrorMessages.PAST_DATE_ERROR.replace('${date}', date)
                   );
                 }
 
@@ -98,7 +96,7 @@ export class LessonRequestValidator {
                   parseInt(minute) > 59
                 ) {
                   return Promise.reject(
-                    `A aula não pode ser agendada antes de 00:00 e depois de 23:59. Horário escolhido: ${time}`
+                    EnumErrorMessages.TIME_INVALID.replace('${time}', time)
                   );
                 }
 
@@ -109,18 +107,14 @@ export class LessonRequestValidator {
                   );
                 if (existingLesson) {
                   return Promise.reject(
-                    `Já existe uma aula agendada para o aluno nesse horário: ${date}`
+                    EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
                   );
                 }
               })
             );
-
             return Promise.resolve(true);
           } catch (error) {
-            if (error instanceof Error) {
-              return Promise.reject(error.message);
-            }
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .customSanitizer((value) => {
@@ -134,48 +128,42 @@ export class LessonRequestValidator {
         }),
       body('subjectId')
         .isInt()
-        .withMessage('O Id da matéria deve ser um número.')
+        .withMessage(EnumErrorMessages.SUBJECT_ID_INVALID)
         .notEmpty()
-        .withMessage('Matéria é obrigatória.')
+        .withMessage(EnumErrorMessages.SUBJECT_ID_REQUIRED)
         .custom(async (value) => {
           try {
             const subject = await SubjectRepository.findSubjectById(value);
-
             if (!subject) {
-              return Promise.reject('Matéria não encontrada.');
+              return Promise.reject(EnumErrorMessages.SUBJECT_NOT_FOUND);
             }
-
             return Promise.resolve(true);
           } catch (error) {
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('studentId')
         .isInt()
-        .withMessage('O Id do aluno deve ser um número.')
+        .withMessage(EnumErrorMessages.STUDENT_ID_INVALID)
         .notEmpty()
-        .withMessage('Aluno é obrigatório.')
+        .withMessage(EnumErrorMessages.STUDENT_ID_REQUIRED)
         .custom(async (value) => {
           try {
             const student = await StudentRepository.findStudentById(value);
-
             if (!student) {
-              return Promise.reject('Aluno não encontrado.');
+              return Promise.reject(EnumErrorMessages.STUDENT_NOT_FOUND);
             }
-
             return Promise.resolve(true);
           } catch (error) {
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('additionalInfo')
         .optional()
         .isString()
-        .withMessage('Informações adicionais devem ser uma string.')
+        .withMessage(EnumErrorMessages.ADDITIONAL_INFO_STRING)
         .isLength({ max: 200 })
-        .withMessage(
-          'Informações adicionais deve ter no máximo 200 caracteres.'
-        )
+        .withMessage(EnumErrorMessages.ADDITIONAL_INFO_LENGTH)
     ]);
   }
 }

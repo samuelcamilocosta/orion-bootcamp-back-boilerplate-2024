@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { TutorController } from '../controller/TutorController';
 import { MysqlDataSource } from '../config/database';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 jest.mock('../config/database');
 const updatePersonalData = TutorController.prototype.updatePersonalData;
@@ -59,7 +60,7 @@ describe('updatePersonalData', () => {
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Tutor não encontrado.'
+      message: EnumErrorMessages.TUTOR_NOT_FOUND
     });
   });
 
@@ -76,7 +77,7 @@ describe('updatePersonalData', () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Erro interno do servidor.'
+      message: EnumErrorMessages.INTERNAL_SERVER
     });
   });
 });

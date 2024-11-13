@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { EducationLevelService } from '../service/EducationLevelService';
-import { EducationLevelRepository } from '../repository/EducationLevelRepository';
+import { handleError } from '../utils/ErrorHandler';
 
 export class EducationLevelController {
   /**
@@ -81,13 +81,8 @@ export class EducationLevelController {
         message: 'Nível de ensino criado com sucesso!'
       });
     } catch (error) {
-      if (
-        error.message === 'Nível de ensino é obrigatório.' ||
-        error.message === 'Nível de ensino inválido.'
-      ) {
-        return res.status(400).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -139,10 +134,11 @@ export class EducationLevelController {
   async getAll(req: Request, res: Response) {
     try {
       const educationLevels =
-        await EducationLevelRepository.findAllEducationLevels();
+        await EducationLevelService.getAllEducationLevels();
       return res.status(200).json(educationLevels);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

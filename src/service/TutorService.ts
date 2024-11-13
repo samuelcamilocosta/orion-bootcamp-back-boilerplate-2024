@@ -5,6 +5,9 @@ import { EnumUserType } from '../entity/enum/EnumUserType';
 import { S3Service } from './S3Service';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
+import { AppError } from '../error/AppError';
+import { handleError } from '../utils/ErrorHandler';
 
 export class TutorService extends UserService {
   static async createTutor(tutorData) {
@@ -39,28 +42,26 @@ export class TutorService extends UserService {
         !foundEducationLevels ||
         foundEducationLevels.length !== educationLevelIds.length
       ) {
-        throw new Error('Um ou mais níveis de ensino não encontrados.');
+        throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_NOT_FOUND, 404);
       }
 
       tutor.educationLevels = foundEducationLevels;
       const savedTutor = await TutorRepository.saveTutor(tutor);
       return UserService.generateUserResponse(savedTutor, EnumUserType.TUTOR);
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Erro interno do servidor.');
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 
   static async updateTutorPhoto(tutor: Tutor, file: Express.Multer.File) {
     try {
       if (!tutor) {
-        throw new Error('Tutor não encontrado.');
+        throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
       if (!file) {
-        throw new Error('Arquivo de foto é obrigatório.');
+        throw new AppError(EnumErrorMessages.PHOTO_REQUIRED, 400);
       }
 
       const photoUrl = await S3Service.uploadPhoto(file);
@@ -68,10 +69,8 @@ export class TutorService extends UserService {
 
       return await TutorRepository.saveTutor(tutor);
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Erro interno do servidor.');
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 
@@ -83,24 +82,23 @@ export class TutorService extends UserService {
   ) {
     try {
       if (!tutor) {
-        throw new Error('Tutor não encontrado.');
+        throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
+
       tutor.expertise = expertise;
       tutor.projectReason = projectReason;
 
       const foundSubjects =
         await SubjectRepository.findSubjectByIds(subjectIds);
       if (foundSubjects.length !== subjectIds.length) {
-        throw new Error('Uma ou mais matérias não foram encontradas.');
+        throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND, 404);
       }
 
       tutor.subjects = foundSubjects;
       return await TutorRepository.saveTutor(tutor);
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Erro interno do servidor.');
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 
@@ -109,23 +107,25 @@ export class TutorService extends UserService {
       const tutor = await TutorRepository.findTutorById(Number(id));
 
       if (!tutor) {
-        throw new Error('Tutor não encontrado.');
+        throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
-
       return tutor;
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Erro interno do servidor.');
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 
   static async getAllTutors() {
-    const tutors = await TutorRepository.findAllTutors();
-    if (!tutors) {
-      throw new Error('Nenhum tutor encontrado.');
+    try {
+      const tutors = await TutorRepository.findAllTutors();
+      if (!tutors) {
+        throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
+      }
+      return tutors;
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
-    return tutors;
   }
 }

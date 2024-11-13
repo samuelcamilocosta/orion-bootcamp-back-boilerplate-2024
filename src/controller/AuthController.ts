@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../service/AuthService';
+import { handleError } from '../utils/ErrorHandler';
 
 export class AuthController {
   /**
@@ -102,19 +103,8 @@ export class AuthController {
         token: token
       });
     } catch (error) {
-      const errorMessage = error.message;
-
-      if (errorMessage === 'Credenciais inválidas.') {
-        return res.status(400).json({
-          message: 'Email ou senha incorretos. Tente novamente.'
-        });
-      }
-      if (errorMessage === 'Usuário não encontrado.') {
-        return res.status(404).json({
-          message: 'Email ou senha incorretos. Tente novamente.'
-        });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   };
 }

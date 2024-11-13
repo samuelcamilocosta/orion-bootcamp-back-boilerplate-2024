@@ -4,6 +4,7 @@ import { CommonValidations } from './CommonValidations';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
 import { TutorRepository } from '../repository/TutorRepository';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 export class TutorValidator extends CommonValidations {
   /**
@@ -23,18 +24,18 @@ export class TutorValidator extends CommonValidations {
       body('cpf')
         .trim()
         .isString()
-        .withMessage('CPF inválido.')
+        .withMessage(EnumErrorMessages.CPF_INVALID)
         .notEmpty()
-        .withMessage('CPF é obrigatório.')
+        .withMessage(EnumErrorMessages.CPF_REQUIRED)
         .custom((value: string): Promise<boolean> => {
           try {
             const cleanCpf = value.replace(/\D/g, '');
             if (!cpf.isValid(cleanCpf)) {
-              return Promise.reject('CPF inválido.');
+              return Promise.reject(EnumErrorMessages.CPF_INVALID);
             }
             return Promise.resolve(true);
           } catch (error) {
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .custom(async (value: string): Promise<boolean> => {
@@ -44,14 +45,12 @@ export class TutorValidator extends CommonValidations {
               await TutorRepository.findTutorByCpf(cleanCpf);
 
             if (existingTutor) {
-              return Promise.reject(
-                'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
-              );
+              return Promise.reject(EnumErrorMessages.CPF_ALREADY_EXISTS);
             }
 
             return true;
           } catch (error) {
-            return Promise.reject('Erro interno do servidor.');
+            return Promise.reject(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .customSanitizer((value: string): string => {

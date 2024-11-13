@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { StudentService } from '../service/StudentService';
+import { handleError } from '../utils/ErrorHandler';
 
 export class StudentController {
   /**
@@ -140,12 +141,8 @@ export class StudentController {
         token: token
       });
     } catch (error) {
-      if (error.message === 'Nível de ensino não encontrado.') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -236,10 +233,10 @@ export class StudentController {
   async getAll(req: Request, res: Response) {
     try {
       const students = await StudentService.getAllStudents();
-
       return res.status(200).json(students);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -336,15 +333,11 @@ export class StudentController {
   async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-
       const student = await StudentService.getStudentById(Number(id));
-
       return res.status(200).json(student);
     } catch (error) {
-      if (error.message === 'Aluno não encontrado.') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

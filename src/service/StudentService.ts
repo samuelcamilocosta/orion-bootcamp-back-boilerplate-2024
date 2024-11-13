@@ -3,50 +3,74 @@ import { Student } from '../entity/Student';
 import { StudentRepository } from '../repository/StudentRepository';
 import { UserService } from './UserService';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
+import { handleError } from '../utils/ErrorHandler';
+import { AppError } from '../error/AppError';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 export class StudentService extends UserService {
   static async createStudent(studentData) {
-    const { fullName, username, birthDate, email, educationLevelId, password } =
-      studentData;
-    const { hashedPassword, salt } = password;
+    try {
+      const {
+        fullName,
+        username,
+        birthDate,
+        email,
+        educationLevelId,
+        password
+      } = studentData;
+      const { hashedPassword, salt } = password;
 
-    const student = new Student();
-    student.fullName = fullName;
-    student.username = username;
-    student.birthDate = birthDate;
-    student.password = hashedPassword;
-    student.email = email;
-    student.salt = salt;
+      const student = new Student();
+      student.fullName = fullName;
+      student.username = username;
+      student.birthDate = birthDate;
+      student.password = hashedPassword;
+      student.email = email;
+      student.salt = salt;
 
-    const foundEducationLevel =
-      await EducationLevelRepository.findEducationLevelById(educationLevelId);
+      const foundEducationLevel =
+        await EducationLevelRepository.findEducationLevelById(educationLevelId);
 
-    if (foundEducationLevel) {
+      if (!foundEducationLevel) {
+        throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_NOT_FOUND, 404);
+      }
+
       student.educationLevel = foundEducationLevel;
-    }
 
-    if (!foundEducationLevel) {
-      throw new Error('Nível de ensino não encontrado.');
+      const savedStudent = await StudentRepository.saveStudent(student);
+      return UserService.generateUserResponse(
+        savedStudent,
+        EnumUserType.STUDENT
+      );
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
-
-    const savedStudent = await StudentRepository.saveStudent(student);
-    return UserService.generateUserResponse(savedStudent, EnumUserType.STUDENT);
   }
 
   static async getStudentById(id: number) {
-    const student = await StudentRepository.findStudentById(id);
-
-    if (!student) {
-      throw new Error('Aluno não encontrado.');
+    try {
+      const student = await StudentRepository.findStudentById(id);
+      if (!student) {
+        throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
+      }
+      return student;
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
-    return student;
   }
 
   static async getAllStudents() {
-    const students = await StudentRepository.findAllStudents();
-    if (!students) {
-      throw new Error('Nenhum aluno encontrado.');
+    try {
+      const students = await StudentRepository.findAllStudents();
+      if (!students) {
+        throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
+      }
+      return students;
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
-    return students;
   }
 }

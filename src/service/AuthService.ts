@@ -4,33 +4,38 @@ import { Tutor } from '../entity/Tutor';
 import { Student } from '../entity/Student';
 import { UserRepository } from '../repository/UserRepository';
 import { EnumUserType } from '../entity/enum/EnumUserType';
+import { AppError } from '../error/AppError';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 export class AuthService {
   static async login(email: string, password: string, role: string) {
-    const invalidCredentials = 'Credenciais inválidas.';
-    if (!email || !password || !role) {
-      throw new Error(invalidCredentials);
-    }
+    try {
+      if (!email || !password || !role) {
+        throw new AppError(EnumErrorMessages.INVALID_CREDENTIALS, 400);
+      }
 
-    const user = await UserRepository.findUserByEmail(
-      email,
-      role as EnumUserType
-    );
-    if (!user) {
-      throw new Error('Usuário não encontrado.');
-    }
+      const user = await UserRepository.findUserByEmail(
+        email,
+        role as EnumUserType
+      );
+      if (!user) {
+        throw new AppError(EnumErrorMessages.INVALID_CREDENTIALS, 404);
+      }
 
-    const { isMatch, roleFound } = await this.verifyPassword(user, password);
-    if (!isMatch) {
-      throw new Error(invalidCredentials);
-    }
+      const { isMatch, roleFound } = await this.verifyPassword(user, password);
+      if (!isMatch) {
+        throw new AppError(EnumErrorMessages.INVALID_CREDENTIALS, 400);
+      }
 
-    if (role !== roleFound) {
-      throw new Error(invalidCredentials);
-    }
+      if (role !== roleFound) {
+        throw new AppError(EnumErrorMessages.INVALID_CREDENTIALS, 400);
+      }
 
-    const token = this.generateToken(user.id, user.email, role);
-    return { userId: user.id, token, role: roleFound };
+      const token = this.generateToken(user.id, user.email, role);
+      return { userId: user.id, token, role: roleFound };
+    } catch (error) {
+      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+    }
   }
 
   static generateToken(id: number, email: string, role: string): string {

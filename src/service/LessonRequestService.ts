@@ -3,6 +3,8 @@ import { LessonRequestRepository } from '../repository/LessonRequestRepository';
 import { EnumStatusName } from '../entity/enum/EnumStatusName';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { StudentRepository } from '../repository/StudentRepository';
+import { AppError } from '../error/AppError';
+import { EnumErrorMessages } from '../error/enum/EnumErrorMessages';
 
 export class LessonRequestService {
   static async createLessonRequest(lessonRequestData) {
@@ -22,10 +24,10 @@ export class LessonRequestService {
       ]);
 
       if (!foundSubject) {
-        throw new Error('Matéria não encontrada.');
+        throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND, 404);
       }
       if (!foundStudent) {
-        throw new Error('Aluno não encontrado.');
+        throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
       }
 
       lessonRequest.subject = foundSubject;
@@ -33,10 +35,7 @@ export class LessonRequestService {
 
       return await LessonRequestRepository.saveLessonRequest(lessonRequest);
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Erro interno do servidor.');
+      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
     }
   }
 
@@ -57,18 +56,22 @@ export class LessonRequestService {
 
       return formattedLessonRequests;
     } catch (error) {
-      throw new Error('Erro interno do servidor.');
+      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
     }
   }
 
   static async getLessonRequestById(id: number) {
-    const lesson = await LessonRequestRepository.getLessonRequestById(
-      Number(id)
-    );
+    try {
+      const lesson = await LessonRequestRepository.getLessonRequestById(
+        Number(id)
+      );
 
-    if (!lesson) {
-      throw new Error('Aula não encontrada.');
+      if (!lesson) {
+        throw new AppError(EnumErrorMessages.LESSON_NOT_FOUND, 404);
+      }
+      return lesson;
+    } catch (error) {
+      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
     }
-    return lesson;
   }
 }
