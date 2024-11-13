@@ -574,6 +574,7 @@ export class TutorController {
         username: tutor.username,
         email: tutor.email,
         fullName: tutor.fullName,
+        birthDate: tutor.birthDate,
         cpf: tutor.cpf,
         photoUrl: tutor.photoUrl,
         educationLevels: tutor.educationLevels,
