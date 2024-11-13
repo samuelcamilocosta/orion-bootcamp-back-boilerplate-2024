@@ -20,8 +20,6 @@ export class SubjectRepository {
 
   static async findAllSubjects() {
     const repository = MysqlDataSource.getRepository(Subject);
-    return await repository.find({
-      select: ['subjectId', 'subjectName']
-    });
+    return await repository.find();
   }
 }
