@@ -247,7 +247,7 @@ export class TutorController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Nenhum tutor encontrado."
+   *                   example: "Tutor não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
