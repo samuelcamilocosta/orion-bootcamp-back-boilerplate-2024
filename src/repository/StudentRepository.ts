@@ -7,7 +7,7 @@ export class StudentRepository extends UserRepository {
   private static selectFields = [
     'id',
     'username',
-    'email',
+    'fullName',
     'birthDate',
     'fullName',
     'educationLevel',
