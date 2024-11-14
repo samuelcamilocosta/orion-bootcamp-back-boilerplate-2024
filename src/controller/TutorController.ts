@@ -63,22 +63,65 @@ export class TutorController {
    *             schema:
    *               type: object
    *               properties:
-   *                 fullName:
-   *                   type: string
+   *                 id:
+   *                   type: integer
+   *                   example: 1
    *                 username:
    *                   type: string
+   *                   example: "nometutor"
+   *                 fullName:
+   *                   type: string
+   *                   example: "Nome Tutor"
+   *                 photoUrl:
+   *                   type: string
+   *                   example: "https://example.com/photo.jpg"
    *                 birthDate:
    *                   type: string
-   *                 email:
+   *                   example: "01/01/1990"
+   *                 expertise:
    *                   type: string
-   *                 cpf:
+   *                   example: "Matemática"
+   *                 projectReason:
    *                   type: string
-   *                 educationLevel:
+   *                   example: "Ajudar os alunos"
+   *                 educationLevels:
    *                   type: array
    *                   items:
-   *                     type: integer
-   *                 tutorId:
-   *                   type: integer
+   *                     type: object
+   *                     properties:
+   *                       educationId:
+   *                         type: integer
+   *                         example: 1
+   *                       levelType:
+   *                         type: string
+   *                         example: "Fundamental"
+   *                 lessonRequests:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       ClassId:
+   *                         type: integer
+   *                         example: 14
+   *                       reason:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "reforço"
+   *                       preferredDates:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "29/12/2025 às 23:45"
+   *                       status:
+   *                         type: string
+   *                         example: "pendente"
+   *                       additionalInfo:
+   *                         type: string
+   *                         example: "Looking for a tutor with experience in calculus."
+   *                 token:
+   *                   type: string
+   *                   example: "token_de_autenticacao"
    *       '400':
    *         description: Validation error
    *         content:
@@ -170,18 +213,21 @@ export class TutorController {
    *                   username:
    *                     type: string
    *                     example: "usuario_tutor01"
-   *                   email:
-   *                     type: string
-   *                     example: "usuario_tutor01@exemplo.com"
    *                   fullName:
    *                     type: string
    *                     example: "nome_tutor01"
-   *                   cpf:
-   *                     type: string
-   *                     example: "63806240078"
    *                   photoUrl:
    *                     type: string
    *                     example: "https://orion-photos.s3.sa-east-1.amazonaws.com/nome_tutor01.jpg"
+   *                   birthDate:
+   *                     type: string
+   *                     example: "2001-03-19"
+   *                   expertise:
+   *                     type: string
+   *                     example: "Matemática"
+   *                   projectReason:
+   *                     type: string
+   *                     example: "Ajudar os alunos"
    *                   educationLevels:
    *                     type: array
    *                     items:
@@ -312,9 +358,62 @@ export class TutorController {
    *             schema:
    *               type: object
    *               properties:
-   *                 message:
+   *                 id:
+   *                   type: integer
+   *                   example: 1
+   *                 username:
    *                   type: string
-   *                   example: "Tutor atualizado com sucesso"
+   *                   example: "nometutor"
+   *                 fullName:
+   *                   type: string
+   *                   example: "Nome Tutor"
+   *                 photoUrl:
+   *                   type: string
+   *                   example: "https://example.com/photo.jpg"
+   *                 birthDate:
+   *                   type: string
+   *                   example: "01/01/1990"
+   *                 expertise:
+   *                   type: string
+   *                   example: "Matemática"
+   *                 projectReason:
+   *                   type: string
+   *                   example: "Ajudar os alunos"
+   *                 educationLevels:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       educationId:
+   *                         type: integer
+   *                         example: 1
+   *                       levelType:
+   *                         type: string
+   *                         example: "Fundamental"
+   *                 lessonRequests:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       ClassId:
+   *                         type: integer
+   *                         example: 14
+   *                       reason:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "reforço"
+   *                       preferredDates:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "29/12/2025 às 23:45"
+   *                       status:
+   *                         type: string
+   *                         example: "pendente"
+   *                       additionalInfo:
+   *                         type: string
+   *                         example: "Looking for a tutor with experience in calculus."
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -384,6 +483,8 @@ export class TutorController {
    *             properties:
    *               id:
    *                 type: integer
+   *                 description: ID of the tutor
+   *                 example: 1
    *     responses:
    *       '200':
    *         description: Photo updated successfully
@@ -473,16 +574,25 @@ export class TutorController {
    *                   example: 1
    *                 username:
    *                   type: string
-   *                   example: "usuario_tutor01"
-   *                 email:
-   *                   type: string
-   *                   example: "usuario_tutor01@exemplo.com"
+   *                   example: "testeTutor2"
    *                 fullName:
    *                   type: string
-   *                   example: "nome_tutor01"
-   *                 cpf:
+   *                   example: "testeTutor"
+   *                 photoUrl:
    *                   type: string
-   *                   example: "63806240078"
+   *                   nullable: true
+   *                   example: "https://orion-photos.s3.sa-east-1.amazonaws.com/nome_tutor01.jpg"
+   *                 birthDate:
+   *                   type: string
+   *                   example: "2001-03-19"
+   *                 expertise:
+   *                   type: string
+   *                   nullable: true
+   *                   example: null
+   *                 projectReason:
+   *                   type: string
+   *                   nullable: true
+   *                   example: null
    *                 educationLevels:
    *                   type: array
    *                   items:
@@ -490,13 +600,10 @@ export class TutorController {
    *                     properties:
    *                       educationId:
    *                         type: integer
-   *                         example: 1
+   *                         example: 2
    *                       levelType:
    *                         type: string
-   *                         example: "Fundamental"
-   *                   photoUrl:
-   *                     type: string
-   *                     example: "https://orion-photos.s3.sa-east-1.amazonaws.com/nome_tutor01.jpg"
+   *                         example: "Médio"
    *                 lessonRequests:
    *                   type: array
    *                   items:
