@@ -8,7 +8,7 @@ import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class StudentService extends UserService {
-  private static formatStudent(student: Student) {
+  static formatStudent(student: Student) {
     return {
       id: student.id,
       username: student.username,

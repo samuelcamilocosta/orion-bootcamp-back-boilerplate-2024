@@ -10,7 +10,7 @@ import { AppError } from '../error/AppError';
 import { handleError } from '../utils/ErrorHandler';
 
 export class TutorService extends UserService {
-  private static formatTutor(tutor: Tutor) {
+  static formatTutor(tutor: Tutor) {
     return {
       id: tutor.id,
       username: tutor.username,
