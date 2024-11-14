@@ -152,7 +152,7 @@ export class StudentController {
    * /api/get/student:
    *   get:
    *     summary: Retrieve a list of all students
-   *     tags: [student]
+   *     tags: [Student]
    *     security:
    *       - BearerAuth: []
    *     responses:
@@ -167,16 +167,16 @@ export class StudentController {
    *                 properties:
    *                   id:
    *                     type: integer
-   *                     example: 2
+   *                     example: 1
    *                   username:
    *                     type: string
    *                     example: "nome_aluno_usuario1234"
-   *                   email:
-   *                     type: string
-   *                     example: "nome_aluno1234@exemplo.com"
    *                   fullName:
    *                     type: string
-   *                     example: "nome_aluno1234"
+   *                     example: "Nome Aluno"
+   *                   birthDate:
+   *                     type: string
+   *                     example: "2001-03-19"
    *                   educationLevel:
    *                     type: object
    *                     properties:
@@ -246,7 +246,7 @@ export class StudentController {
    * /api/get/student/{id}:
    *   get:
    *     summary: Retrieve a student by ID
-   *     tags: [student]
+   *     tags: [Student]
    *     security:
    *       - BearerAuth: []
    *     parameters:
@@ -271,12 +271,12 @@ export class StudentController {
    *                 username:
    *                   type: string
    *                   example: "nome_aluno_usuario1234"
-   *                 email:
-   *                   type: string
-   *                   example: "nome_aluno1234@exemplo.com"
    *                 fullName:
    *                   type: string
-   *                   example: "nome_aluno1234"
+   *                   example: "Nome Aluno"
+   *                 birthDate:
+   *                   type: string
+   *                   example: "2001-03-19"
    *                 educationLevel:
    *                   type: object
    *                   properties:

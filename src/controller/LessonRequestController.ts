@@ -39,7 +39,7 @@ export class LessonRequestController {
    *                 type: string
    *                 description: Additional information
    *                 maxLength: 200
-   *                 example: "Informações adicionais"
+   *                 example: "Looking for a tutor with experience in calculus."
    *               studentId:
    *                 type: integer
    *                 description: ID of the student
@@ -54,7 +54,7 @@ export class LessonRequestController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Seu pedido de aula foi enviado com sucesso!"
+   *                   example: "Aula criada com sucesso!"
    *                 lessonRequest:
    *                   type: object
    *                   properties:
@@ -67,37 +67,50 @@ export class LessonRequestController {
    *                       type: array
    *                       items:
    *                         type: string
+   *                       example: ["2025-12-25 23:45"]
    *                     additionalInfo:
    *                       type: string
+   *                       example: "Looking for a tutor with experience in calculus."
    *                     status:
    *                       type: string
+   *                       example: "pendente"
    *                     subject:
    *                       type: object
    *                       properties:
    *                         subjectId:
    *                           type: integer
+   *                           example: 1
    *                         subjectName:
    *                           type: string
+   *                           example: "Biologia"
    *                     student:
    *                       type: object
    *                       properties:
    *                         id:
    *                           type: integer
+   *                           example: 2
    *                         username:
    *                           type: string
-   *                         email:
-   *                           type: string
-   *                         password:
-   *                           type: string
-   *                         salt:
-   *                           type: string
+   *                           example: "Jose123"
    *                         fullName:
    *                           type: string
+   *                           example: "Jose Silva"
    *                         birthDate:
    *                           type: string
    *                           format: date
+   *                           example: "2001-03-19"
+   *                         educationLevel:
+   *                           type: object
+   *                           properties:
+   *                             educationId:
+   *                               type: integer
+   *                               example: 1
+   *                             levelType:
+   *                               type: string
+   *                               example: "Fundamental"
    *                     ClassId:
    *                       type: integer
+   *                       example: 12
    *       '400':
    *         description: Bad request, validation errors
    *         content:
@@ -213,10 +226,13 @@ export class LessonRequestController {
    *                     example: "pendente"
    *                   additionalInfo:
    *                     type: string
+   *                     example: "Looking for a tutor with experience in calculus."
    *                   subjectId:
    *                     type: integer
+   *                     example: 1
    *                   studentId:
    *                     type: integer
+   *                     example: 1
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -272,7 +288,7 @@ export class LessonRequestController {
    *             schema:
    *               type: object
    *               properties:
-   *                 classId:
+   *                 ClassId:
    *                   type: integer
    *                   example: 1
    *                 reason:
@@ -291,6 +307,35 @@ export class LessonRequestController {
    *                 additionalInfo:
    *                   type: string
    *                   example: "Looking for a tutor with experience in calculus."
+   *                 subject:
+   *                   type: object
+   *                   properties:
+   *                     subjectId:
+   *                       type: integer
+   *                       example: 1
+   *                     subjectName:
+   *                       type: string
+   *                       example: "Biologia"
+   *                 student:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: integer
+   *                       example: 1
+   *                     username:
+   *                       type: string
+   *                       example: "teste123"
+   *                     fullName:
+   *                       type: string
+   *                       example: "Teste"
+   *                     birthDate:
+   *                       type: string
+   *                       format: date
+   *                       example: "2001-03-19"
+   *                 tutor:
+   *                   type: object
+   *                   nullable: true
+   *                   example: null
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -301,7 +346,7 @@ export class LessonRequestController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
-   *      '404':
+   *       '404':
    *         description: Lesson request not found
    *         content:
    *           application/json:

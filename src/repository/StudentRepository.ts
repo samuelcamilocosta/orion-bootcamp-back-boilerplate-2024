@@ -4,6 +4,17 @@ import { UserRepository } from './UserRepository';
 import { EnumStatusName } from '../enum/EnumStatusName';
 
 export class StudentRepository extends UserRepository {
+  private static relations = ['educationLevel', 'lessonRequests'];
+  private static selectFields = [
+    'id',
+    'username',
+    'fullName',
+    'birthDate',
+    'fullName',
+    'educationLevel',
+    'lessonRequests'
+  ];
+
   static async saveStudent(student: Student): Promise<Student> {
     const repository = MysqlDataSource.getRepository(Student);
     return await repository.save(student);
@@ -12,15 +23,10 @@ export class StudentRepository extends UserRepository {
   static async findAllStudents() {
     const repository = MysqlDataSource.getRepository(Student);
     return await repository.find({
-      select: [
-        'id',
-        'username',
-        'email',
-        'fullName',
-        'educationLevel',
-        'lessonRequests'
-      ],
-      relations: ['educationLevel', 'lessonRequests']
+      select: Object.fromEntries(
+        this.selectFields.map((field) => [field, true])
+      ),
+      relations: this.relations
     });
   }
 
@@ -28,16 +34,10 @@ export class StudentRepository extends UserRepository {
     const repository = MysqlDataSource.getRepository(Student);
     return await repository.findOne({
       where: { id },
-      select: [
-        'id',
-        'username',
-        'email',
-        'fullName',
-        'educationLevel',
-        'birthDate',
-        'lessonRequests'
-      ],
-      relations: ['educationLevel', 'lessonRequests']
+      select: Object.fromEntries(
+        this.selectFields.map((field) => [field, true])
+      ),
+      relations: this.relations
     });
   }
 

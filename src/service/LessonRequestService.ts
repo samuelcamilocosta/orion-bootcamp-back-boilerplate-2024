@@ -5,8 +5,27 @@ import { SubjectRepository } from '../repository/SubjectRepository';
 import { StudentRepository } from '../repository/StudentRepository';
 import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { StudentService } from './StudentService';
+import { TutorService } from './TutorService';
 
 export class LessonRequestService {
+  static formatLessonRequest(lessonRequest: LessonRequest) {
+    return {
+      ClassId: lessonRequest.ClassId,
+      reason: lessonRequest.reason,
+      preferredDates: lessonRequest.preferredDates,
+      status: lessonRequest.status,
+      additionalInfo: lessonRequest.additionalInfo,
+      subject: lessonRequest.subject,
+      student: lessonRequest.student
+        ? StudentService.formatStudent(lessonRequest.student)
+        : null,
+      tutor: lessonRequest.tutor
+        ? TutorService.formatTutor(lessonRequest.tutor)
+        : null
+    };
+  }
+
   static async createLessonRequest(lessonRequestData) {
     try {
       const { reason, preferredDates, subjectId, additionalInfo, studentId } =
@@ -62,14 +81,14 @@ export class LessonRequestService {
 
   static async getLessonRequestById(id: number) {
     try {
-      const lesson = await LessonRequestRepository.getLessonRequestById(
+      const lessonRequest = await LessonRequestRepository.getLessonRequestById(
         Number(id)
       );
 
-      if (!lesson) {
-        throw new AppError(EnumErrorMessages.LESSON_NOT_FOUND, 404);
+      if (!lessonRequest) {
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
-      return lesson;
+      return LessonRequestService.formatLessonRequest(lessonRequest);
     } catch (error) {
       throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
     }

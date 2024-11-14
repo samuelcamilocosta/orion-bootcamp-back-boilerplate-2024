@@ -47,7 +47,7 @@ export enum EnumErrorMessages {
   SUBJECT_ID_INVALID = 'O Id da matéria deve ser um número.',
 
   // Lesson errors
-  LESSON_NOT_FOUND = 'Aula não encontrada.',
+  LESSON_REQUEST_NOT_FOUND = 'Aula não encontrada.',
   EXISTING_LESSON = 'Já existe uma aula agendada para o aluno nesse horário: ${date}',
   REASON_REQUIRED = 'Motivo da aula é obrigatório.',
   REASON_INVALID = 'Motivo da aula inválido. Deve conter ao menos um desses: ${validReasons}',

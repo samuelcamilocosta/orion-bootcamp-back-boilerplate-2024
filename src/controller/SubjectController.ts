@@ -66,9 +66,8 @@ export class SubjectController {
    *                   example: "Erro interno do servidor."
    */
   async create(req: Request, res: Response) {
-    const { subjectName } = req.body;
-
     try {
+      const { subjectName } = req.body;
       await SubjectService.createSubject(subjectName);
       return res
         .status(201)

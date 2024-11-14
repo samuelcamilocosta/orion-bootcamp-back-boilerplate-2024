@@ -8,6 +8,17 @@ import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class StudentService extends UserService {
+  static formatStudent(student: Student) {
+    return {
+      id: student.id,
+      username: student.username,
+      fullName: student.fullName,
+      birthDate: student.birthDate,
+      educationLevel: student.educationLevel,
+      lessonRequests: student.lessonRequests
+    };
+  }
+
   static async createStudent(studentData) {
     try {
       const {
@@ -54,7 +65,7 @@ export class StudentService extends UserService {
       if (!student) {
         throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
       }
-      return student;
+      return StudentService.formatStudent(student);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -67,7 +78,7 @@ export class StudentService extends UserService {
       if (!students) {
         throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
       }
-      return students;
+      return students.map(StudentService.formatStudent);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -76,8 +87,9 @@ export class StudentService extends UserService {
 
   static async getPendingLessonByStudentId(id: number) {
     try {
-      const lessons = await StudentRepository.findPendingLessonByStudentId(id);
-      return lessons;
+      const pendingLessonRequests =
+        await StudentRepository.findPendingLessonByStudentId(id);
+      return pendingLessonRequests;
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
