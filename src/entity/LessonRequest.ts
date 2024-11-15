@@ -2,8 +2,8 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Subject } from './Subject';
 import { Student } from './Student';
 import { Tutor } from './Tutor';
-import { ReasonName } from './enum/ReasonName';
-import { StatusName } from './enum/StatusName';
+import { EnumReasonName } from './enum/EnumReasonName';
+import { EnumStatusName } from './enum/EnumStatusName';
 
 @Entity()
 export class LessonRequest {
@@ -13,7 +13,7 @@ export class LessonRequest {
   @Column({
     type: 'simple-array'
   })
-  reason: ReasonName[];
+  reason: EnumReasonName[];
 
   @Column({
     type: 'simple-array'
@@ -31,10 +31,10 @@ export class LessonRequest {
 
   @Column({
     type: 'enum',
-    enum: StatusName,
-    default: 'pendente'
+    enum: EnumStatusName,
+    default: EnumStatusName.PENDENTE
   })
-  status: StatusName;
+  status: EnumStatusName;
 
   @Column({
     type: 'varchar',

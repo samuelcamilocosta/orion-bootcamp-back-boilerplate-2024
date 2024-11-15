@@ -7,7 +7,7 @@ import { Tutor } from '../entity/Tutor';
 import { In } from 'typeorm';
 
 const birthDateRegex =
-  /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2]|[0-9])\/\d{4}$/;
+  /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%¨&*])[A-Za-z\d!@#$%¨&*]{6,}$/;
@@ -174,7 +174,9 @@ export class CommonValidations {
         });
 
         if (existingTutor || existingStudent) {
-          return Promise.reject('Email já cadastrado.');
+          return Promise.reject(
+            'Não foi possível concluir o cadastro. Verifique os dados inseridos.'
+          );
         }
 
         return true;

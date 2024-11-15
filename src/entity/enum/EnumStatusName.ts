@@ -1,4 +1,4 @@
-export enum StatusName {
+export enum EnumStatusName {
   PENDENTE = 'pendente',
   ACEITO = 'aceito',
   FINALIZADO = 'finalizado',

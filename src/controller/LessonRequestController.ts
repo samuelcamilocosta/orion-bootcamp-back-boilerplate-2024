@@ -1,72 +1,262 @@
 import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 import { Request, Response } from 'express';
+import { EnumStatusName } from '../entity/enum/EnumStatusName';
 import { Subject } from '../entity/Subject';
 import { Student } from '../entity/Student';
+import { LessonRequestRepository } from '../repository/LessonRequestRepository';
 
 export class LessonRequestController {
+  /**
+   * @swagger
+   * /api/register/lessonrequest:
+   *   post:
+   *     summary: Create a new lesson request
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               reason:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                 description: Reasons for the lesson
+   *                 example: ["reforço", "prova ou trabalho"]
+   *               preferredDates:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                 description: Preferred dates for the lesson
+   *                 example: ["22/12/2024 às 10:00"]
+   *               subjectId:
+   *                 type: integer
+   *                 description: ID of the subject
+   *                 example: 1
+   *               additionalInfo:
+   *                 type: string
+   *                 description: Additional information
+   *                 maxLength: 200
+   *                 example: "Informações adicionais"
+   *               studentId:
+   *                 type: integer
+   *                 description: ID of the student
+   *                 example: 1
+   *     responses:
+   *       '201':
+   *         description: Lesson request created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Seu pedido de aula foi enviado com sucesso!"
+   *                 lessonRequest:
+   *                   type: object
+   *                   properties:
+   *                     reason:
+   *                       type: array
+   *                       items:
+   *                         type: string
+   *                     preferredDates:
+   *                       type: array
+   *                       items:
+   *                         type: string
+   *                     additionalInfo:
+   *                       type: string
+   *                     status:
+   *                       type: string
+   *                     subject:
+   *                       type: object
+   *                       properties:
+   *                         subjectId:
+   *                           type: integer
+   *                         subjectName:
+   *                           type: string
+   *                     student:
+   *                       type: object
+   *                       properties:
+   *                         id:
+   *                           type: integer
+   *                         username:
+   *                           type: string
+   *                         email:
+   *                           type: string
+   *                         password:
+   *                           type: string
+   *                         salt:
+   *                           type: string
+   *                         fullName:
+   *                           type: string
+   *                         birthDate:
+   *                           type: string
+   *                           format: date
+   *                     ClassId:
+   *                       type: integer
+   *       '400':
+   *         description: Bad request, validation errors
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: object
+   *                   properties:
+   *                     errors:
+   *                       type: array
+   *                       items:
+   *                         type: object
+   *                         properties:
+   *                           type:
+   *                             type: string
+   *                             example: "field"
+   *                           value:
+   *                             type: array
+   *                             items:
+   *                               type: string
+   *                             example: ["wrong reason"]
+   *                           msg:
+   *                             type: string
+   *                             example: "Motivo da aula inválido. Deve conter ao menos um desses: reforço, prova ou trabalho, correção de exercício, outro."
+   *                           path:
+   *                             type: string
+   *                             example: "reason"
+   *                           location:
+   *                             type: string
+   *                             example: "body"
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async create(req: Request, res: Response) {
-    const {
-      reason,
-      preferredDates,
-      subject,
-      status,
-      additionalInfo,
-      studentId
-    } = req.body;
+    const { reason, preferredDates, subjectId, additionalInfo, studentId } =
+      req.body;
 
     const lessonRequest = new LessonRequest();
     lessonRequest.reason = reason;
     lessonRequest.preferredDates = preferredDates;
-    lessonRequest.status = status;
     lessonRequest.additionalInfo = additionalInfo;
+    lessonRequest.status = EnumStatusName.PENDENTE;
 
     try {
-      const foundSubjectId = await MysqlDataSource.getRepository(
-        Subject
-      ).findOne({
-        where: { subjectId: subject }
+      const [foundSubject, foundStudent] = await Promise.all([
+        MysqlDataSource.getRepository(Subject).findOne({
+          where: { subjectId: subjectId }
+        }),
+        MysqlDataSource.getRepository(Student).findOne({
+          where: { id: studentId }
+        })
+      ]);
+
+      if (!foundSubject) {
+        return res.status(404).json({ message: 'Matéria não encontrada.' });
+      }
+      lessonRequest.subject = foundSubject;
+
+      if (!foundStudent) {
+        return res.status(404).json({ message: 'Aluno não encontrado.' });
+      }
+      lessonRequest.student = foundStudent;
+      await LessonRequestRepository.createLessonRequest(lessonRequest);
+
+      return res.status(201).json({
+        message: 'Seu pedido de aula foi enviado com sucesso!',
+        lessonRequest
       });
-
-      if (foundSubjectId) {
-        lessonRequest.subject = foundSubjectId;
-      }
-      const foundStudent = await MysqlDataSource.getRepository(Student).findOne(
-        { where: { id: studentId } }
-      );
-
-      if (foundStudent) {
-        lessonRequest.student = foundStudent;
-      }
-
-      await MysqlDataSource.getRepository(LessonRequest).save(lessonRequest);
-
-      return res
-        .status(201)
-        .json({ message: 'Seu pedido de aula foi enviado com sucesso!' });
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno no servidor' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
+
+  /**
+   * @swagger
+   * /api/get/lessonrequest:
+   *   get:
+   *     summary: Retrieve all lesson requests
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
+   *     responses:
+   *       '200':
+   *         description: List of lesson requests retrieved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 properties:
+   *                   classId:
+   *                     type: integer
+   *                   reason:
+   *                     type: array
+   *                     items:
+   *                       type: string
+   *                   preferredDates:
+   *                     type: array
+   *                     items:
+   *                       type: string
+   *                   status:
+   *                     type: string
+   *                   additionalInfo:
+   *                     type: string
+   *                   subjectId:
+   *                     type: integer
+   *                   studentId:
+   *                     type: integer
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async getAll(req: Request, res: Response) {
     try {
-      const lessonRequests = await MysqlDataSource.getRepository(
-        LessonRequest
-      ).find({
-        select: [
-          'ClassId',
-          'reason',
-          'preferredDates',
-          'status',
-          'additionalInfo',
-          'subject',
-          'student'
-        ],
-        relations: ['subject', 'student']
-      });
+      const lessonRequests =
+        await LessonRequestRepository.getAllLessonRequests();
 
       const formattedLessonRequests = lessonRequests.map((request) => ({
-        id: request.ClassId,
+        classId: request.ClassId,
         reason: request.reason,
         preferredDates: request.preferredDates,
         status: request.status,
@@ -77,28 +267,29 @@ export class LessonRequestController {
 
       return res.status(200).json(formattedLessonRequests);
     } catch (error) {
-      console.error('Error fetching lesson request:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Erro interno do servidor.' });
     }
   }
 
   /**
    * @swagger
-   * /api/get/lesson/{id}:
+   * /api/get/lessonrequest/{id}:
    *   get:
    *     summary: Retrieve a lesson request by ID
-   *     tags: [lesson]
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
    *     parameters:
    *       - name: id
    *         in: path
    *         required: true
-   *         description: ID of the lesson request to retrieve
+   *         description: ID of the lesson request
    *         schema:
    *           type: integer
    *           example: 1
    *     responses:
    *       '200':
-   *         description: A lesson request object
+   *         description: Lesson request retrieved successfully
    *         content:
    *           application/json:
    *             schema:
@@ -124,7 +315,17 @@ export class LessonRequestController {
    *                 additionalInfo:
    *                   type: string
    *                   example: "Looking for a tutor with experience in calculus."
-   *       '404':
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *      '404':
    *         description: Lesson request not found
    *         content:
    *           application/json:
@@ -149,10 +350,8 @@ export class LessonRequestController {
     const { id } = req.params;
 
     try {
-      const lesson = await MysqlDataSource.getRepository(LessonRequest).findOne(
-        {
-          where: { ClassId: Number(id) }
-        }
+      const lesson = await LessonRequestRepository.getLessonRequestById(
+        Number(id)
       );
 
       if (!lesson) {

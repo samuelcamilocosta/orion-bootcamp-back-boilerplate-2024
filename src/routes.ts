@@ -13,6 +13,7 @@ import { SubjectController } from './controller/SubjectController';
 import { upload } from './config/s3Client';
 import { UpdatePersonalDataValidator } from './validator/UpdatePersonalDataValidator';
 import { UploadPhotoValidator } from './validator/UploadPhotoValidator';
+import { LessonRequestValidator } from './validator/LessonRequestValidator';
 
 const router = Router();
 
@@ -30,12 +31,14 @@ router.get('/api/get/tutor', authMiddleware(), new TutorController().getAll);
 
 router.patch(
   '/api/update/tutor',
+  authMiddleware(),
   UpdatePersonalDataValidator,
   new TutorController().updatePersonalData
 );
 
 router.patch(
   '/api/update/photo',
+  authMiddleware(),
   upload.single('image'),
   UploadPhotoValidator,
   new TutorController().updatePhoto
@@ -60,7 +63,7 @@ router.post(
   new StudentController().create
 );
 
-router.get('/api/get/student/:id', new StudentController().getById);
+router.get('/api/get/student/:id', authMiddleware(), new StudentController().getById);
 
 // Education Level routes
 router.post(
@@ -69,7 +72,7 @@ router.post(
   new EducationLevelController().create
 );
 
-router.get('/api/get/educationlevel', new EducationLevelController().getAll);
+router.get('/api/get/educationlevel', authMiddleware(), new EducationLevelController().getAll);
 
 // Login route
 router.post('/api/login', AuthValidator.login(), new AuthController().login);
@@ -77,15 +80,32 @@ router.post('/api/login', AuthValidator.login(), new AuthController().login);
 // Lesson Request route
 router.post(
   '/api/register/lessonrequest',
+  authMiddleware(),
+  LessonRequestValidator.createLessonRequest(),
   new LessonRequestController().create
 );
 
-router.get('/api/get/lessonrequest', new LessonRequestController().getAll);
+router.get(
+  '/api/get/lessonrequest',
+  authMiddleware(),
+  new LessonRequestController().getAll
+);
 
-router.get('/api/get/lessonrequest/:id', new LessonRequestController().getById);
+router.get(
+  '/api/get/lessonrequest/:id',
+  authMiddleware(),
+  new LessonRequestController().getById
+);
 
 // Subject route
-router.post('/api/register/subject', new SubjectController().create);
-router.get('/api/get/subject', new SubjectController().getAll);
-
+router.post(
+  '/api/register/subject',
+  authMiddleware(),
+  new SubjectController().create
+);
+router.get(
+  '/api/get/subject',
+  authMiddleware(),
+  new SubjectController().getAll
+);
 export default router;
