@@ -84,4 +84,15 @@ export class StudentService extends UserService {
       throw new AppError(message, statusCode);
     }
   }
+
+  static async getPendingLessonByStudentId(id: number) {
+    try {
+      const pendingLessonRequests =
+        await StudentRepository.findPendingLessonByStudentId(id);
+      return pendingLessonRequests;
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
+    }
+  }
 }

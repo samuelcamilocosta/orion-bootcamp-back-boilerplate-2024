@@ -335,7 +335,31 @@ export class StudentController {
     try {
       const { id } = req.params;
       const student = await StudentService.getStudentById(Number(id));
-      return res.status(200).json(student);
+
+      const formattedStudent = {
+        id: student.id,
+        username: student.username,
+        email: student.email,
+        fullName: student.fullName,
+        birthDate: student.birthDate,
+        educationLevel: student.educationLevel,
+        lessonRequests: student.lessonRequests
+      };
+
+      return res.status(200).json(formattedStudent);
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
+
+  async getPendingLessonByStudentId(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const lessons = await StudentService.getPendingLessonByStudentId(
+        Number(id)
+      );
+      return res.status(200).json(lessons);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });
