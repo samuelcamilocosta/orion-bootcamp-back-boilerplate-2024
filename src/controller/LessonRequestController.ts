@@ -222,10 +222,12 @@ export class LessonRequestController {
       return res.status(400).json({ message: 'Parâmetro inválido' });
     }
 
-    const service = new DeleteLessonRequestService();
+    const lessonRequestService = new DeleteLessonRequestService();
 
     try {
-      const result = await service.execute(Number(classId));
+      const result = await lessonRequestService.deleteLessonRequestById(
+        Number(classId)
+      );
 
       if (result instanceof Error) {
         return res.status(404).json({ message: result.message });

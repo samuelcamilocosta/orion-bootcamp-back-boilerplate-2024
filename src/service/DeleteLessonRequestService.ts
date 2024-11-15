@@ -7,7 +7,7 @@ export class DeleteLessonRequestService {
     this.lessonRequestRepository = new LessonRequestRepository();
   }
 
-  async execute(classId: number) {
+  async deleteLessonRequestById(classId: number) {
     const lessonRequest =
       await this.lessonRequestRepository.findByClassId(classId);
     if (!lessonRequest) {

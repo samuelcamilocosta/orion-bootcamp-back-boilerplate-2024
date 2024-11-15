@@ -37,7 +37,9 @@ describe('LessonRequestController - DeleteById', () => {
 
   it('should return 204 if deletion is successful', async () => {
     req.params.id = '1';
-    deleteLessonRequestService.execute.mockResolvedValueOnce(undefined);
+    deleteLessonRequestService.deleteLessonRequestById.mockResolvedValueOnce(
+      undefined
+    );
 
     await controller.DeleteById(req as Request, res as Response);
 
@@ -47,7 +49,7 @@ describe('LessonRequestController - DeleteById', () => {
 
   it('should return 500 if lesson request is not found', async () => {
     req.params.id = '1';
-    deleteLessonRequestService.execute.mockResolvedValueOnce(
+    deleteLessonRequestService.deleteLessonRequestById.mockResolvedValueOnce(
       new Error('Not found')
     );
 
@@ -61,7 +63,7 @@ describe('LessonRequestController - DeleteById', () => {
 
   it('should return 500 if there is a server error', async () => {
     req.params.id = '1';
-    deleteLessonRequestService.execute.mockRejectedValueOnce(
+    deleteLessonRequestService.deleteLessonRequestById.mockRejectedValueOnce(
       new Error('Server error')
     );
 
