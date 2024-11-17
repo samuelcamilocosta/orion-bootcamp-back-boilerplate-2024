@@ -225,12 +225,12 @@ export class LessonRequestController {
     const lessonRequestService = new DeleteLessonRequestService();
 
     try {
-      const result = await lessonRequestService.deleteLessonRequestById(
+      const deletedRequest = await lessonRequestService.deleteLessonRequestById(
         Number(classId)
       );
 
-      if (result instanceof Error) {
-        return res.status(404).json({ message: result.message });
+      if (deletedRequest instanceof Error) {
+        return res.status(404).json({ message: deletedRequest.message });
       }
 
       return res
