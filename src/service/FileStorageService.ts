@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import { bucketName, randomImgName, s3 } from '../config/s3Client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 
-export class S3Service {
+export class FileStorageService {
   static async uploadPhoto(file: Express.Multer.File) {
     const buffer = await sharp(file.buffer)
       .resize({
