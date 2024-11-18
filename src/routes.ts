@@ -111,6 +111,12 @@ router.get(
   new LessonRequestController().getById
 );
 
+router.patch(
+  '/api/update/lessonrequest',
+  authMiddleware(),
+  new LessonRequestController().updateLesson
+);
+
 // Subject route
 router.post(
   '/api/register/subject',

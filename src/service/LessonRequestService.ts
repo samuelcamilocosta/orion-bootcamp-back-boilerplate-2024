@@ -1,12 +1,14 @@
 import { LessonRequest } from '../entity/LessonRequest';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
-import { EnumStatusName } from '../enum/EnumStatusName';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { StudentRepository } from '../repository/StudentRepository';
 import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { EnumReasonName } from '../enum/EnumReasonName';
+import { EnumStatusName } from '../enum/EnumStatusName';
 import { StudentService } from './StudentService';
 import { TutorService } from './TutorService';
+import { handleError } from '../utils/ErrorHandler';
 
 export class LessonRequestService {
   static formatLessonRequest(lessonRequest: LessonRequest) {
@@ -54,7 +56,8 @@ export class LessonRequestService {
 
       return await LessonRequestRepository.saveLessonRequest(lessonRequest);
     } catch (error) {
-      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 
@@ -75,7 +78,8 @@ export class LessonRequestService {
 
       return formattedLessonRequests;
     } catch (error) {
-      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 
@@ -90,7 +94,52 @@ export class LessonRequestService {
       }
       return LessonRequestService.formatLessonRequest(lessonRequest);
     } catch (error) {
-      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
+    }
+  }
+
+  static async updateLessonRequest(
+    lessonId: number,
+    subjectId: number,
+    reason: EnumReasonName[],
+    additionalInfo: string,
+    preferredDates: string[]
+  ) {
+    try {
+      const lessonRequest =
+        await LessonRequestRepository.getLessonRequestById(lessonId);
+
+      if (!lessonRequest) {
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+      }
+
+      if (
+        !reason.every((reason) =>
+          Object.values(EnumReasonName).includes(reason)
+        )
+      ) {
+        throw new AppError(EnumErrorMessages.REASON_INVALID, 400);
+      }
+
+      const foundSubject = await SubjectRepository.findSubjectById(subjectId);
+
+      if (!foundSubject) {
+        throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND, 404);
+      }
+
+      lessonRequest.reason = reason;
+      lessonRequest.additionalInfo = additionalInfo;
+      lessonRequest.preferredDates = preferredDates;
+      lessonRequest.subject = foundSubject;
+
+      const updatedLesson =
+        await LessonRequestRepository.saveLessonRequest(lessonRequest);
+
+      return updatedLesson;
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
     }
   }
 }

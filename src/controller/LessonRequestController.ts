@@ -381,4 +381,26 @@ export class LessonRequestController {
       return res.status(statusCode).json({ message });
     }
   }
+
+  async updateLesson(req: Request, res: Response) {
+    try {
+      const { lessonId, subjectId, reason, additionalInfo, preferredDates } =
+        req.body;
+
+      await LessonRequestService.updateLessonRequest(
+        lessonId,
+        subjectId,
+        reason,
+        additionalInfo,
+        preferredDates
+      );
+
+      return res
+        .status(200)
+        .json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
 }
