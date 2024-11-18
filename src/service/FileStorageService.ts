@@ -23,6 +23,6 @@ export class FileStorageService {
     const command = new PutObjectCommand(params);
     await s3.send(command);
 
-    return `https://orion-photos.s3.sa-east-1.amazonaws.com/${randomName}`;
+    return `${process.env.PHOTO_STORAGE}${randomName}`;
   }
 }
