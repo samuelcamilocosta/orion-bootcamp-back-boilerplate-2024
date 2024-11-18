@@ -22,6 +22,7 @@ describe('UpdatePersonalDataValidator', () => {
 
   it('should call next() if validation passes', () => {
     req.body = {
+      id: 1,
       expertise: 'Mathematics',
       projectReason: 'I love teaching'
     };
