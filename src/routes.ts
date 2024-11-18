@@ -112,7 +112,7 @@ router.get(
 );
 
 router.patch(
-  '/api/update/lessonrequest',
+  '/api/update/lessonrequest/:lessonId',
   authMiddleware(),
   new LessonRequestController().updateLesson
 );

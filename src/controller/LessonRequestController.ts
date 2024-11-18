@@ -384,11 +384,11 @@ export class LessonRequestController {
 
   async updateLesson(req: Request, res: Response) {
     try {
-      const { lessonId, subjectId, reason, additionalInfo, preferredDates } =
-        req.body;
+      const { lessonId } = req.params;
+      const { subjectId, reason, additionalInfo, preferredDates } = req.body;
 
       await LessonRequestService.updateLessonRequest(
-        lessonId,
+        Number(lessonId),
         subjectId,
         reason,
         additionalInfo,
