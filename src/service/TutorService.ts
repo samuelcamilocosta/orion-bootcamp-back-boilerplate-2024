@@ -105,7 +105,7 @@ export class TutorService extends UserService {
 
       const foundSubjects =
         await SubjectRepository.findSubjectByIds(subjectIds);
-      if (foundSubjects.length !== subjectIds.length) {
+      if (!foundSubjects || foundSubjects.length !== subjectIds.length) {
         throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND, 404);
       }
 

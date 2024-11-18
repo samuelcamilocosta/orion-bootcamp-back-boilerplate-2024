@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { TutorController } from '../controller/TutorController';
 import { MysqlDataSource } from '../config/database';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { EnumSuccessMessages } from 'enum/EnumSuccessMessages';
 
 jest.mock('../config/database');
 const updatePersonalData = TutorController.prototype.updatePersonalData;
@@ -30,12 +31,30 @@ describe('updatePersonalData', () => {
       subject: [1, 2]
     };
 
-    const mockTutor = { id: 1, expertise: '', projectReason: '', subjects: [] };
-    const mockFoundSubjects = [{ subjectId: 1 }, { subjectId: 2 }];
+    const mockTutor = {
+      id: 1,
+      username: 'testeTutor2',
+      fullName: 'testeTutor',
+      photoUrl: null,
+      birthDate: '2001-03-19',
+      expertise: 'Biologia',
+      projectReason: 'I love studying',
+      educationLevels: [
+        { educationId: 2, levelType: 'Médio' },
+        { educationId: 3, levelType: 'Pré-Vestibular' }
+      ],
+      lessonRequests: [],
+      subjects: [1, 2]
+    };
+
+    const mockFoundSubjects = [
+      { subjectId: 1, subjectName: 'Biologia' },
+      { subjectId: 2, subjectName: 'Sociologia' }
+    ];
 
     MysqlDataSource.getRepository = jest.fn().mockReturnValue({
       findOne: jest.fn().mockResolvedValue(mockTutor),
-      findBy: jest.fn().mockResolvedValue(mockFoundSubjects),
+      find: jest.fn().mockResolvedValue(mockFoundSubjects),
       save: jest.fn().mockResolvedValue({ ...mockTutor, ...req.body })
     });
 
@@ -44,7 +63,7 @@ describe('updatePersonalData', () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Tutor atualizado com sucesso!'
+        message: EnumSuccessMessages.TUTOR_UPDATED
       })
     );
   });

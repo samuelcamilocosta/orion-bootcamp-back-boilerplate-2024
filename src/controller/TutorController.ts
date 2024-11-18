@@ -446,10 +446,11 @@ export class TutorController {
    *                   example: "Erro interno do servidor."
    */
   async updatePersonalData(req: Request, res: Response) {
-    const { expertise, projectReason, subject: subjectIds, id } = req.body;
-
     try {
+      const { id, expertise, projectReason, subject: subjectIds } = req.body;
+
       const tutor = await TutorService.getTutorById(id);
+
       await TutorService.updateTutorPersonalData(
         tutor,
         expertise,
