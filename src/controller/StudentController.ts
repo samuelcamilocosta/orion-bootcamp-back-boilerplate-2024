@@ -339,7 +339,6 @@ export class StudentController {
       const formattedStudent = {
         id: student.id,
         username: student.username,
-        email: student.email,
         fullName: student.fullName,
         birthDate: student.birthDate,
         educationLevel: student.educationLevel,
