@@ -8,10 +8,16 @@ export const UploadPhotoValidator = (
 ) => {
   const { id } = req.body;
 
-  if (!id || typeof id !== 'number') {
+  if (!id) {
     return res
       .status(400)
       .json({ message: EnumErrorMessages.TUTOR_ID_REQUIRED });
+  }
+
+  if (isNaN(Number(id))) {
+    return res
+      .status(400)
+      .json({ message: EnumErrorMessages.TUTOR_ID_INVALID });
   }
 
   if (!req.file) {

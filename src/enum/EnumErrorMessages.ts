@@ -28,7 +28,8 @@ export enum EnumErrorMessages {
 
   // Tutor errors
   TUTOR_NOT_FOUND = 'Tutor não encontrado.',
-  TUTOR_ID_REQUIRED = 'ID do tutor é obrigatório e deve ser um número.',
+  TUTOR_ID_REQUIRED = 'ID do tutor é obrigatório.',
+  TUTOR_ID_INVALID = 'ID do tutor deve ser um número.',
   CPF_ALREADY_EXISTS = 'Não foi possível concluir o cadastro. Verifique os dados inseridos.',
   CPF_REQUIRED = 'CPF é obrigatório.',
   CPF_INVALID = 'CPF inválido.',
