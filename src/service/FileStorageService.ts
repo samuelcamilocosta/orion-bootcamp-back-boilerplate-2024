@@ -1,6 +1,5 @@
 import sharp from 'sharp';
-import { bucketName, randomImgName, s3 } from '../config/s3Client';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Uploader } from '../third-party/S3Uploader';
 
 export class FileStorageService {
   static async uploadPhoto(file: Express.Multer.File) {
@@ -12,17 +11,6 @@ export class FileStorageService {
       })
       .toBuffer();
 
-    const randomName = randomImgName();
-    const params = {
-      Bucket: bucketName,
-      Key: randomName,
-      Body: buffer,
-      ContentType: file.mimetype
-    };
-
-    const command = new PutObjectCommand(params);
-    await s3.send(command);
-
-    return `${process.env.PHOTO_STORAGE}${randomName}`;
+    return await S3Uploader.uploadPhotoS3(buffer, file.mimetype);
   }
 }
