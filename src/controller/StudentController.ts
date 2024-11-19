@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { StudentService } from '../service/StudentService';
 import { handleError } from '../utils/ErrorHandler';
 import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
+import { EnumStatusName } from '../enum/EnumStatusName';
 
 export class StudentController {
   /**
@@ -352,13 +353,44 @@ export class StudentController {
     }
   }
 
-  async getPendingLessonByStudentId(req: Request, res: Response) {
+  static async getStudentLessonsByStatus(
+    req: Request,
+    res: Response,
+    status: EnumStatusName
+  ) {
     try {
-      const { id } = req.params;
-      const lessons = await StudentService.getPendingLessonByStudentId(
-        Number(id)
+      const studentId = req.params;
+      const lessons = await StudentService.getStudentLessonsByStatus(
+        studentId,
+        status
       );
       return res.status(200).json(lessons);
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
+
+  async getStudentPendingLessons(req: Request, res: Response) {
+    try {
+      return StudentController.getStudentLessonsByStatus(
+        req,
+        res,
+        EnumStatusName.PENDENTE
+      );
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
+
+  async getStudentConfirmedLessons(req: Request, res: Response) {
+    try {
+      return StudentController.getStudentLessonsByStatus(
+        req,
+        res,
+        EnumStatusName.ACEITO
+      );
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });

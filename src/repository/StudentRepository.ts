@@ -41,36 +41,38 @@ export class StudentRepository extends UserRepository {
     });
   }
 
-  static async findPendingLessonByStudentId(id: number) {
+  static async findStudentLessonsByStatus(id: number, status: EnumStatusName) {
     const repository = MysqlDataSource.getRepository(Student);
+
     const rawResults = await repository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .where('student.id = :id', { id })
-      .andWhere('lessonRequest.status = :status', {
-        status: EnumStatusName.PENDENTE
-      })
+      .andWhere('lessonRequest.status = :status', { status })
       .select([
         'lessonRequest.ClassId as classId',
         'lessonRequest.reason as reason',
         'lessonRequest.preferredDates as preferredDates',
         'lessonRequest.status as status',
         'lessonRequest.additionalInfo as additionalInfo',
-        'lessonRequest.subject.subjectId as subjectId',
-        'lessonRequest.student.id as studentId',
-        'lessonRequest.tutor.id as tutorId'
+        'subject.subjectId as subjectId',
+        'subject.subjectName as subjectName'
       ])
       .getRawMany();
 
     return rawResults.map((result) => ({
-      classId: result.classId,
-      reason: result.reason,
-      preferredDates: result.preferredDates,
+      ClassId: result.classId,
+      reason: result.reason ? [result.reason] : [],
+      preferredDates: result.preferredDates ? [result.preferredDates] : [],
       status: result.status,
       additionalInfo: result.additionalInfo,
-      subjectId: result.subjectId,
-      studentId: result.studentId,
-      tutorId: result.tutorId
+      subject: result.subjectId
+        ? {
+            subjectId: result.subjectId,
+            subjectName: result.subjectName
+          }
+        : null
     }));
   }
 }
