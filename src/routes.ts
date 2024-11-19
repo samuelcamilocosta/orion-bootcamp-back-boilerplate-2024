@@ -28,6 +28,11 @@ router.post(
 );
 
 router.get('/api/get/tutor', authMiddleware(), new TutorController().getAll);
+router.get(
+  '/api/get/tutor/:id',
+  authMiddleware(),
+  new TutorController().getById
+);
 
 router.patch(
   '/api/update/tutor',
@@ -44,10 +49,10 @@ router.patch(
   new TutorController().updatePhoto
 );
 
-router.get(
-  '/api/get/tutor/:id',
+router.patch(
+  '/api/update/tutor-accept-lesson',
   authMiddleware(),
-  new TutorController().getById
+  new TutorController().acceptLessonRequest
 );
 
 // Students routes
