@@ -447,7 +447,7 @@ export class LessonRequestController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Motivo da aula inválido. Deve conter ao menos um desses: "reforço", "prova ou trabalho", "correção de exercício", "outro""
+   *                   example: "Motivo da aula inválido. Deve conter ao menos um desses: reforço, prova ou trabalho, correção de exercício, outro"
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
