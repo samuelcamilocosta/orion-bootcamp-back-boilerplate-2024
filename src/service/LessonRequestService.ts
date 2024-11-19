@@ -119,7 +119,14 @@ export class LessonRequestService {
           Object.values(EnumReasonName).includes(reason)
         )
       ) {
-        throw new AppError(EnumErrorMessages.REASON_INVALID, 400);
+        const validReasons = Object.values(EnumReasonName).join(', ');
+        throw new AppError(
+          EnumErrorMessages.REASON_INVALID.replace(
+            '${validReasons}',
+            validReasons
+          ),
+          400
+        );
       }
 
       const foundSubject = await SubjectRepository.findSubjectById(subjectId);
