@@ -66,17 +66,7 @@ export class LessonRequestService {
       const lessonRequests =
         await LessonRequestRepository.getAllLessonRequests();
 
-      const formattedLessonRequests = lessonRequests.map((request) => ({
-        classId: request.ClassId,
-        reason: request.reason,
-        preferredDates: request.preferredDates,
-        status: request.status,
-        additionalInfo: request.additionalInfo,
-        subjectId: request.subject?.subjectId,
-        studentId: request.student?.id
-      }));
-
-      return formattedLessonRequests;
+      return lessonRequests.map(this.formatLessonRequest);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
