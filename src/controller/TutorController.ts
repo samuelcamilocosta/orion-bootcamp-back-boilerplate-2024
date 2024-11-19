@@ -681,4 +681,19 @@ export class TutorController {
       return res.status(statusCode).json({ message });
     }
   }
+
+  async acceptLessonRequest(req: Request, res: Response) {
+    try {
+      const { lessonId, tutorId } = req.body;
+
+      await TutorService.acceptLessonRequest(lessonId, tutorId);
+
+      return res
+        .status(200)
+        .json({ message: EnumSuccessMessages.LESSON_REQUEST_ACCEPTED });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
 }
