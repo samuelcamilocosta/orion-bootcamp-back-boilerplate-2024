@@ -48,34 +48,31 @@ export class StudentRepository extends UserRepository {
     const repository = MysqlDataSource.getRepository(Student);
 
     const numericStudentId = Number(studentId.id);
-    const rawResults = await repository
-      .createQueryBuilder('student')
-      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+    const results = await repository
+      .createQueryBuilder('mainStudent')
+      .leftJoinAndSelect('mainStudent.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.tutors', 'tutor')
-      .where('student.id = :id', { id: numericStudentId })
+      .leftJoinAndSelect('lessonRequest.student', 'student')
+      .where('mainStudent.id = :id', { id: numericStudentId })
       .andWhere('lessonRequest.status = :status', { status })
-      .select([
-        'lessonRequest.ClassId as classId',
-        'lessonRequest.reason as reason',
-        'lessonRequest.preferredDates as preferredDates',
-        'lessonRequest.status as status',
-        'lessonRequest.additionalInfo as additionalInfo',
-        'lessonRequest.subject.subjectId as subjectId',
-        'lessonRequest.student.id as studentId',
-        'tutor.id as tutorId'
-      ])
-      .getRawMany();
+      .getMany();
 
-    return rawResults.map((result) => ({
-      ClassId: result.classId,
-      reason: result.reason ? [result.reason] : [],
-      preferredDates: result.preferredDates ? [result.preferredDates] : [],
-      status: result.status,
-      additionalInfo: result.additionalInfo,
-      subject: result.subject,
-      student: result.student,
-      tutors: result.tutor ? [result.tutor] : []
-    }));
+    return results
+      .map((student) => {
+        return student.lessonRequests.map((lessonRequest) => ({
+          ClassId: lessonRequest.ClassId,
+          reason: lessonRequest.reason ? lessonRequest.reason : [],
+          preferredDates: lessonRequest.preferredDates
+            ? lessonRequest.preferredDates
+            : [],
+          status: lessonRequest.status,
+          additionalInfo: lessonRequest.additionalInfo,
+          subject: lessonRequest.subject,
+          student: lessonRequest.student,
+          tutors: lessonRequest.tutors
+        }));
+      })
+      .flat();
   }
 }

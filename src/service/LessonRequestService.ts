@@ -14,8 +14,12 @@ export class LessonRequestService {
   static formatLessonRequest(lessonRequest: LessonRequest) {
     return {
       ClassId: lessonRequest.ClassId,
-      reason: lessonRequest.reason,
-      preferredDates: lessonRequest.preferredDates,
+      reason: Array.isArray(lessonRequest.reason)
+        ? lessonRequest.reason
+        : [lessonRequest.reason],
+      preferredDates: lessonRequest.preferredDates
+        ? lessonRequest.preferredDates
+        : [],
       status: lessonRequest.status,
       additionalInfo: lessonRequest.additionalInfo,
       subject: lessonRequest.subject,
