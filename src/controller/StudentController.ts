@@ -396,4 +396,17 @@ export class StudentController {
       return res.status(statusCode).json({ message });
     }
   }
+
+  async getStudentConfirmedLessons(req: Request, res: Response) {
+    try {
+      return StudentController.getStudentLessonsByStatus(
+        req,
+        res,
+        EnumStatusName.CONFIRMADO
+      );
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
 }
