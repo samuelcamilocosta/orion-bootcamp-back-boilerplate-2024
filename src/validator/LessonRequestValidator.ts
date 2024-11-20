@@ -6,6 +6,7 @@ import { StudentRepository } from '../repository/StudentRepository';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { AppError } from '../error/AppError';
+import { handleError } from '../utils/ErrorHandler';
 
 export class LessonRequestValidator {
   static createLessonRequest() {
@@ -105,7 +106,8 @@ export class LessonRequestValidator {
             );
             return true;
           } catch (error) {
-            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+            const { statusCode, message } = handleError(error);
+            throw new AppError(message, statusCode);
           }
         })
         .customSanitizer((value) => {
@@ -130,7 +132,8 @@ export class LessonRequestValidator {
             }
             return true;
           } catch (error) {
-            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+            const { statusCode, message } = handleError(error);
+            throw new AppError(message, statusCode);
           }
         }),
       body('studentId')
@@ -146,7 +149,8 @@ export class LessonRequestValidator {
             }
             return true;
           } catch (error) {
-            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+            const { statusCode, message } = handleError(error);
+            throw new AppError(message, statusCode);
           }
         }),
       body('additionalInfo')

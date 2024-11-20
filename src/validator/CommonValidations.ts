@@ -4,6 +4,7 @@ import { UserRepository } from '../repository/UserRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { AppError } from '../error/AppError';
+import { handleError } from '../utils/ErrorHandler';
 
 const birthDateRegex =
   /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -39,7 +40,8 @@ export class CommonValidations {
 
           return true;
         } catch (error) {
-          throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+          const { statusCode, message } = handleError(error);
+          throw new AppError(message, statusCode);
         }
       });
   }
@@ -161,7 +163,8 @@ export class CommonValidations {
 
           return true;
         } catch (error) {
-          throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+          const { statusCode, message } = handleError(error);
+          throw new AppError(message, statusCode);
         }
       });
   }
@@ -204,10 +207,8 @@ export class CommonValidations {
 
           return true;
         } catch (error) {
-          if (error instanceof Error) {
-            throw new AppError(error.message);
-          }
-          throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+          const { statusCode, message } = handleError(error);
+          throw new AppError(message, statusCode);
         }
       });
   }

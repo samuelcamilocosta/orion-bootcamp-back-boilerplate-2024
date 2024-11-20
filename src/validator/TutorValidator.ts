@@ -6,6 +6,7 @@ import { RequestHandler } from 'express';
 import { TutorRepository } from '../repository/TutorRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { AppError } from '../error/AppError';
+import { handleError } from '../utils/ErrorHandler';
 
 export class TutorValidator extends CommonValidations {
   /**
@@ -36,7 +37,8 @@ export class TutorValidator extends CommonValidations {
             }
             return true;
           } catch (error) {
-            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+            const { statusCode, message } = handleError(error);
+            throw new AppError(message, statusCode);
           }
         })
         .custom(async (value: string): Promise<boolean> => {
@@ -51,7 +53,8 @@ export class TutorValidator extends CommonValidations {
 
             return true;
           } catch (error) {
-            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
+            const { statusCode, message } = handleError(error);
+            throw new AppError(message, statusCode);
           }
         })
         .customSanitizer((value: string): string => {
