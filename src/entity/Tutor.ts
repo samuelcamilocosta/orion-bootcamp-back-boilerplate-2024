@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 import { Subject } from './Subject';
 import { EducationLevel } from './EducationLevel';
 import { User } from './User';
@@ -46,6 +46,17 @@ export class Tutor extends User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   photoUrl: string;
 
-  @OneToMany(() => LessonRequest, (lessonRequest) => lessonRequest.tutor)
+  @ManyToMany(() => LessonRequest, (lessonRequest) => lessonRequest.tutors)
+  @JoinTable({
+    name: 'lesson_request_tutors',
+    joinColumn: {
+      name: 'tutorId',
+      referencedColumnName: 'id'
+    },
+    inverseJoinColumn: {
+      name: 'lessonRequestId',
+      referencedColumnName: 'ClassId'
+    }
+  })
   lessonRequests: LessonRequest[];
 }

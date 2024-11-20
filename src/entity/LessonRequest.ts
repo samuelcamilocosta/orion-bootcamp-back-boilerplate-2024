@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 import { Subject } from './Subject';
 import { Student } from './Student';
 import { Tutor } from './Tutor';
@@ -26,8 +32,8 @@ export class LessonRequest {
   @ManyToOne(() => Student, (student) => student.lessonRequests)
   student: Student;
 
-  @ManyToOne(() => Tutor, (tutor) => tutor.lessonRequests)
-  tutor: Tutor;
+  @ManyToMany(() => Tutor, (tutor) => tutor.lessonRequests)
+  tutors: Tutor[];
 
   @Column({
     type: 'enum',
