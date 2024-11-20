@@ -86,6 +86,12 @@ router.get(
   new StudentController().getStudentAcceptedLessons
 );
 
+router.get(
+  '/api/get/student-confirmed-lessons/:id',
+  authMiddleware(),
+  new StudentController().getStudentConfirmedLessons
+);
+
 // Education Level routes
 router.post(
   '/api/register/educationlevel',
