@@ -41,15 +41,19 @@ export class StudentRepository extends UserRepository {
     });
   }
 
-  static async findLessonsByStudentIdAndStatus(id: number, status: EnumStatusName) {
+  static async findStudentLessonsByStatus(
+    studentId: { id: string },
+    status: EnumStatusName
+  ) {
     const repository = MysqlDataSource.getRepository(Student);
 
+    const numericStudentId = Number(studentId.id);
     const rawResults = await repository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.tutors', 'tutor')
-      .where('student.id = :id', { id })
+      .where('student.id = :id', { id: numericStudentId })
       .andWhere('lessonRequest.status = :status', { status })
       .select([
         'lessonRequest.ClassId as classId',
@@ -64,14 +68,14 @@ export class StudentRepository extends UserRepository {
       .getRawMany();
 
     return rawResults.map((result) => ({
-      classId: result.classId,
+      ClassId: result.classId,
       reason: result.reason ? [result.reason] : [],
       preferredDates: result.preferredDates ? [result.preferredDates] : [],
       status: result.status,
       additionalInfo: result.additionalInfo,
-      subjectId: result.subjectId,
-      studentId: result.studentId,
-      tutorId: result.tutorId
+      subject: result.subject,
+      student: result.student,
+      tutors: result.tutor ? [result.tutor] : []
     }));
   }
 }
