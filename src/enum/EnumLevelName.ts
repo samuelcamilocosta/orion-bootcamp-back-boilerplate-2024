@@ -1,4 +1,4 @@
-export enum LevelName {
+export enum EnumLevelName {
   FUNDAMENTAL = 'Fundamental',
   MEDIO = 'Médio',
   PREVESTIBULAR = 'Pré-Vestibular'

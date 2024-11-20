@@ -1,10 +1,10 @@
 import { body } from 'express-validator';
 import { cpf } from 'cpf-cnpj-validator';
-import { Tutor } from '../entity/Tutor';
-import { MysqlDataSource } from '../config/database';
 import { CommonValidations } from './CommonValidations';
 import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
+import { TutorRepository } from '../repository/TutorRepository';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class TutorValidator extends CommonValidations {
   /**
@@ -24,28 +24,34 @@ export class TutorValidator extends CommonValidations {
       body('cpf')
         .trim()
         .isString()
-        .withMessage('CPF inválido.')
+        .withMessage(EnumErrorMessages.CPF_INVALID)
         .notEmpty()
-        .withMessage('CPF é obrigatório.')
+        .withMessage(EnumErrorMessages.CPF_REQUIRED)
         .custom((value: string): boolean => {
-          const cleanCpf = value.replace(/\D/g, '');
-          if (!cpf.isValid(cleanCpf)) {
-            throw new Error('CPF inválido.');
+          try {
+            const cleanCpf = value.replace(/\D/g, '');
+            if (!cpf.isValid(cleanCpf)) {
+              throw new Error(EnumErrorMessages.CPF_INVALID);
+            }
+            return true;
+          } catch (error) {
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
-          return true;
         })
         .custom(async (value: string): Promise<boolean> => {
-          const tutorRepository = MysqlDataSource.getRepository(Tutor);
-          const cleanCpf = value.replace(/\D/g, '');
-          const existingTutor = await tutorRepository.findOne({
-            where: { cpf: cleanCpf }
-          });
+          try {
+            const cleanCpf = value.replace(/\D/g, '');
+            const existingTutor =
+              await TutorRepository.findTutorByCpf(cleanCpf);
 
-          if (existingTutor) {
-            return Promise.reject('CPF já cadastrado.');
+            if (existingTutor) {
+              throw new Error(EnumErrorMessages.CPF_ALREADY_EXISTS);
+            }
+
+            return true;
+          } catch (error) {
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
-
-          return true;
         })
         .customSanitizer((value: string): string => {
           return value.replace(/\D/g, '');

@@ -1,13 +1,11 @@
 import { body } from 'express-validator';
 import * as bcrypt from 'bcrypt';
-import { MysqlDataSource } from '../config/database';
-import { EducationLevel } from '../entity/EducationLevel';
-import { Student } from '../entity/Student';
-import { Tutor } from '../entity/Tutor';
-import { In } from 'typeorm';
+import { UserRepository } from '../repository/UserRepository';
+import { EducationLevelRepository } from '../repository/EducationLevelRepository';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 const birthDateRegex =
-  /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2]|[0-9])\/\d{4}$/;
+  /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%¨&*])[A-Za-z\d!@#$%¨&*]{6,}$/;
@@ -17,35 +15,31 @@ export class CommonValidations {
     return body('fullName')
       .trim()
       .isString()
-      .withMessage('Nome completo inválido.')
+      .withMessage(EnumErrorMessages.FULL_NAME_INVALID)
       .notEmpty()
-      .withMessage('Nome completo é obrigatório.');
+      .withMessage(EnumErrorMessages.FULL_NAME_REQUIRED);
   }
 
   protected username() {
     return body('username')
       .trim()
       .isString()
-      .withMessage('Nome de usuário inválido.')
+      .withMessage(EnumErrorMessages.USERNAME_INVALID)
       .notEmpty()
-      .withMessage('Nome de usuário é obrigatório.')
+      .withMessage(EnumErrorMessages.USERNAME_REQUIRED)
       .custom(async (value: string): Promise<boolean> => {
-        const tutorRepository = MysqlDataSource.getRepository(Tutor);
-        const studentRepository = MysqlDataSource.getRepository(Student);
+        try {
+          const existingUser =
+            await UserRepository.findExistingUserByUsername(value);
 
-        const existingTutor = await tutorRepository.findOne({
-          where: { username: value }
-        });
+          if (existingUser) {
+            throw new Error(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
+          }
 
-        const existingStudent = await studentRepository.findOne({
-          where: { username: value }
-        });
-
-        if (existingTutor || existingStudent) {
-          return Promise.reject('Nome de usuário já cadastrado.');
+          return true;
+        } catch (error) {
+          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
         }
-
-        return true;
       });
   }
 
@@ -53,19 +47,15 @@ export class CommonValidations {
     return body('birthDate')
       .trim()
       .isString()
-      .withMessage('Data de nascimento inválida.')
+      .withMessage(EnumErrorMessages.BIRTH_DATE_INVALID)
       .notEmpty()
-      .withMessage('Data de nascimento é obrigatória.')
+      .withMessage(EnumErrorMessages.BIRTH_DATE_REQUIRED)
       .custom((value: string): boolean => {
         if (!birthDateRegex.test(value)) {
-          throw new Error(
-            'Data de nascimento deve estar no formato DD/MM/YYYY.'
-          );
+          throw new Error(EnumErrorMessages.BIRTH_DATE_FORMAT);
         }
 
         const [day, month, year] = value.split('/').map(Number);
-        const dateErrorMessage =
-          'Data de nascimento incorreta, verifique a data inserida.';
 
         if (month === 2) {
           const isLeapYear =
@@ -73,14 +63,14 @@ export class CommonValidations {
               ? true
               : false;
           if (day > 29 || (day === 29 && !isLeapYear)) {
-            throw new Error(dateErrorMessage);
+            throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (month === 4 || month === 6 || month === 9 || month === 11) {
           if (day > 30) {
-            throw new Error(dateErrorMessage);
+            throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (day > 31) {
-          throw new Error(dateErrorMessage);
+          throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
         }
 
         const now = new Date();
@@ -95,7 +85,7 @@ export class CommonValidations {
         currentDate.setMinutes(currentDate.getMinutes() + offset);
 
         if (inputDate >= currentDate) {
-          throw new Error('Data de nascimento não pode ser uma data futura.');
+          throw new Error(EnumErrorMessages.BIRTH_DATE_FUTURE);
         }
 
         return true;
@@ -115,12 +105,12 @@ export class CommonValidations {
     return body('confirmPassword')
       .trim()
       .isString()
-      .withMessage('Confirmação de senha inválida.')
+      .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_INVALID)
       .notEmpty()
-      .withMessage('Confirmação de senha é obrigatória.')
-      .custom((value, { req }) => {
+      .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_REQUIRED)
+      .custom((value, { req }): boolean => {
         if (value !== req.body.password) {
-          throw new Error('As senhas não correspondem.');
+          throw new Error(EnumErrorMessages.PASSWORDS_NOT_MATCH);
         }
         return true;
       });
@@ -130,16 +120,14 @@ export class CommonValidations {
     return body('password')
       .trim()
       .isString()
-      .withMessage('Senha inválida.')
+      .withMessage(EnumErrorMessages.PASSWORD_INVALID)
       .notEmpty()
-      .withMessage('Senha é obrigatória.')
+      .withMessage(EnumErrorMessages.PASSWORD_REQUIRED)
       .isLength({ min: 6 })
-      .withMessage('Senha deve ter no mínimo 6 caracteres.')
-      .custom((value) => {
+      .withMessage(EnumErrorMessages.PASSWORD_MIN_LENGTH)
+      .custom((value): boolean => {
         if (!passwordRegex.test(value)) {
-          throw new Error(
-            'A senha deve ter ao menos 1 letra maiúscula, 1 número e 1 caractere especial.'
-          );
+          throw new Error(EnumErrorMessages.PASSWORD_REQUIREMENTS);
         }
         return true;
       })
@@ -147,7 +135,7 @@ export class CommonValidations {
         async (value: string): Promise<{ hashedPassword; salt }> => {
           const salt = await bcrypt.genSalt(10);
           const hashedPassword = await bcrypt.hash(value, salt);
-          return Promise.resolve({ hashedPassword, salt });
+          return { hashedPassword, salt };
         }
       );
   }
@@ -156,28 +144,24 @@ export class CommonValidations {
     return body('email')
       .trim()
       .isString()
-      .withMessage('Email inválido.')
+      .withMessage(EnumErrorMessages.EMAIL_INVALID)
       .notEmpty()
-      .withMessage('Email é obrigatório.')
+      .withMessage(EnumErrorMessages.EMAIL_REQUIRED)
       .isEmail()
-      .withMessage('Email inválido.')
+      .withMessage(EnumErrorMessages.EMAIL_INVALID)
       .custom(async (value: string): Promise<boolean> => {
-        const tutorRepository = MysqlDataSource.getRepository(Tutor);
-        const studentRepository = MysqlDataSource.getRepository(Student);
+        try {
+          const existingUser =
+            await UserRepository.findExistingUserByEmail(value);
 
-        const existingTutor = await tutorRepository.findOne({
-          where: { email: value }
-        });
+          if (existingUser) {
+            throw new Error(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
+          }
 
-        const existingStudent = await studentRepository.findOne({
-          where: { email: value }
-        });
-
-        if (existingTutor || existingStudent) {
-          return Promise.reject('Email já cadastrado.');
+          return true;
+        } catch (error) {
+          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
         }
-
-        return true;
       });
   }
 
@@ -185,44 +169,45 @@ export class CommonValidations {
     return body(['educationLevelId', 'educationLevelIds'])
       .trim()
       .custom(async (value, { req }) => {
-        const educationLevelRepository =
-          MysqlDataSource.getRepository(EducationLevel);
+        try {
+          const educationLevelId = req.body.educationLevelId;
+          const educationLevelIds = req.body.educationLevelIds;
 
-        const educationLevelId = req.body.educationLevelId;
-        const educationLevelIds = req.body.educationLevelIds;
+          if (educationLevelId.length > 1) {
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
+          }
 
-        if (educationLevelId.length > 1) {
-          throw new Error(
-            'Somente um nível de ensino é permitido para educationLevelId.'
-          );
+          if (
+            (!educationLevelId && !educationLevelIds) ||
+            (educationLevelId.length === 0 && educationLevelIds.length === 0)
+          ) {
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
+          }
+
+          if (educationLevelId && educationLevelIds) {
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
+          }
+
+          const educationLevels =
+            educationLevelIds || (educationLevelId ? [educationLevelId] : []);
+
+          const parsedValues = educationLevels.map((id: string) => Number(id));
+          const existingEducationLevels =
+            await EducationLevelRepository.findEducationLevelsByIds(
+              parsedValues
+            );
+
+          if (existingEducationLevels.length !== parsedValues.length) {
+            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);
+          }
+
+          return true;
+        } catch (error) {
+          if (error instanceof Error) {
+            throw new Error(error.message);
+          }
+          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
         }
-
-        if (
-          (!educationLevelId && !educationLevelIds) ||
-          (educationLevelId.length === 0 && educationLevelIds.length === 0)
-        ) {
-          throw new Error('Níveis de ensino são obrigatórios.');
-        }
-
-        if (educationLevelId && educationLevelIds) {
-          throw new Error(
-            'Não é permitido o envio de educationLevelId e educationLevelIds simultaneamente.'
-          );
-        }
-
-        const educationLevels =
-          educationLevelIds || (educationLevelId ? [educationLevelId] : []);
-
-        const parsedValues = educationLevels.map((id: string) => Number(id));
-        const existingEducationLevels = await educationLevelRepository.find({
-          where: { educationId: In(parsedValues) }
-        });
-
-        if (existingEducationLevels.length !== parsedValues.length) {
-          throw new Error('Um ou mais níveis de ensino não existem.');
-        }
-
-        return true;
       });
   }
 }

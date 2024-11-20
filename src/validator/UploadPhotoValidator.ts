@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export const UploadPhotoValidator = (
   req: Request,
@@ -6,21 +7,36 @@ export const UploadPhotoValidator = (
   next: NextFunction
 ) => {
   const { id } = req.body;
-  console.log(id);
+
   if (!id) {
     return res
       .status(400)
-      .json({ message: 'ID do tutor inválido ou não informado' });
+      .json({ message: EnumErrorMessages.TUTOR_ID_REQUIRED });
   }
 
-  if (!req.file || req.file.mimetype !== 'image/jpeg') {
-    return res.status(400).json({ message: 'A imagem deve ser do tipo jpg' });
+  if (isNaN(Number(id))) {
+    return res
+      .status(400)
+      .json({ message: EnumErrorMessages.TUTOR_ID_INVALID });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({
+      message: EnumErrorMessages.PHOTO_REQUIRED
+    });
+  }
+
+  if (req.file.mimetype !== 'image/jpeg') {
+    return res.status(400).json({
+      message: EnumErrorMessages.INVALID_FILE_TYPE
+    });
   }
 
   if (req.file.size > 5 * 1024 * 1024) {
-    return res.status(400).json({ message: 'A imagem deve ter no máximo 5MB' });
+    return res.status(400).json({
+      message: EnumErrorMessages.FILE_TOO_LARGE
+    });
   }
 
-  console.log('Entrei');
   next();
 };

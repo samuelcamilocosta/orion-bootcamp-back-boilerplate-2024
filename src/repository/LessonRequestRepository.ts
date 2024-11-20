@@ -1,17 +1,47 @@
 import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
-import { Repository } from 'typeorm';
 
 export class LessonRequestRepository {
-  private get repo(): Repository<LessonRequest> {
-    return MysqlDataSource.getRepository(LessonRequest);
+  private static relations = ['subject', 'student', 'tutor'];
+
+  static async saveLessonRequest(
+    lessonRequest: LessonRequest
+  ): Promise<LessonRequest> {
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.save(lessonRequest);
   }
 
-  async findByClassId(ClassId: number): Promise<LessonRequest[]> {
-    return this.repo.find({ where: { ClassId } });
+  static async findByPreferredDate(
+    preferredDate: string,
+    studentId: number
+  ): Promise<LessonRequest | null> {
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.findOne({
+      where: { preferredDates: preferredDate, student: { id: studentId } }
+    });
   }
 
-  async deleteByClassId(ClassId: number) {
-    await this.repo.delete({ ClassId });
+  static async getAllLessonRequests(): Promise<LessonRequest[]> {
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.find({
+      relations: this.relations
+    });
+  }
+
+  static async getLessonRequestById(id: number): Promise<LessonRequest | null> {
+    return await MysqlDataSource.getRepository(LessonRequest).findOne({
+      where: { ClassId: id },
+      relations: this.relations
+    });
+  }
+
+  static async findByClassId(ClassId: number): Promise<LessonRequest[]> {
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    return await repository.find({ where: { ClassId } });
+  }
+
+  static async deleteByClassId(ClassId: number): Promise<void> {
+    const repository = MysqlDataSource.getRepository(LessonRequest);
+    await repository.delete({ ClassId });
   }
 }

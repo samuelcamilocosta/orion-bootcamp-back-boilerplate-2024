@@ -1,5 +1,6 @@
 import { body } from 'express-validator';
 import { BaseValidator } from './BaseValidator';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class AuthValidator extends BaseValidator {
   /**
@@ -11,16 +12,16 @@ export class AuthValidator extends BaseValidator {
       body('email')
         .trim()
         .notEmpty()
-        .withMessage('Email é obrigatório.')
+        .withMessage(EnumErrorMessages.EMAIL_REQUIRED)
         .isEmail()
-        .withMessage('Email inválido.'),
+        .withMessage(EnumErrorMessages.EMAIL_INVALID),
 
       body('password')
         .trim()
         .isString()
-        .withMessage('Senha inválida.')
+        .withMessage(EnumErrorMessages.PASSWORD_INVALID)
         .notEmpty()
-        .withMessage('Senha é obrigatória.')
+        .withMessage(EnumErrorMessages.PASSWORD_REQUIRED)
     ]);
   }
 }

@@ -6,11 +6,9 @@ import { Repository } from 'typeorm';
 jest.mock('../../config/database');
 
 describe('LessonRequestRepository - deleteByClassId', () => {
-  let repository: LessonRequestRepository;
   let mockRepo: jest.Mocked<Repository<LessonRequest>>;
 
   beforeEach(() => {
-    repository = new LessonRequestRepository();
     mockRepo = {
       delete: jest.fn()
     } as unknown as jest.Mocked<Repository<LessonRequest>>;
@@ -21,22 +19,24 @@ describe('LessonRequestRepository - deleteByClassId', () => {
     jest.clearAllMocks();
   });
 
-  it('should delete lesson requests by ClassId successfully', async () => {
+  it('deve excluir solicitações de aula com sucesso pelo ClassId', async () => {
     const classId = 1;
+
     mockRepo.delete.mockResolvedValueOnce({ affected: 1, raw: {} });
 
-    await repository.deleteByClassId(classId);
+    await LessonRequestRepository.deleteByClassId(classId);
 
     expect(mockRepo.delete).toHaveBeenCalledWith({ ClassId: classId });
   });
 
-  it('should handle errors during deletion', async () => {
+  it('deve lidar com erros durante a exclusão', async () => {
     const classId = 1;
-    const error = new Error('Deletion error');
+    const error = new Error('Erro na exclusão');
+
     mockRepo.delete.mockRejectedValueOnce(error);
 
-    await expect(repository.deleteByClassId(classId)).rejects.toThrow(
-      'Deletion error'
-    );
+    await expect(
+      LessonRequestRepository.deleteByClassId(classId)
+    ).rejects.toThrow('Erro na exclusão');
   });
 });
