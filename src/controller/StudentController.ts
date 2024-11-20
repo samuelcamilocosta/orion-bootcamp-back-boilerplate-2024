@@ -396,4 +396,23 @@ export class StudentController {
       return res.status(statusCode).json({ message });
     }
   }
+
+  async confirmLessonRequest(req: Request, res: Response) {
+    try {
+      const { lessonId, tutorId } = req.body;
+
+      const lessonRequest = await StudentService.confirmLessonRequest(
+        lessonId,
+        tutorId
+      );
+
+      return res.status(200).json({
+        message: EnumSuccessMessages.LESSON_REQUEST_CONFIRMED,
+        lessonRequest
+      });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
 }
