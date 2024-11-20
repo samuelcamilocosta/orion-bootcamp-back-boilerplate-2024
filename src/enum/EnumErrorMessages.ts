@@ -56,6 +56,7 @@ export enum EnumErrorMessages {
   ADDITIONAL_INFO_STRING = 'Informações adicionais devem ser uma string.',
   ADDITIONAL_INFO_LENGTH = 'Informações adicionais deve ter no máximo 200 caracteres.',
   INVALID_PENDENTE_STATUS = 'O status do pedido de aula deve estar como pendente.',
+  INVALID_ACEITO_STATUS = 'O status do pedido de aula deve estar como aceito.',
   TUTOR_ALREADY_ADDED = 'O tutor já está na lista de tutores do pedido de aula.',
 
   // Education level errors
