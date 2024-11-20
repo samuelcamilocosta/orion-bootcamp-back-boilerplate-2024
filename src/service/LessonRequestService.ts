@@ -20,9 +20,10 @@ export class LessonRequestService {
       student: lessonRequest.student
         ? StudentService.formatStudent(lessonRequest.student)
         : null,
-      tutor: lessonRequest.tutor
-        ? TutorService.formatTutor(lessonRequest.tutor)
-        : null
+      tutors:
+        lessonRequest.tutors && lessonRequest.tutors.length > 0
+          ? lessonRequest.tutors.map((tutor) => TutorService.formatTutor(tutor))
+          : null
     };
   }
 

@@ -2,7 +2,7 @@ import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 
 export class LessonRequestRepository {
-  private static relations = ['subject', 'student', 'tutor'];
+  private static relations = ['subject', 'student', 'tutors'];
 
   static async saveLessonRequest(
     lessonRequest: LessonRequest
@@ -29,9 +29,12 @@ export class LessonRequestRepository {
   }
 
   static async getLessonRequestById(id: number): Promise<LessonRequest | null> {
-    return await MysqlDataSource.getRepository(LessonRequest).findOne({
-      where: { ClassId: id },
-      relations: this.relations
-    });
+    return await MysqlDataSource.getRepository(LessonRequest)
+      .createQueryBuilder('lessonRequest')
+      .leftJoinAndSelect('lessonRequest.tutors', 'tutor')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect('lessonRequest.student', 'student')
+      .where('lessonRequest.ClassId = :id', { id })
+      .getOne();
   }
 }

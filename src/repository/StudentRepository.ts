@@ -46,6 +46,7 @@ export class StudentRepository extends UserRepository {
     const rawResults = await repository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.tutors', 'tutor')
       .where('student.id = :id', { id })
       .andWhere('lessonRequest.status = :status', {
         status: EnumStatusName.PENDENTE
@@ -58,7 +59,7 @@ export class StudentRepository extends UserRepository {
         'lessonRequest.additionalInfo as additionalInfo',
         'lessonRequest.subject.subjectId as subjectId',
         'lessonRequest.student.id as studentId',
-        'lessonRequest.tutor.id as tutorId'
+        'tutor.id as tutorId'
       ])
       .getRawMany();
 
