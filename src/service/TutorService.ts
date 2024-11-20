@@ -10,6 +10,7 @@ import { EnumStatusName } from '../enum/EnumStatusName';
 import { EnumUserType } from '../enum/EnumUserType';
 import { AppError } from '../error/AppError';
 import { handleError } from '../utils/ErrorHandler';
+import { LessonRequestService } from './LessonRequestService';
 
 export class TutorService extends UserService {
   static formatTutor(tutor: Tutor) {
@@ -22,8 +23,12 @@ export class TutorService extends UserService {
       expertise: tutor.expertise,
       projectReason: tutor.projectReason,
       educationLevels: tutor.educationLevels,
-      lessonRequests: tutor.lessonRequests,
-      subjects: tutor.subjects
+      lessonRequests: tutor.lessonRequests
+        ? tutor.lessonRequests.map((lessonRequest) =>
+            LessonRequestService.formatLessonRequest(lessonRequest)
+          )
+        : [],
+      subjects: tutor.subjects ? tutor.subjects : []
     };
   }
 
