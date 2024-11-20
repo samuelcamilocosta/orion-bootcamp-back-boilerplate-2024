@@ -1,13 +1,7 @@
 import { Request, Response } from 'express';
-import { MysqlDataSource } from '../config/database';
-import { Tutor } from '../entity/Tutor';
-import { EducationLevel } from '../entity/EducationLevel';
-import { In } from 'typeorm';
-import { AuthService } from '../service/AuthService';
-import { Subject } from '../entity/Subject';
-import sharp from 'sharp';
-import { randomImgName, s3, bucketName } from '../config/s3Client';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { TutorService } from '../service/TutorService';
+import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class TutorController {
   /**
@@ -69,22 +63,65 @@ export class TutorController {
    *             schema:
    *               type: object
    *               properties:
-   *                 fullName:
-   *                   type: string
+   *                 id:
+   *                   type: integer
+   *                   example: 1
    *                 username:
    *                   type: string
+   *                   example: "nometutor"
+   *                 fullName:
+   *                   type: string
+   *                   example: "Nome Tutor"
+   *                 photoUrl:
+   *                   type: string
+   *                   example: "https://example.com/photo.jpg"
    *                 birthDate:
    *                   type: string
-   *                 email:
+   *                   example: "01/01/1990"
+   *                 expertise:
    *                   type: string
-   *                 cpf:
+   *                   example: "Matemática"
+   *                 projectReason:
    *                   type: string
-   *                 educationLevel:
+   *                   example: "Ajudar os alunos"
+   *                 educationLevels:
    *                   type: array
    *                   items:
-   *                     type: integer
-   *                 tutorId:
-   *                   type: integer
+   *                     type: object
+   *                     properties:
+   *                       educationId:
+   *                         type: integer
+   *                         example: 1
+   *                       levelType:
+   *                         type: string
+   *                         example: "Fundamental"
+   *                 lessonRequests:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       ClassId:
+   *                         type: integer
+   *                         example: 14
+   *                       reason:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "reforço"
+   *                       preferredDates:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "29/12/2025 às 23:45"
+   *                       status:
+   *                         type: string
+   *                         example: "pendente"
+   *                       additionalInfo:
+   *                         type: string
+   *                         example: "Looking for a tutor with experience in calculus."
+   *                 token:
+   *                   type: string
+   *                   example: "token_de_autenticacao"
    *       '400':
    *         description: Validation error
    *         content:
@@ -112,6 +149,16 @@ export class TutorController {
    *                       location:
    *                         type: string
    *                         example: "body"
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Um ou mais níveis de ensino não encontrados."
    *       '500':
    *         description: Server error
    *         content:
@@ -126,50 +173,19 @@ export class TutorController {
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const {
-      fullName,
-      username,
-      birthDate,
-      email,
-      cpf,
-      educationLevelIds,
-      password
-    } = req.body;
-
-    const { hashedPassword, salt } = password;
-
-    const tutor = new Tutor();
-    tutor.fullName = fullName;
-    tutor.username = username;
-    tutor.birthDate = birthDate;
-    tutor.password = hashedPassword;
-    tutor.email = email;
-    tutor.cpf = cpf;
-    tutor.salt = salt;
-
     try {
-      const foundEducationLevel = await MysqlDataSource.getRepository(
-        EducationLevel
-      ).find({
-        where: { educationId: In(educationLevelIds) }
-      });
-
-      if (foundEducationLevel) {
-        tutor.educationLevels = foundEducationLevel;
-      }
-
-      await MysqlDataSource.getRepository(Tutor).save(tutor);
-
-      const token = AuthService.generateToken(tutor.id, tutor.email, 'tutor');
+      const { user: savedTutor, token } = await TutorService.createTutor(
+        req.body
+      );
 
       return res.status(201).json({
-        message: 'Tutor criado com sucesso.',
-        tutorId: tutor.id,
+        message: EnumSuccessMessages.TUTOR_CREATED,
+        tutorId: savedTutor.id,
         token: token
       });
     } catch (error) {
-      console.error('Error saving tutor:', error);
-      return res.status(500).json({ message: 'Internal Server Error', error });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -197,18 +213,21 @@ export class TutorController {
    *                   username:
    *                     type: string
    *                     example: "usuario_tutor01"
-   *                   email:
-   *                     type: string
-   *                     example: "usuario_tutor01@exemplo.com"
    *                   fullName:
    *                     type: string
    *                     example: "nome_tutor01"
-   *                   cpf:
-   *                     type: string
-   *                     example: "63806240078"
    *                   photoUrl:
    *                     type: string
    *                     example: "https://orion-photos.s3.sa-east-1.amazonaws.com/nome_tutor01.jpg"
+   *                   birthDate:
+   *                     type: string
+   *                     example: "2001-03-19"
+   *                   expertise:
+   *                     type: string
+   *                     example: "Matemática"
+   *                   projectReason:
+   *                     type: string
+   *                     example: "Ajudar os alunos"
    *                   educationLevels:
    *                     type: array
    *                     items:
@@ -265,6 +284,16 @@ export class TutorController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Tutor não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -278,23 +307,11 @@ export class TutorController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const tutor = await MysqlDataSource.getRepository(Tutor).find({
-        select: [
-          'id',
-          'cpf',
-          'username',
-          'email',
-          'fullName',
-          'photoUrl',
-          'educationLevels',
-          'lessonRequests',
-          'subjects'
-        ],
-        relations: ['educationLevels', 'lessonRequests', 'subjects']
-      });
-      return res.status(200).json(tutor);
+      const tutors = await TutorService.getAllTutors();
+      return res.status(200).json(tutors);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -316,19 +333,23 @@ export class TutorController {
    *               id:
    *                 type: integer
    *                 description: Tutor ID
+   *                 example: 1
    *               expertise:
    *                 type: string
    *                 maxLength: 50
    *                 description: Tutor's area of expertise
+   *                 example: "Matemática"
    *               projectReason:
    *                 type: string
    *                 maxLength: 200
    *                 description: Reason for joining the project
+   *                 example: "Ajudar os alunos a entender melhor os conceitos matemáticos"
    *               subject:
    *                 type: array
    *                 items:
    *                   type: integer
    *                 description: Array of subject IDs
+   *                 example: [1, 2]
    *     responses:
    *       '200':
    *         description: Tutor updated successfully
@@ -337,9 +358,62 @@ export class TutorController {
    *             schema:
    *               type: object
    *               properties:
-   *                 message:
+   *                 id:
+   *                   type: integer
+   *                   example: 1
+   *                 username:
    *                   type: string
-   *                   example: "Tutor atualizado com sucesso"
+   *                   example: "nometutor"
+   *                 fullName:
+   *                   type: string
+   *                   example: "Nome Tutor"
+   *                 photoUrl:
+   *                   type: string
+   *                   example: "https://example.com/photo.jpg"
+   *                 birthDate:
+   *                   type: string
+   *                   example: "01/01/1990"
+   *                 expertise:
+   *                   type: string
+   *                   example: "Matemática"
+   *                 projectReason:
+   *                   type: string
+   *                   example: "Ajudar os alunos"
+   *                 educationLevels:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       educationId:
+   *                         type: integer
+   *                         example: 1
+   *                       levelType:
+   *                         type: string
+   *                         example: "Fundamental"
+   *                 lessonRequests:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       ClassId:
+   *                         type: integer
+   *                         example: 14
+   *                       reason:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "reforço"
+   *                       preferredDates:
+   *                         type: array
+   *                         items:
+   *                           type: string
+   *                           example: "29/12/2025 às 23:45"
+   *                       status:
+   *                         type: string
+   *                         example: "pendente"
+   *                       additionalInfo:
+   *                         type: string
+   *                         example: "Looking for a tutor with experience in calculus."
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -352,6 +426,14 @@ export class TutorController {
    *                   example: "Token inválido."
    *       '404':
    *         description: Tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Tutor não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -364,40 +446,24 @@ export class TutorController {
    *                   example: "Erro interno do servidor."
    */
   async updatePersonalData(req: Request, res: Response) {
-    const { expertise, projectReason, subject: subjectIds, id } = req.body;
-
     try {
-      const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const tutor = await tutorRepository.findOne({
-        where: { id },
-        relations: ['subjects']
-      });
+      const { id, expertise, projectReason, subject: subjectIds } = req.body;
 
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado' });
-      }
+      const tutor = await TutorService.getTutorById(id);
 
-      tutor.expertise = expertise ?? tutor.expertise;
-      tutor.projectReason = projectReason ?? tutor.projectReason;
+      await TutorService.updateTutorPersonalData(
+        tutor,
+        expertise,
+        projectReason,
+        subjectIds
+      );
 
-      if (Array.isArray(subjectIds) && subjectIds.length > 0) {
-        const foundSubjects = await MysqlDataSource.getRepository(
-          Subject
-        ).findBy({
-          subjectId: In(subjectIds)
-        });
-
-        tutor.subjects =
-          foundSubjects.length > 0 ? foundSubjects : tutor.subjects;
-      }
-
-      await tutorRepository.save(tutor);
-
-      return res.status(200).json({ message: 'Tutor atualizado com sucesso' });
-    } catch (error) {
       return res
-        .status(500)
-        .json({ message: 'Erro ao atualizar o tutor', error });
+        .status(200)
+        .json({ message: EnumSuccessMessages.TUTOR_UPDATED });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -418,9 +484,22 @@ export class TutorController {
    *             properties:
    *               id:
    *                 type: integer
+   *                 description: ID of the tutor
+   *                 example: 1
    *     responses:
    *       '200':
    *         description: Photo updated successfully
+   *         example: "Foto atualizada com sucesso!"
+   *       '400':
+   *         description: Bad request, missing or invalid data
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Arquivo de foto é obrigatório."
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -431,6 +510,16 @@ export class TutorController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
+   *       '404':
+   *         description: Tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Tutor não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -443,51 +532,17 @@ export class TutorController {
    *                   example: "Erro interno do servidor."
    */
   async updatePhoto(req: Request, res: Response) {
-    const { id } = req.body;
-
-    let buffer: Buffer;
-
     try {
-      buffer = await sharp(req.file.buffer)
-        .resize({
-          height: 300,
-          width: 300,
-          fit: 'cover'
-        })
-        .toBuffer();
+      const { id } = req.body;
+      const tutor = await TutorService.getTutorById(id);
+      await TutorService.updateTutorPhoto(tutor, req.file);
+
+      return res.status(200).json({
+        message: EnumSuccessMessages.PHOTO_UPDATED
+      });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro ao processar a imagem', error });
-    }
-
-    try {
-      const randomName = randomImgName();
-      const params = {
-        Bucket: bucketName,
-        Key: randomName,
-        Body: buffer,
-        ContentType: req.file.mimetype
-      };
-
-      const command = new PutObjectCommand(params);
-      await s3.send(command);
-
-      const tutorRepository = MysqlDataSource.getRepository(Tutor);
-      const tutor = await tutorRepository.findOne({ where: { id } });
-
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado' });
-      }
-      const photoUrl = `https://orion-photos.s3.sa-east-1.amazonaws.com/${randomName}`;
-      tutor.photoUrl = photoUrl;
-      await tutorRepository.save(tutor);
-
-      return res.status(200).json({ message: 'Foto atualizada com sucesso' });
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro ao atualizar a foto', error });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -520,16 +575,25 @@ export class TutorController {
    *                   example: 1
    *                 username:
    *                   type: string
-   *                   example: "usuario_tutor01"
-   *                 email:
-   *                   type: string
-   *                   example: "usuario_tutor01@exemplo.com"
+   *                   example: "testeTutor2"
    *                 fullName:
    *                   type: string
-   *                   example: "nome_tutor01"
-   *                 cpf:
+   *                   example: "testeTutor"
+   *                 photoUrl:
    *                   type: string
-   *                   example: "63806240078"
+   *                   nullable: true
+   *                   example: "https://orion-photos.s3.sa-east-1.amazonaws.com/nome_tutor01.jpg"
+   *                 birthDate:
+   *                   type: string
+   *                   example: "2001-03-19"
+   *                 expertise:
+   *                   type: string
+   *                   nullable: true
+   *                   example: null
+   *                 projectReason:
+   *                   type: string
+   *                   nullable: true
+   *                   example: null
    *                 educationLevels:
    *                   type: array
    *                   items:
@@ -537,13 +601,10 @@ export class TutorController {
    *                     properties:
    *                       educationId:
    *                         type: integer
-   *                         example: 1
+   *                         example: 2
    *                       levelType:
    *                         type: string
-   *                         example: "Fundamental"
-   *                   photoUrl:
-   *                     type: string
-   *                     example: "https://orion-photos.s3.sa-east-1.amazonaws.com/nome_tutor01.jpg"
+   *                         example: "Médio"
    *                 lessonRequests:
    *                   type: array
    *                   items:
@@ -611,32 +672,13 @@ export class TutorController {
    *                   example: "Erro interno do servidor."
    */
   async getById(req: Request, res: Response) {
-    const { id } = req.params;
-
     try {
-      const tutor = await MysqlDataSource.getRepository(Tutor).findOne({
-        where: { id: Number(id) },
-        select: [
-          'id',
-          'cpf',
-          'username',
-          'email',
-          'fullName',
-          'educationLevels',
-          'photoUrl',
-          'lessonRequests',
-          'subjects'
-        ],
-        relations: ['educationLevels', 'lessonRequests', 'subjects']
-      });
-
-      if (!tutor) {
-        return res.status(404).json({ message: 'Tutor não encontrado.' });
-      }
-
+      const { id } = req.params;
+      const tutor = await TutorService.getTutorById(Number(id));
       return res.status(200).json(tutor);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

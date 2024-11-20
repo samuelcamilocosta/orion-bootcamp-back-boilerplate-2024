@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { MysqlDataSource } from '../config/database';
-import { EducationLevel } from '../entity/EducationLevel';
-import { Student } from '../entity/Student';
-import { AuthService } from '../service/AuthService';
+import { StudentService } from '../service/StudentService';
+import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class StudentController {
   /**
@@ -108,6 +107,16 @@ export class StudentController {
    *                       location:
    *                         type: string
    *                         example: "body"
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Nível de ensino não encontrado."
    *       '500':
    *         description: Server error
    *         content:
@@ -122,47 +131,19 @@ export class StudentController {
    *                   type: string
    */
   async create(req: Request, res: Response) {
-    const { fullName, username, birthDate, password, email, educationLevelId } =
-      req.body;
-
-    const { hashedPassword, salt } = password;
-
-    const student = new Student();
-    student.fullName = fullName;
-    student.username = username;
-    student.birthDate = birthDate;
-    student.password = hashedPassword;
-    student.email = email;
-    student.salt = salt;
-
     try {
-      const foundEducationLevel = await MysqlDataSource.getRepository(
-        EducationLevel
-      ).findOne({
-        where: { educationId: educationLevelId }
-      });
-
-      if (foundEducationLevel) {
-        student.educationLevel = foundEducationLevel;
-      }
-
-      await MysqlDataSource.getRepository(Student).save(student);
-
-      const token = AuthService.generateToken(
-        student.id,
-        student.email,
-        'student'
+      const { user: savedStudent, token } = await StudentService.createStudent(
+        req.body
       );
 
       return res.status(201).json({
-        message: 'Aluno criado com sucesso.',
-        id: student.id,
+        message: EnumSuccessMessages.STUDENT_CREATED,
+        id: savedStudent.id,
         token: token
       });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -171,7 +152,7 @@ export class StudentController {
    * /api/get/student:
    *   get:
    *     summary: Retrieve a list of all students
-   *     tags: [student]
+   *     tags: [Student]
    *     security:
    *       - BearerAuth: []
    *     responses:
@@ -186,16 +167,16 @@ export class StudentController {
    *                 properties:
    *                   id:
    *                     type: integer
-   *                     example: 2
+   *                     example: 1
    *                   username:
    *                     type: string
    *                     example: "nome_aluno_usuario1234"
-   *                   email:
-   *                     type: string
-   *                     example: "nome_aluno1234@exemplo.com"
    *                   fullName:
    *                     type: string
-   *                     example: "nome_aluno1234"
+   *                     example: "Nome Aluno"
+   *                   birthDate:
+   *                     type: string
+   *                     example: "2001-03-19"
    *                   educationLevel:
    *                     type: object
    *                     properties:
@@ -252,20 +233,11 @@ export class StudentController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const student = await MysqlDataSource.getRepository(Student).find({
-        select: [
-          'id',
-          'username',
-          'email',
-          'fullName',
-          'educationLevel',
-          'lessonRequests'
-        ],
-        relations: ['educationLevel', 'lessonRequests']
-      });
-      return res.status(200).json(student);
+      const students = await StudentService.getAllStudents();
+      return res.status(200).json(students);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -274,7 +246,7 @@ export class StudentController {
    * /api/get/student/{id}:
    *   get:
    *     summary: Retrieve a student by ID
-   *     tags: [student]
+   *     tags: [Student]
    *     security:
    *       - BearerAuth: []
    *     parameters:
@@ -299,12 +271,12 @@ export class StudentController {
    *                 username:
    *                   type: string
    *                   example: "nome_aluno_usuario1234"
-   *                 email:
-   *                   type: string
-   *                   example: "nome_aluno1234@exemplo.com"
    *                 fullName:
    *                   type: string
-   *                   example: "nome_aluno1234"
+   *                   example: "Nome Aluno"
+   *                 birthDate:
+   *                   type: string
+   *                   example: "2001-03-19"
    *                 educationLevel:
    *                   type: object
    *                   properties:
@@ -362,27 +334,34 @@ export class StudentController {
   async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      const student = await StudentService.getStudentById(Number(id));
 
-      const student = await MysqlDataSource.getRepository(Student).findOne({
-        where: { id: Number(id) },
-        select: [
-          'id',
-          'username',
-          'email',
-          'fullName',
-          'educationLevel',
-          'lessonRequests'
-        ],
-        relations: ['educationLevel', 'lessonRequests']
-      });
+      const formattedStudent = {
+        id: student.id,
+        username: student.username,
+        fullName: student.fullName,
+        birthDate: student.birthDate,
+        educationLevel: student.educationLevel,
+        lessonRequests: student.lessonRequests
+      };
 
-      if (!student) {
-        return res.status(404).json({ message: 'Estudante não encontrado.' });
-      }
-
-      return res.status(200).json(student);
+      return res.status(200).json(formattedStudent);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
+
+  async getPendingLessonByStudentId(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const lessons = await StudentService.getPendingLessonByStudentId(
+        Number(id)
+      );
+      return res.status(200).json(lessons);
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

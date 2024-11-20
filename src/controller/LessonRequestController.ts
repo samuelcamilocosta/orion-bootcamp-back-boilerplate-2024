@@ -1,10 +1,7 @@
-import { MysqlDataSource } from '../config/database';
-import { LessonRequest } from '../entity/LessonRequest';
 import { Request, Response } from 'express';
-import { EnumStatusName } from '../entity/enum/EnumStatusName';
-import { Subject } from '../entity/Subject';
-import { Student } from '../entity/Student';
-import { LessonRequestRepository } from '../repository/LessonRequestRepository';
+import { LessonRequestService } from '../service/LessonRequestService';
+import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class LessonRequestController {
   /**
@@ -26,8 +23,8 @@ export class LessonRequestController {
    *                 type: array
    *                 items:
    *                   type: string
-   *                 description: Reasons for the lesson
-   *                 example: ["reforço", "prova ou trabalho"]
+   *                   enum: ['reforço', 'prova ou trabalho', 'correção de exercício', 'outro']
+   *                 example: ["reforço"]
    *               preferredDates:
    *                 type: array
    *                 items:
@@ -42,7 +39,7 @@ export class LessonRequestController {
    *                 type: string
    *                 description: Additional information
    *                 maxLength: 200
-   *                 example: "Informações adicionais"
+   *                 example: "Looking for a tutor with experience in calculus."
    *               studentId:
    *                 type: integer
    *                 description: ID of the student
@@ -57,7 +54,7 @@ export class LessonRequestController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Seu pedido de aula foi enviado com sucesso!"
+   *                   example: "Aula criada com sucesso!"
    *                 lessonRequest:
    *                   type: object
    *                   properties:
@@ -65,41 +62,55 @@ export class LessonRequestController {
    *                       type: array
    *                       items:
    *                         type: string
+   *                       example: ["reforço"]
    *                     preferredDates:
    *                       type: array
    *                       items:
    *                         type: string
+   *                       example: ["2025-12-25 23:45"]
    *                     additionalInfo:
    *                       type: string
+   *                       example: "Looking for a tutor with experience in calculus."
    *                     status:
    *                       type: string
+   *                       example: "pendente"
    *                     subject:
    *                       type: object
    *                       properties:
    *                         subjectId:
    *                           type: integer
+   *                           example: 1
    *                         subjectName:
    *                           type: string
+   *                           example: "Biologia"
    *                     student:
    *                       type: object
    *                       properties:
    *                         id:
    *                           type: integer
+   *                           example: 2
    *                         username:
    *                           type: string
-   *                         email:
-   *                           type: string
-   *                         password:
-   *                           type: string
-   *                         salt:
-   *                           type: string
+   *                           example: "Jose123"
    *                         fullName:
    *                           type: string
+   *                           example: "Jose Silva"
    *                         birthDate:
    *                           type: string
    *                           format: date
+   *                           example: "2001-03-19"
+   *                         educationLevel:
+   *                           type: object
+   *                           properties:
+   *                             educationId:
+   *                               type: integer
+   *                               example: 1
+   *                             levelType:
+   *                               type: string
+   *                               example: "Fundamental"
    *                     ClassId:
    *                       type: integer
+   *                       example: 12
    *       '400':
    *         description: Bad request, validation errors
    *         content:
@@ -142,6 +153,16 @@ export class LessonRequestController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
+   *       '404':
+   *         description: Not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aluno não encontrado."
    *       '500':
    *         description: Internal server error
    *         content:
@@ -154,42 +175,18 @@ export class LessonRequestController {
    *                   example: "Erro interno do servidor."
    */
   async create(req: Request, res: Response) {
-    const { reason, preferredDates, subjectId, additionalInfo, studentId } =
-      req.body;
-
-    const lessonRequest = new LessonRequest();
-    lessonRequest.reason = reason;
-    lessonRequest.preferredDates = preferredDates;
-    lessonRequest.additionalInfo = additionalInfo;
-    lessonRequest.status = EnumStatusName.PENDENTE;
-
     try {
-      const [foundSubject, foundStudent] = await Promise.all([
-        MysqlDataSource.getRepository(Subject).findOne({
-          where: { subjectId: subjectId }
-        }),
-        MysqlDataSource.getRepository(Student).findOne({
-          where: { id: studentId }
-        })
-      ]);
-
-      if (!foundSubject) {
-        return res.status(404).json({ message: 'Matéria não encontrada.' });
-      }
-      lessonRequest.subject = foundSubject;
-
-      if (!foundStudent) {
-        return res.status(404).json({ message: 'Aluno não encontrado.' });
-      }
-      lessonRequest.student = foundStudent;
-      await LessonRequestRepository.createLessonRequest(lessonRequest);
+      const lessonRequest = await LessonRequestService.createLessonRequest(
+        req.body
+      );
 
       return res.status(201).json({
-        message: 'Seu pedido de aula foi enviado com sucesso!',
+        message: EnumSuccessMessages.LESSON_REQUEST_CREATED,
         lessonRequest
       });
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -213,22 +210,29 @@ export class LessonRequestController {
    *                 properties:
    *                   classId:
    *                     type: integer
+   *                     example: 1
    *                   reason:
    *                     type: array
    *                     items:
    *                       type: string
+   *                     example: ["reforço"]
    *                   preferredDates:
    *                     type: array
    *                     items:
    *                       type: string
+   *                     example: ["29/12/2025 às 23:45"]
    *                   status:
    *                     type: string
+   *                     example: "pendente"
    *                   additionalInfo:
    *                     type: string
+   *                     example: "Looking for a tutor with experience in calculus."
    *                   subjectId:
    *                     type: integer
+   *                     example: 1
    *                   studentId:
    *                     type: integer
+   *                     example: 1
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -252,22 +256,11 @@ export class LessonRequestController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const lessonRequests =
-        await LessonRequestRepository.getAllLessonRequests();
-
-      const formattedLessonRequests = lessonRequests.map((request) => ({
-        classId: request.ClassId,
-        reason: request.reason,
-        preferredDates: request.preferredDates,
-        status: request.status,
-        additionalInfo: request.additionalInfo,
-        subjectId: request.subject?.subjectId,
-        studentId: request.student?.id
-      }));
-
-      return res.status(200).json(formattedLessonRequests);
+      const lessonRequests = await LessonRequestService.getAllLessonRequests();
+      return res.status(200).json(lessonRequests);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -275,7 +268,7 @@ export class LessonRequestController {
    * @swagger
    * /api/get/lessonrequest/{id}:
    *   get:
-   *     summary: Retrieve a lesson request by ID
+   *     summary: Get lesson request by ID
    *     tags: [Lesson Request]
    *     security:
    *       - BearerAuth: []
@@ -302,19 +295,47 @@ export class LessonRequestController {
    *                   type: array
    *                   items:
    *                     type: string
-   *                   example: ["reforço"]
+   *                     example: ["reforço"]
    *                 preferredDates:
    *                   type: array
    *                   items:
    *                     type: string
-   *                     format: date
-   *                   example: ["2023-10-01", "2023-10-02"]
+   *                     example: ["29/12/2025 às 23:45"]
    *                 status:
    *                   type: string
    *                   example: "pendente"
    *                 additionalInfo:
    *                   type: string
    *                   example: "Looking for a tutor with experience in calculus."
+   *                 subject:
+   *                   type: object
+   *                   properties:
+   *                     subjectId:
+   *                       type: integer
+   *                       example: 1
+   *                     subjectName:
+   *                       type: string
+   *                       example: "Biologia"
+   *                 student:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: integer
+   *                       example: 1
+   *                     username:
+   *                       type: string
+   *                       example: "teste123"
+   *                     fullName:
+   *                       type: string
+   *                       example: "Teste"
+   *                     birthDate:
+   *                       type: string
+   *                       format: date
+   *                       example: "2001-03-19"
+   *                 tutor:
+   *                   type: object
+   *                   nullable: true
+   *                   example: null
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -325,7 +346,7 @@ export class LessonRequestController {
    *                 message:
    *                   type: string
    *                   example: "Token inválido."
-   *      '404':
+   *       '404':
    *         description: Lesson request not found
    *         content:
    *           application/json:
@@ -336,7 +357,7 @@ export class LessonRequestController {
    *                   type: string
    *                   example: "Aula não encontrada."
    *       '500':
-   *         description: Server error
+   *         description: Internal server error
    *         content:
    *           application/json:
    *             schema:
@@ -350,17 +371,14 @@ export class LessonRequestController {
     const { id } = req.params;
 
     try {
-      const lesson = await LessonRequestRepository.getLessonRequestById(
+      const lesson = await LessonRequestService.getLessonRequestById(
         Number(id)
       );
 
-      if (!lesson) {
-        return res.status(404).json({ message: 'Aula não encontrada.' });
-      }
-
       return res.status(200).json(lesson);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }

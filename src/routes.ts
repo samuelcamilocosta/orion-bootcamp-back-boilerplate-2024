@@ -63,7 +63,17 @@ router.post(
   new StudentController().create
 );
 
-router.get('/api/get/student/:id', authMiddleware(), new StudentController().getById);
+router.get(
+  '/api/get/student/:id',
+  authMiddleware(),
+  new StudentController().getById
+);
+
+router.get(
+  '/api/get/student-pending/:id',
+  authMiddleware(),
+  new StudentController().getPendingLessonByStudentId
+);
 
 // Education Level routes
 router.post(
@@ -72,7 +82,11 @@ router.post(
   new EducationLevelController().create
 );
 
-router.get('/api/get/educationlevel', authMiddleware(), new EducationLevelController().getAll);
+router.get(
+  '/api/get/educationlevel',
+  authMiddleware(),
+  new EducationLevelController().getAll
+);
 
 // Login route
 router.post('/api/login', AuthValidator.login(), new AuthController().login);

@@ -1,43 +1,46 @@
 import { body } from 'express-validator';
-import { EnumReasonName } from '../entity/enum/EnumReasonName';
-import { Subject } from '../entity/Subject';
-import { Student } from '../entity/Student';
-import { MysqlDataSource } from '../config/database';
+import { EnumReasonName } from '../enum/EnumReasonName';
 import { BaseValidator } from './BaseValidator';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
+import { StudentRepository } from '../repository/StudentRepository';
+import { SubjectRepository } from '../repository/SubjectRepository';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class LessonRequestValidator {
   static createLessonRequest() {
     return BaseValidator.validationList([
       body('reason')
         .trim()
-        .custom((value) => {
+        .custom((value): boolean => {
           const validReasons = Object.values(EnumReasonName);
-          const invalidReason = `Motivo da aula inválido. Deve conter ao menos um desses: ${validReasons.join(', ')}`;
+          const invalidReason = EnumErrorMessages.REASON_INVALID.replace(
+            '${validReasons}',
+            validReasons.join(', ')
+          );
+
           if (!Array.isArray(value)) {
             throw new Error(invalidReason);
           }
 
-          value.forEach((reason: EnumReasonName) => {
-            if (typeof reason !== 'string' || !validReasons.includes(reason)) {
+          for (const reason of value) {
+            if (
+              typeof reason !== 'string' ||
+              !validReasons.includes(reason as EnumReasonName)
+            ) {
               throw new Error(invalidReason);
             }
-          });
+          }
           return true;
         }),
       body('preferredDates')
         .isArray({ min: 1, max: 3 })
-        .withMessage(
-          'Datas preferidas são obrigatórias. Mínimo de 1 e máximo de 3.'
-        )
-        .custom((value) => {
+        .withMessage(EnumErrorMessages.PREFERRED_DATES_REQUIRED)
+        .custom((value): boolean => {
           const dateRegex =
             /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} às \d{2}:\d{2}$/;
-          value.forEach((date) => {
+          for (const date of value) {
             if (typeof date !== 'string' || !dateRegex.test(date)) {
-              throw new Error(
-                'Data inválida. O formato correto é dd/MM/yyyy às HH:mm.'
-              );
+              throw new Error(EnumErrorMessages.DATE_FORMAT_INVALID);
             }
             const [day, month, yearTime] = date.split('/');
             const [year] = yearTime.split(' às ');
@@ -47,58 +50,62 @@ export class LessonRequestValidator {
               dateObject.getMonth() + 1 !== parseInt(month) ||
               dateObject.getDate() !== parseInt(day)
             ) {
-              throw new Error('Data inválida. Verifique se a data existe.');
+              throw new Error(EnumErrorMessages.DATE_INVALID);
             }
-          });
+          }
           return true;
         })
         .custom(async (value, { req }) => {
-          const studentId = req.body.studentId;
+          try {
+            const studentId = req.body.studentId;
 
-          const uniqueDates = new Set(value);
-          if (uniqueDates.size !== value.length) {
-            throw new Error('Datas preferidas não podem ser duplicadas.');
+            const uniqueDates = new Set(value);
+            if (uniqueDates.size !== value.length) {
+              throw new Error(EnumErrorMessages.DUPLICATE_PREFERRED_DATES);
+            }
+
+            await Promise.all(
+              value.map(async (date) => {
+                const [day, month, yearTime] = date.split('/');
+                const [year, time] = yearTime.split(' às ');
+                const formattedDate = `${year}-${month}-${day} ${time}`;
+
+                const lessonDate = new Date(formattedDate);
+                const now = new Date();
+                if (lessonDate < now) {
+                  throw new Error(
+                    EnumErrorMessages.PAST_DATE_ERROR.replace('${date}', date)
+                  );
+                }
+
+                const [hour, minute] = time.split(':');
+                if (
+                  parseInt(hour) < 0 ||
+                  parseInt(hour) > 23 ||
+                  parseInt(minute) < 0 ||
+                  parseInt(minute) > 59
+                ) {
+                  throw new Error(
+                    EnumErrorMessages.TIME_INVALID.replace('${time}', time)
+                  );
+                }
+
+                const existingLesson =
+                  await LessonRequestRepository.findByPreferredDate(
+                    formattedDate,
+                    studentId
+                  );
+                if (existingLesson) {
+                  throw new Error(
+                    EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
+                  );
+                }
+              })
+            );
+            return true;
+          } catch (error) {
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
-
-          const datePromises = value.map(async (date) => {
-            const [day, month, yearTime] = date.split('/');
-            const [year, time] = yearTime.split(' às ');
-            const formattedDate = `${year}-${month}-${day} ${time}`;
-
-            const lessonDate = new Date(formattedDate);
-            const now = new Date();
-            if (lessonDate < now) {
-              throw new Error(
-                `A data e hora não podem ser no passado: ${date}`
-              );
-            }
-
-            const [hour, minute] = time.split(':');
-            if (
-              parseInt(hour) < 0 ||
-              parseInt(hour) > 23 ||
-              parseInt(minute) < 0 ||
-              parseInt(minute) > 59
-            ) {
-              throw new Error(
-                `A aula não pode ser agendada antes de 00:00 e depois de 23:59. Horário escolhido: ${time}`
-              );
-            }
-
-            const existingLesson =
-              await LessonRequestRepository.findByPreferredDate(
-                formattedDate,
-                studentId
-              );
-            if (existingLesson) {
-              throw new Error(
-                `Já existe uma aula agendada para o aluno nesse horário: ${date}`
-              );
-            }
-          });
-
-          await Promise.all(datePromises);
-          return true;
         })
         .customSanitizer((value) => {
           return value.map((date) => {
@@ -111,46 +118,42 @@ export class LessonRequestValidator {
         }),
       body('subjectId')
         .isInt()
-        .withMessage('O Id da matéria deve ser um número.')
+        .withMessage(EnumErrorMessages.SUBJECT_ID_INVALID)
         .notEmpty()
-        .withMessage('Matéria é obrigatória.')
+        .withMessage(EnumErrorMessages.SUBJECT_ID_REQUIRED)
         .custom(async (value) => {
-          const subjectRepository = MysqlDataSource.getRepository(Subject);
-          const subject = await subjectRepository.findOne({
-            where: { subjectId: value }
-          });
-
-          if (!subject) {
-            return Promise.reject('Matéria não encontrada.');
+          try {
+            const subject = await SubjectRepository.findSubjectById(value);
+            if (!subject) {
+              throw new Error(EnumErrorMessages.SUBJECT_NOT_FOUND);
+            }
+            return true;
+          } catch (error) {
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
-
-          return true;
         }),
       body('studentId')
         .isInt()
-        .withMessage('O Id do aluno deve ser um número.')
+        .withMessage(EnumErrorMessages.STUDENT_ID_INVALID)
         .notEmpty()
-        .withMessage('Aluno é obrigatório.')
+        .withMessage(EnumErrorMessages.STUDENT_ID_REQUIRED)
         .custom(async (value) => {
-          const studentRepository = MysqlDataSource.getRepository(Student);
-          const student = await studentRepository.findOne({
-            where: { id: value }
-          });
-
-          if (!student) {
-            return Promise.reject('Aluno não encontrado.');
+          try {
+            const student = await StudentRepository.findStudentById(value);
+            if (!student) {
+              throw new Error(EnumErrorMessages.STUDENT_NOT_FOUND);
+            }
+            return true;
+          } catch (error) {
+            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
           }
-
-          return true;
         }),
       body('additionalInfo')
         .optional()
         .isString()
-        .withMessage('Informações adicionais devem ser uma string.')
+        .withMessage(EnumErrorMessages.ADDITIONAL_INFO_STRING)
         .isLength({ max: 200 })
-        .withMessage(
-          'Informações adicionais deve ter no máximo 200 caracteres.'
-        )
+        .withMessage(EnumErrorMessages.ADDITIONAL_INFO_LENGTH)
     ]);
   }
 }

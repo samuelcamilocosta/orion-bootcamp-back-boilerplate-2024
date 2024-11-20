@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../service/AuthService';
-import { UserRepository } from '../repository/UserRepository';
+import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class AuthController {
   /**
@@ -28,6 +29,11 @@ export class AuthController {
    *                 type: string
    *                 description: Password of the user
    *                 example: "senhA@123"
+   *               role:
+   *                 type: string
+   *                 enum: [tutor, student]
+   *                 description: Role of the user
+   *                 example: "tutor"
    *     responses:
    *       '200':
    *         description: Login successful
@@ -38,40 +44,28 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Login bem-sucedido."
-   *                 user:
+   *                   example: "Login realizado com sucesso!"
+   *                   enum: [EnumSuccessMessages.LOGIN_SUCCESS]
+   *                 userId:
+   *                   type: integer
+   *                   example: 1
+   *                 role:
    *                   type: string
    *                   example: "aluno"
    *                 token:
    *                   type: string
    *                   description: JWT token for authenticated requests
    *       '400':
-   *         description: Invalid credentials or validation error
+   *         description: Invalid credentials
    *         content:
    *           application/json:
    *             schema:
    *               type: object
    *               properties:
-   *                    errors:
-   *                     type: array
-   *                     items:
-   *                      type: object
-   *                      properties:
-   *                        type:
-   *                          type: string
-   *                          example: "field"
-   *                        value:
-   *                          type: string
-   *                          example: ""
-   *                        msg:
-   *                          type: string
-   *                          example: "Email é obrigatório."
-   *                        path:
-   *                          type: string
-   *                          example: "email"
-   *                        location:
-   *                          type: string
-   *                          example: "body"
+   *                 message:
+   *                   type: string
+   *                   example: "Credenciais inválidas."
+   *                   enum: [EnumErrorMessages.INVALID_CREDENTIALS]
    *       '404':
    *         description: Email not found
    *         content:
@@ -81,7 +75,8 @@ export class AuthController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Email ou senha incorretos. Tente novamente."
+   *                   example: "Credenciais inválidas."
+   *                   enum: [EnumErrorMessages.INVALID_CREDENTIALS]
    *       '500':
    *         description: Server error
    *         content:
@@ -92,6 +87,7 @@ export class AuthController {
    *                 message:
    *                   type: string
    *                   example: "Erro interno do servidor."
+   *                   enum: [EnumErrorMessages.INTERNAL_SERVER]
    *                 error:
    *                   type: string
    */
@@ -99,36 +95,21 @@ export class AuthController {
     const { email, password, role } = req.body;
 
     try {
-      const user = await UserRepository.findUserByEmail(email);
-      const loginSuccess = 'Login bem-sucedido.';
-      const incorrectCredentials =
-        'Email ou senha incorretos. Tente novamente.';
+      const {
+        userId,
+        token,
+        role: userRole
+      } = await AuthService.login(email, password, role);
 
-      if (!user) {
-        return res.status(404).json({ message: incorrectCredentials });
-      }
-
-      const { isMatch, roleFound } = await AuthService.verifyPassword(
-        user,
-        password
-      );
-      if (!isMatch) {
-        return res.status(400).json({ message: incorrectCredentials });
-      }
-
-      if (role !== roleFound) {
-        return res.status(400).json({ message: 'Tipo de usuário inválido.' });
-      }
-
-      const token = AuthService.generateToken(user.id, user.email, role);
-
-      return res
-        .status(200)
-        .json({ message: loginSuccess, role: role, token: token });
+      return res.status(200).json({
+        message: EnumSuccessMessages.LOGIN_SUCCESS,
+        userId: userId,
+        role: userRole,
+        token: token
+      });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Erro interno do servidor.', error: error.message });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   };
 }

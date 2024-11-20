@@ -2,8 +2,8 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Subject } from './Subject';
 import { Student } from './Student';
 import { Tutor } from './Tutor';
-import { EnumReasonName } from './enum/EnumReasonName';
-import { EnumStatusName } from './enum/EnumStatusName';
+import { EnumReasonName } from '../enum/EnumReasonName';
+import { EnumStatusName } from '../enum/EnumStatusName';
 
 @Entity()
 export class LessonRequest {

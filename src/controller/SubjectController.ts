@@ -1,6 +1,7 @@
-import { Subject } from '../entity/Subject';
-import { MysqlDataSource } from '../config/database';
 import { Request, Response } from 'express';
+import { SubjectService } from '../service/SubjectService';
+import { handleError } from '../utils/ErrorHandler';
+import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 
 export class SubjectController {
   /**
@@ -33,6 +34,16 @@ export class SubjectController {
    *                 message:
    *                   type: string
    *                   example: "Matéria criada com sucesso!"
+   *       '400':
+   *         description: Subject name is required
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Nome da matéria é obrigatório."
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -52,20 +63,18 @@ export class SubjectController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Erro interno no servidor"
+   *                   example: "Erro interno do servidor."
    */
   async create(req: Request, res: Response) {
-    const { subjectName } = req.body;
-
-    const subject = new Subject();
-    subject.subjectName = subjectName;
-
     try {
-      await MysqlDataSource.getRepository(Subject).save(subject);
-
-      return res.status(201).json({ message: 'Matéria criada com sucesso!' });
+      const { subjectName } = req.body;
+      await SubjectService.createSubject(subjectName);
+      return res
+        .status(201)
+        .json({ message: EnumSuccessMessages.SUBJECT_CREATED });
     } catch (error) {
-      return res.status(500).json({ message: 'Erro interno no servidor' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 
@@ -112,17 +121,15 @@ export class SubjectController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: "Internal Server Error"
+   *                   example: "Erro interno do servidor."
    */
   async getAll(req: Request, res: Response) {
     try {
-      const subject = await MysqlDataSource.getRepository(Subject).find({
-        select: ['subjectId', 'subjectName']
-      });
-      return res.status(200).json(subject);
+      const subjects = await SubjectService.getAllSubjects();
+      return res.status(200).json(subjects);
     } catch (error) {
-      console.error('Error fetching students:', error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
     }
   }
 }
