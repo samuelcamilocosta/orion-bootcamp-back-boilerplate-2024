@@ -18,6 +18,10 @@ export class StudentService extends UserService {
       birthDate: student.birthDate,
       educationLevel: student.educationLevel,
       lessonRequests: student.lessonRequests
+        ? student.lessonRequests.map((lessonRequest) =>
+            LessonRequestService.formatLessonRequest(lessonRequest)
+          )
+        : []
     };
   }
 

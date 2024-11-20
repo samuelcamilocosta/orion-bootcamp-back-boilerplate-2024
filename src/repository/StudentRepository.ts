@@ -4,17 +4,6 @@ import { UserRepository } from './UserRepository';
 import { EnumStatusName } from '../enum/EnumStatusName';
 
 export class StudentRepository extends UserRepository {
-  private static relations = ['educationLevel', 'lessonRequests'];
-  private static selectFields = [
-    'id',
-    'username',
-    'fullName',
-    'birthDate',
-    'fullName',
-    'educationLevel',
-    'lessonRequests'
-  ];
-
   static async saveStudent(student: Student): Promise<Student> {
     const repository = MysqlDataSource.getRepository(Student);
     return await repository.save(student);
@@ -22,23 +11,33 @@ export class StudentRepository extends UserRepository {
 
   static async findAllStudents() {
     const repository = MysqlDataSource.getRepository(Student);
-    return await repository.find({
-      select: Object.fromEntries(
-        this.selectFields.map((field) => [field, true])
-      ),
-      relations: this.relations
-    });
+
+    const student = await repository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.educationLevel', 'educationLevel')
+      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect('lessonRequest.tutors', 'lessonTutors')
+      .orderBy('student.id', 'ASC')
+      .addOrderBy('lessonRequest.ClassId', 'ASC')
+      .getMany();
+
+    return student;
   }
 
   static async findStudentById(id: number) {
     const repository = MysqlDataSource.getRepository(Student);
-    return await repository.findOne({
-      where: { id },
-      select: Object.fromEntries(
-        this.selectFields.map((field) => [field, true])
-      ),
-      relations: this.relations
-    });
+
+    const student = await repository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.educationLevel', 'educationLevel')
+      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect('lessonRequest.tutors', 'tutors')
+      .where('student.id = :id', { id })
+      .getOne();
+
+    return student;
   }
 
   static async findStudentLessonsByStatus(
