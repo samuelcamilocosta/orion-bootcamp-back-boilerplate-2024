@@ -384,7 +384,7 @@ export class StudentController {
     }
   }
 
-  async getStudentConfirmedLessons(req: Request, res: Response) {
+  async getStudentAcceptedLessons(req: Request, res: Response) {
     try {
       return StudentController.getStudentLessonsByStatus(
         req,
