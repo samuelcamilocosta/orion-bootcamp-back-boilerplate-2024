@@ -5,6 +5,7 @@ import { BaseValidator } from './BaseValidator';
 import { RequestHandler } from 'express';
 import { TutorRepository } from '../repository/TutorRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { AppError } from '../error/AppError';
 
 export class TutorValidator extends CommonValidations {
   /**
@@ -31,11 +32,11 @@ export class TutorValidator extends CommonValidations {
           try {
             const cleanCpf = value.replace(/\D/g, '');
             if (!cpf.isValid(cleanCpf)) {
-              throw new Error(EnumErrorMessages.CPF_INVALID);
+              throw new AppError(EnumErrorMessages.CPF_INVALID);
             }
             return true;
           } catch (error) {
-            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .custom(async (value: string): Promise<boolean> => {
@@ -45,12 +46,12 @@ export class TutorValidator extends CommonValidations {
               await TutorRepository.findTutorByCpf(cleanCpf);
 
             if (existingTutor) {
-              throw new Error(EnumErrorMessages.CPF_ALREADY_EXISTS);
+              throw new AppError(EnumErrorMessages.CPF_ALREADY_EXISTS);
             }
 
             return true;
           } catch (error) {
-            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .customSanitizer((value: string): string => {

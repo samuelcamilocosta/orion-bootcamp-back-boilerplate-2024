@@ -5,6 +5,7 @@ import { LessonRequestRepository } from '../repository/LessonRequestRepository';
 import { StudentRepository } from '../repository/StudentRepository';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { AppError } from '../error/AppError';
 
 export class LessonRequestValidator {
   static createLessonRequest() {
@@ -19,7 +20,7 @@ export class LessonRequestValidator {
           );
 
           if (!Array.isArray(value)) {
-            throw new Error(invalidReason);
+            throw new AppError(invalidReason);
           }
 
           for (const reason of value) {
@@ -27,7 +28,7 @@ export class LessonRequestValidator {
               typeof reason !== 'string' ||
               !validReasons.includes(reason as EnumReasonName)
             ) {
-              throw new Error(invalidReason);
+              throw new AppError(invalidReason);
             }
           }
           return true;
@@ -50,7 +51,7 @@ export class LessonRequestValidator {
               dateObject.getMonth() + 1 !== parseInt(month) ||
               dateObject.getDate() !== parseInt(day)
             ) {
-              throw new Error(EnumErrorMessages.DATE_INVALID);
+              throw new AppError(EnumErrorMessages.DATE_INVALID);
             }
           }
           return true;
@@ -61,7 +62,7 @@ export class LessonRequestValidator {
 
             const uniqueDates = new Set(value);
             if (uniqueDates.size !== value.length) {
-              throw new Error(EnumErrorMessages.DUPLICATE_PREFERRED_DATES);
+              throw new AppError(EnumErrorMessages.DUPLICATE_PREFERRED_DATES);
             }
 
             await Promise.all(
@@ -73,7 +74,7 @@ export class LessonRequestValidator {
                 const lessonDate = new Date(formattedDate);
                 const now = new Date();
                 if (lessonDate < now) {
-                  throw new Error(
+                  throw new AppError(
                     EnumErrorMessages.PAST_DATE_ERROR.replace('${date}', date)
                   );
                 }
@@ -85,7 +86,7 @@ export class LessonRequestValidator {
                   parseInt(minute) < 0 ||
                   parseInt(minute) > 59
                 ) {
-                  throw new Error(
+                  throw new AppError(
                     EnumErrorMessages.TIME_INVALID.replace('${time}', time)
                   );
                 }
@@ -96,7 +97,7 @@ export class LessonRequestValidator {
                     studentId
                   );
                 if (existingLesson) {
-                  throw new Error(
+                  throw new AppError(
                     EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
                   );
                 }
@@ -104,7 +105,7 @@ export class LessonRequestValidator {
             );
             return true;
           } catch (error) {
-            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
           }
         })
         .customSanitizer((value) => {
@@ -125,11 +126,11 @@ export class LessonRequestValidator {
           try {
             const subject = await SubjectRepository.findSubjectById(value);
             if (!subject) {
-              throw new Error(EnumErrorMessages.SUBJECT_NOT_FOUND);
+              throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND);
             }
             return true;
           } catch (error) {
-            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('studentId')
@@ -141,11 +142,11 @@ export class LessonRequestValidator {
           try {
             const student = await StudentRepository.findStudentById(value);
             if (!student) {
-              throw new Error(EnumErrorMessages.STUDENT_NOT_FOUND);
+              throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND);
             }
             return true;
           } catch (error) {
-            throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+            throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
           }
         }),
       body('additionalInfo')

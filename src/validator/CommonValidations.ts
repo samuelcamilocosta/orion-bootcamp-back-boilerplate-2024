@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../repository/UserRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { AppError } from '../error/AppError';
 
 const birthDateRegex =
   /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -33,12 +34,12 @@ export class CommonValidations {
             await UserRepository.findExistingUserByUsername(value);
 
           if (existingUser) {
-            throw new Error(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
+            throw new AppError(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
           }
 
           return true;
         } catch (error) {
-          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+          throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
@@ -52,7 +53,7 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.BIRTH_DATE_REQUIRED)
       .custom((value: string): boolean => {
         if (!birthDateRegex.test(value)) {
-          throw new Error(EnumErrorMessages.BIRTH_DATE_FORMAT);
+          throw new AppError(EnumErrorMessages.BIRTH_DATE_FORMAT);
         }
 
         const [day, month, year] = value.split('/').map(Number);
@@ -63,14 +64,14 @@ export class CommonValidations {
               ? true
               : false;
           if (day > 29 || (day === 29 && !isLeapYear)) {
-            throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
+            throw new AppError(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (month === 4 || month === 6 || month === 9 || month === 11) {
           if (day > 30) {
-            throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
+            throw new AppError(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
         } else if (day > 31) {
-          throw new Error(EnumErrorMessages.BIRTH_DATE_INCORRECT);
+          throw new AppError(EnumErrorMessages.BIRTH_DATE_INCORRECT);
         }
 
         const now = new Date();
@@ -85,7 +86,7 @@ export class CommonValidations {
         currentDate.setMinutes(currentDate.getMinutes() + offset);
 
         if (inputDate >= currentDate) {
-          throw new Error(EnumErrorMessages.BIRTH_DATE_FUTURE);
+          throw new AppError(EnumErrorMessages.BIRTH_DATE_FUTURE);
         }
 
         return true;
@@ -110,7 +111,7 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.CONFIRM_PASSWORD_REQUIRED)
       .custom((value, { req }): boolean => {
         if (value !== req.body.password) {
-          throw new Error(EnumErrorMessages.PASSWORDS_NOT_MATCH);
+          throw new AppError(EnumErrorMessages.PASSWORDS_NOT_MATCH);
         }
         return true;
       });
@@ -127,7 +128,7 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.PASSWORD_MIN_LENGTH)
       .custom((value): boolean => {
         if (!passwordRegex.test(value)) {
-          throw new Error(EnumErrorMessages.PASSWORD_REQUIREMENTS);
+          throw new AppError(EnumErrorMessages.PASSWORD_REQUIREMENTS);
         }
         return true;
       })
@@ -155,12 +156,12 @@ export class CommonValidations {
             await UserRepository.findExistingUserByEmail(value);
 
           if (existingUser) {
-            throw new Error(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
+            throw new AppError(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
           }
 
           return true;
         } catch (error) {
-          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+          throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
@@ -174,18 +175,18 @@ export class CommonValidations {
           const educationLevelIds = req.body.educationLevelIds;
 
           if (educationLevelId.length > 1) {
-            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
+            throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
           }
 
           if (
             (!educationLevelId && !educationLevelIds) ||
             (educationLevelId.length === 0 && educationLevelIds.length === 0)
           ) {
-            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
+            throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
           }
 
           if (educationLevelId && educationLevelIds) {
-            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
+            throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
           }
 
           const educationLevels =
@@ -198,15 +199,15 @@ export class CommonValidations {
             );
 
           if (existingEducationLevels.length !== parsedValues.length) {
-            throw new Error(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);
+            throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);
           }
 
           return true;
         } catch (error) {
           if (error instanceof Error) {
-            throw new Error(error.message);
+            throw new AppError(error.message);
           }
-          throw new Error(EnumErrorMessages.INTERNAL_SERVER);
+          throw new AppError(EnumErrorMessages.INTERNAL_SERVER);
         }
       });
   }
