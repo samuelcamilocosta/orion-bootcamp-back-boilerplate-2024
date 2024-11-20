@@ -381,4 +381,123 @@ export class LessonRequestController {
       return res.status(statusCode).json({ message });
     }
   }
+
+  /**
+   * @swagger
+   * /api/update/lessonrequest/{id}:
+   *   patch:
+   *     summary: Update lesson request by ID
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         description: ID of the lesson request to update
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               subjectId:
+   *                 type: integer
+   *                 example: 1
+   *               reason:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                   enum:
+   *                     - "reforço"
+   *                     - "prova ou trabalho"
+   *                     - "correção de exercício"
+   *                     - "outro"
+   *                 example: ["prova ou trabalho"]
+   *               additionalInfo:
+   *                 type: string
+   *                 example: "Testando1234testando"
+   *               preferredDates:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                   format: date-time
+   *                 example: ["2025-06-07T22:45"]
+   *     responses:
+   *       '200':
+   *         description: Lesson request updated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula atualizada com sucesso!"
+   *       '400':
+   *         description: Bad request, invalid data provided
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Motivo da aula inválido. Deve conter ao menos um desses: reforço, prova ou trabalho, correção de exercício, outro"
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *       '404':
+   *         description: Lesson request or subject not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula não encontrada."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
+  async updateLesson(req: Request, res: Response) {
+    try {
+      const { lessonId } = req.params;
+      const { subjectId, reason, additionalInfo, preferredDates } = req.body;
+
+      await LessonRequestService.updateLessonRequest(
+        Number(lessonId),
+        subjectId,
+        reason,
+        additionalInfo,
+        preferredDates
+      );
+
+      return res
+        .status(200)
+        .json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
 }

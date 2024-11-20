@@ -1,4 +1,3 @@
-import { EnumUserType } from '../enum/EnumUserType';
 import { Student } from '../entity/Student';
 import { StudentRepository } from '../repository/StudentRepository';
 import { UserService } from './UserService';
@@ -6,6 +5,9 @@ import { EducationLevelRepository } from '../repository/EducationLevelRepository
 import { handleError } from '../utils/ErrorHandler';
 import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
+import { EnumStatusName } from '../enum/EnumStatusName';
+import { EnumUserType } from '../enum/EnumUserType';
+import { LessonRequestService } from './LessonRequestService';
 
 export class StudentService extends UserService {
   static formatStudent(student: Student) {
@@ -85,11 +87,17 @@ export class StudentService extends UserService {
     }
   }
 
-  static async getPendingLessonByStudentId(id: number) {
+  static async getStudentLessonsByStatus(id, status: EnumStatusName) {
     try {
-      const pendingLessonRequests =
-        await StudentRepository.findPendingLessonByStudentId(id);
-      return pendingLessonRequests;
+      const lessonRequests = await StudentRepository.findStudentLessonsByStatus(
+        id,
+        status
+      );
+
+      if (!lessonRequests) {
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+      }
+      return lessonRequests.map(LessonRequestService.formatLessonRequest);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);

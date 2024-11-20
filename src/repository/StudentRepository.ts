@@ -41,16 +41,16 @@ export class StudentRepository extends UserRepository {
     });
   }
 
-  static async findPendingLessonByStudentId(id: number) {
+  static async findLessonsByStudentIdAndStatus(id: number, status: EnumStatusName) {
     const repository = MysqlDataSource.getRepository(Student);
+
     const rawResults = await repository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.tutors', 'tutor')
       .where('student.id = :id', { id })
-      .andWhere('lessonRequest.status = :status', {
-        status: EnumStatusName.PENDENTE
-      })
+      .andWhere('lessonRequest.status = :status', { status })
       .select([
         'lessonRequest.ClassId as classId',
         'lessonRequest.reason as reason',
@@ -65,8 +65,8 @@ export class StudentRepository extends UserRepository {
 
     return rawResults.map((result) => ({
       classId: result.classId,
-      reason: result.reason,
-      preferredDates: result.preferredDates,
+      reason: result.reason ? [result.reason] : [],
+      preferredDates: result.preferredDates ? [result.preferredDates] : [],
       status: result.status,
       additionalInfo: result.additionalInfo,
       subjectId: result.subjectId,

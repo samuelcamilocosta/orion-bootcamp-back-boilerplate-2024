@@ -77,7 +77,13 @@ router.get(
 router.get(
   '/api/get/student-pending/:id',
   authMiddleware(),
-  new StudentController().getPendingLessonByStudentId
+  new StudentController().getStudentPendingLessons
+);
+
+router.get(
+  '/api/get/student-confirmed-lessons/:id',
+  authMiddleware(),
+  new StudentController().getStudentConfirmedLessons
 );
 
 // Education Level routes
@@ -114,6 +120,12 @@ router.get(
   '/api/get/lessonrequest/:id',
   authMiddleware(),
   new LessonRequestController().getById
+);
+
+router.patch(
+  '/api/update/lessonrequest/:lessonId',
+  authMiddleware(),
+  new LessonRequestController().updateLesson
 );
 
 // Subject route
