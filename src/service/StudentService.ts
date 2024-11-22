@@ -4,6 +4,7 @@ import { UserService } from './UserService';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
 import { StudentRepository } from '../repository/StudentRepository';
+import { LessonRequestTutorRepository } from '../repository/LessonRequestTutorRepository';
 import { handleError } from '../utils/ErrorHandler';
 import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
@@ -126,21 +127,32 @@ export class StudentService extends UserService {
         throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
       }
 
-      const lessonRequestTutor = lessonRequest.lessonRequestTutors.find(
-        (lessonRequestTutor) => lessonRequestTutor.tutor.id === tutorId
-      );
-  
+      const lessonRequestTutor =
+        await LessonRequestTutorRepository.findByLessonRequestAndTutor(
+          lessonId,
+          tutorId
+        );
+
       if (!lessonRequestTutor) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
-      lessonRequestTutor.status = EnumStatusName.CONFIRMADO;
+      await LessonRequestTutorRepository.updateStatus(
+        lessonRequestTutor.id,
+        EnumStatusName.CONFIRMADO
+      );
+
+      lessonRequest.preferredDates = [lessonRequestTutor.chosenDate];
+
+      lessonRequest.lessonRequestTutors =
+        lessonRequest.lessonRequestTutors.filter(
+          (lrt) => lrt.id === lessonRequestTutor.id
+        );
 
       lessonRequest.status = EnumStatusName.CONFIRMADO;
-
       await LessonRequestRepository.saveLessonRequest(lessonRequest);
 
-      return lessonRequest;
+      return LessonRequestService.formatLessonRequest(lessonRequest);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);

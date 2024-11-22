@@ -2,13 +2,6 @@ import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 
 export class LessonRequestRepository {
-  private static relations = [
-    'lessonRequestTutors',
-    'lessonRequestTutors.tutor',
-    'subject',
-    'student'
-  ];
-
   static async saveLessonRequest(
     lessonRequest: LessonRequest
   ): Promise<LessonRequest> {
