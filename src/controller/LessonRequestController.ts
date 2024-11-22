@@ -387,7 +387,7 @@ export class LessonRequestController {
    * /api/delete/lessonrequest/{id}:
    *   delete:
    *     summary: Delete a lesson request by ID
-   *     tags: [lesson]
+   *     tags: [Lesson Request]
    *     parameters:
    *       - name: id
    *         in: path
@@ -562,6 +562,25 @@ export class LessonRequestController {
       return res
         .status(200)
         .json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
+
+  async cancelTutorLessonRequest(req: Request, res: Response) {
+    const classId = Number(req.params.id);
+
+    if (isNaN(classId) || classId <= 0) {
+      return res.status(400).json({ message: 'Parâmetro inválido' });
+    }
+
+    try {
+      const updateRequest =
+        await LessonRequestService.cancelTutorLessonRequestById(
+          Number(classId)
+        );
+      return res.status(204).end().json({ updateRequest });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });
