@@ -126,16 +126,16 @@ export class StudentService extends UserService {
         throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
       }
 
-      const chosenTutor = lessonRequest.tutors.some(
-        (tutor) => tutor.id === tutorId
+      const lessonRequestTutor = lessonRequest.lessonRequestTutors.find(
+        (lessonRequestTutor) => lessonRequestTutor.tutor.id === tutorId
       );
-      if (!chosenTutor) {
+  
+      if (!lessonRequestTutor) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
-      lessonRequest.tutors = lessonRequest.tutors.filter(
-        (tutor) => tutor.id === tutorId
-      );
+      lessonRequestTutor.status = EnumStatusName.CONFIRMADO;
+
       lessonRequest.status = EnumStatusName.CONFIRMADO;
 
       await LessonRequestRepository.saveLessonRequest(lessonRequest);
