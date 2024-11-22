@@ -59,6 +59,7 @@ export enum EnumErrorMessages {
   INVALID_PENDENTE_ACEITO_STATUS = 'O status do pedido de aula deve estar como pendente ou como aceito.',
   INVALID_ACEITO_STATUS = 'O status do pedido de aula deve estar como aceito.',
   TUTOR_ALREADY_ADDED = 'O tutor já está na lista de tutores do pedido de aula.',
+  LESSON_REQUEST_ALREADY_CONFIRMED = 'A aula já foi confirmada, não é possível confirmar novamente.',
 
   // Education level errors
   EDUCATION_LEVEL_NOT_FOUND = 'Nível de ensino não encontrado.',

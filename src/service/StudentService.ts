@@ -123,6 +123,13 @@ export class StudentService extends UserService {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
 
+      if (lessonRequest.status === EnumStatusName.CONFIRMADO) {
+        throw new AppError(
+          EnumErrorMessages.LESSON_REQUEST_ALREADY_CONFIRMED,
+          400
+        );
+      }
+
       if (lessonRequest.status !== EnumStatusName.ACEITO) {
         throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
       }
