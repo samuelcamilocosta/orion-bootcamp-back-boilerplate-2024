@@ -128,6 +128,11 @@ router.get(
   new LessonRequestController().getById
 );
 
+router.delete(
+  '/api/delete/lessonrequest/:id',
+  new LessonRequestController().DeleteById
+);
+
 router.patch(
   '/api/update/lessonrequest/:lessonId',
   authMiddleware(),
