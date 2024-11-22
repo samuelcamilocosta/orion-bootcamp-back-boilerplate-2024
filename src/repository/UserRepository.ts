@@ -7,7 +7,6 @@ export class UserRepository {
   static async findExistingUserByUsername(username: string) {
     const tutorRepository = MysqlDataSource.getRepository(Tutor);
     const studentRepository = MysqlDataSource.getRepository(Student);
-
     return (
       (await tutorRepository.findOne({ where: { username } })) ||
       (await studentRepository.findOne({ where: { username } }))
@@ -32,17 +31,10 @@ export class UserRepository {
       userType === EnumUserType.TUTOR
         ? MysqlDataSource.getRepository(Tutor)
         : MysqlDataSource.getRepository(Student);
+
     return await repository.findOne({
       where: { email },
-      select: [
-        'id',
-        'email',
-        'username',
-        'fullName',
-        'password',
-        'lessonRequests'
-      ],
-      relations: ['lessonRequests']
+      select: ['id', 'email', 'username', 'fullName', 'password']
     });
   }
 }
