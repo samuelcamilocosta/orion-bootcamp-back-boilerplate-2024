@@ -31,7 +31,7 @@ export class LessonRequestService {
         lessonRequest.lessonRequestTutors.length > 0
           ? lessonRequest.lessonRequestTutors.map((lessonRequestTutor) => ({
               tutor: TutorService.formatTutor(lessonRequestTutor.tutor),
-              chosenDates: lessonRequestTutor.chosenDate
+              chosenDate: lessonRequestTutor.chosenDate
             }))
           : []
     };
