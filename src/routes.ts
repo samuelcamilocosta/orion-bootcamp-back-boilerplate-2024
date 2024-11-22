@@ -92,6 +92,12 @@ router.get(
   new StudentController().getStudentConfirmedLessons
 );
 
+router.patch(
+  '/api/student-confirm-lesson',
+  authMiddleware(),
+  new StudentController().confirmLessonRequest
+);
+
 // Education Level routes
 router.post(
   '/api/register/educationlevel',

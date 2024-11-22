@@ -1,13 +1,15 @@
 import { Student } from '../entity/Student';
-import { StudentRepository } from '../repository/StudentRepository';
+import { LessonRequestService } from './LessonRequestService';
 import { UserService } from './UserService';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
+import { LessonRequestRepository } from '../repository/LessonRequestRepository';
+import { StudentRepository } from '../repository/StudentRepository';
+import { LessonRequestTutorRepository } from '../repository/LessonRequestTutorRepository';
 import { handleError } from '../utils/ErrorHandler';
 import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { EnumStatusName } from '../enum/EnumStatusName';
 import { EnumUserType } from '../enum/EnumUserType';
-import { LessonRequestService } from './LessonRequestService';
 
 export class StudentService extends UserService {
   static formatStudent(student: Student) {
@@ -106,6 +108,58 @@ export class StudentService extends UserService {
       return lessonRequests.map((lessonRequest) =>
         LessonRequestService.formatLessonRequest(lessonRequest)
       );
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      throw new AppError(message, statusCode);
+    }
+  }
+
+  static async confirmLessonRequest(lessonId: number, tutorId: number) {
+    try {
+      const lessonRequest =
+        await LessonRequestRepository.getLessonRequestById(lessonId);
+
+      if (!lessonRequest) {
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+      }
+
+      if (lessonRequest.status === EnumStatusName.CONFIRMADO) {
+        throw new AppError(
+          EnumErrorMessages.LESSON_REQUEST_ALREADY_CONFIRMED,
+          400
+        );
+      }
+
+      if (lessonRequest.status !== EnumStatusName.ACEITO) {
+        throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
+      }
+
+      const lessonRequestTutor =
+        await LessonRequestTutorRepository.findByLessonRequestAndTutor(
+          lessonId,
+          tutorId
+        );
+
+      if (!lessonRequestTutor) {
+        throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
+      }
+
+      await LessonRequestTutorRepository.updateStatus(
+        lessonRequestTutor.id,
+        EnumStatusName.CONFIRMADO
+      );
+
+      lessonRequest.preferredDates = [lessonRequestTutor.chosenDate];
+
+      lessonRequest.lessonRequestTutors =
+        lessonRequest.lessonRequestTutors.filter(
+          (lrt) => lrt.id === lessonRequestTutor.id
+        );
+
+      lessonRequest.status = EnumStatusName.CONFIRMADO;
+      await LessonRequestRepository.saveLessonRequest(lessonRequest);
+
+      return LessonRequestService.formatLessonRequest(lessonRequest);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
