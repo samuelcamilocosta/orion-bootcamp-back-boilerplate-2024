@@ -93,7 +93,7 @@ router.get(
 );
 
 router.patch(
-  '/api/update/student-confirm-lesson',
+  '/api/student-confirm-lesson',
   authMiddleware(),
   new StudentController().confirmLessonRequest
 );
