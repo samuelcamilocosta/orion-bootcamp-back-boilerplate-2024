@@ -16,22 +16,26 @@ export class TutorRepository extends UserRepository {
   static async findAllTutors() {
     const repository = MysqlDataSource.getRepository(Tutor);
     return await repository
-      .createQueryBuilder('tutor')
-      .leftJoinAndSelect('tutor.lessonRequests', 'lessonRequest')
+      .createQueryBuilder('mainTutor')
+      .leftJoinAndSelect('mainTutor.lessonRequestTutors', 'lessonRequestTutor')
+      .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect('lessonRequest.tutors', 'tutors')
       .leftJoinAndSelect('lessonRequest.student', 'student')
       .getMany();
   }
 
-  static async findTutorById(id: number) {
+  static async findTutorById(tutorId: number) {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository
-      .createQueryBuilder('tutor')
-      .leftJoinAndSelect('tutor.lessonRequests', 'lessonRequest')
+
+    const tutor = await repository
+      .createQueryBuilder('mainTutor')
+      .leftJoinAndSelect('mainTutor.lessonRequestTutors', 'lessonRequestTutor')
+      .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.student', 'student')
-      .where('tutor.id = :id', { id })
+      .where('mainTutor.id = :id', { id: tutorId })
       .getOne();
+
+    return tutor;
   }
 }
