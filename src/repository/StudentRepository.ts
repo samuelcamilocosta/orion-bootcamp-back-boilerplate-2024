@@ -2,6 +2,10 @@ import { MysqlDataSource } from '../config/database';
 import { Student } from '../entity/Student';
 import { UserRepository } from './UserRepository';
 import { EnumStatusName } from '../enum/EnumStatusName';
+import { LessonRequest } from '../entity/LessonRequest';
+import { LessonRequestTutorRepository } from './LessonRequestTutorRepository';
+import { AppError } from '../error/AppError';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class StudentRepository extends UserRepository {
   static async saveStudent(student: Student): Promise<Student> {
@@ -17,7 +21,11 @@ export class StudentRepository extends UserRepository {
       .leftJoinAndSelect('student.educationLevel', 'educationLevel')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect('lessonRequest.tutors', 'lessonTutors')
+      .leftJoinAndSelect(
+        'lessonRequest.lessonRequestTutors',
+        'lessonRequestTutor'
+      )
+      .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .orderBy('student.id', 'ASC')
       .addOrderBy('lessonRequest.ClassId', 'ASC')
       .getMany();
@@ -25,17 +33,25 @@ export class StudentRepository extends UserRepository {
     return student;
   }
 
-  static async findStudentById(id: number) {
+  static async findStudentById(id: number): Promise<Student> {
     const repository = MysqlDataSource.getRepository(Student);
-
     const student = await repository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.educationLevel', 'educationLevel')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect('lessonRequest.tutors', 'tutors')
+      .leftJoinAndSelect(
+        'lessonRequest.lessonRequestTutors',
+        'lessonRequestTutor'
+      )
+      .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .where('student.id = :id', { id })
       .getOne();
+
+    if (!student) {
+      console.error(`Student with ID ${id} not found`);
+      throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
+    }
 
     return student;
   }
@@ -43,35 +59,34 @@ export class StudentRepository extends UserRepository {
   static async findStudentLessonsByStatus(
     studentId: { id: string },
     status: EnumStatusName
-  ) {
+  ): Promise<LessonRequest[]> {
     const repository = MysqlDataSource.getRepository(Student);
-
     const numericStudentId = Number(studentId.id);
+
     const results = await repository
-      .createQueryBuilder('mainStudent')
-      .leftJoinAndSelect('mainStudent.lessonRequests', 'lessonRequest')
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.educationLevel', 'educationLevel')
+      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect('lessonRequest.tutors', 'tutor')
-      .leftJoinAndSelect('lessonRequest.student', 'student')
-      .where('mainStudent.id = :id', { id: numericStudentId })
+      .leftJoinAndSelect(
+        'lessonRequest.lessonRequestTutors',
+        'lessonRequestTutor'
+      )
+      .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .where('student.id = :id', { id: numericStudentId })
       .andWhere('lessonRequest.status = :status', { status })
       .getMany();
 
-    return results
-      .map((student) => {
-        return student.lessonRequests.map((lessonRequest) => ({
-          ClassId: lessonRequest.ClassId,
-          reason: lessonRequest.reason ? lessonRequest.reason : [],
-          preferredDates: lessonRequest.preferredDates
-            ? lessonRequest.preferredDates
-            : [],
-          status: lessonRequest.status,
-          additionalInfo: lessonRequest.additionalInfo,
-          subject: lessonRequest.subject,
-          student: lessonRequest.student,
-          tutors: lessonRequest.tutors
-        }));
-      })
-      .flat();
+    const lessonRequests = results.flatMap((student) => student.lessonRequests);
+
+    for (const lessonRequest of lessonRequests) {
+      const chosenDates =
+        await LessonRequestTutorRepository.getChosenDatesByLessonRequestId(
+          lessonRequest.ClassId
+        );
+      lessonRequest['chosenDate'] = chosenDates;
+    }
+
+    return lessonRequests;
   }
 }

@@ -684,9 +684,9 @@ export class TutorController {
 
   async acceptLessonRequest(req: Request, res: Response) {
     try {
-      const { lessonId, tutorId } = req.body;
+      const { lessonId, tutorId, chosenDate } = req.body;
 
-      await TutorService.acceptLessonRequest(lessonId, tutorId);
+      await TutorService.acceptLessonRequest(lessonId, tutorId, chosenDate);
 
       return res
         .status(200)
