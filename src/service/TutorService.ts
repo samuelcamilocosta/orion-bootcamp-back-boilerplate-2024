@@ -174,7 +174,10 @@ export class TutorService extends UserService {
         lessonRequest.status !== EnumStatusName.PENDENTE &&
         lessonRequest.status !== EnumStatusName.ACEITO
       ) {
-        throw new AppError(EnumErrorMessages.INVALID_PENDENTE_ACEITO_STATUS, 400);
+        throw new AppError(
+          EnumErrorMessages.INVALID_PENDENTE_ACEITO_STATUS,
+          400
+        );
       }
 
       const tutor = await TutorRepository.findTutorById(tutorId);
