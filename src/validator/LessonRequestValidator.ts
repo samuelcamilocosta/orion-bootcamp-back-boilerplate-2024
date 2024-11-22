@@ -24,6 +24,10 @@ export class LessonRequestValidator {
             throw new AppError(invalidReason);
           }
 
+          if (value.length === 0) {
+            throw new AppError(invalidReason);
+          }
+
           for (const reason of value) {
             if (
               typeof reason !== 'string' ||
@@ -97,6 +101,7 @@ export class LessonRequestValidator {
                     formattedDate,
                     studentId
                   );
+                console.log(existingLesson);
                 if (existingLesson) {
                   throw new AppError(
                     EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
