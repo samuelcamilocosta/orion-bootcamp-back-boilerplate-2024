@@ -381,4 +381,71 @@ export class LessonRequestController {
       return res.status(statusCode).json({ message });
     }
   }
+
+  /**
+   * @swagger
+   * /api/delete/lessonrequest/{id}:
+   *   delete:
+   *     summary: Delete a lesson request by ID
+   *     tags: [lesson]
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         description: ID of the lesson request to delete
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     responses:
+   *       '204':
+   *         description: Lesson request deleted successfully
+   *       '400':
+   *         description: Invalid parameter
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Parâmetro inválido"
+   *       '404':
+   *         description: Lesson request not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Pedido de aula não existe"
+   *       '500':
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno no servidor"
+   */
+
+  async DeleteById(req: Request, res: Response) {
+    const classId = Number(req.params.id);
+
+    if (isNaN(classId) || classId <= 0) {
+      return res.status(400).json({ message: 'Parâmetro inválido' });
+    }
+
+    try {
+      const deletedRequest = await LessonRequestService.deleteLessonRequestById(
+        Number(classId)
+      );
+      return res.status(204).end().json({ deletedRequest });
+    } catch (error) {
+      const { statusCode, message } = handleError(error);
+      return res.status(statusCode).json({ message });
+    }
+  }
 }

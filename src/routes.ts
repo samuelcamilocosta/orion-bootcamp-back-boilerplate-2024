@@ -111,6 +111,11 @@ router.get(
   new LessonRequestController().getById
 );
 
+router.delete(
+  '/api/delete/lessonrequest/:id',
+  new LessonRequestController().DeleteById
+);
+
 // Subject route
 router.post(
   '/api/register/subject',

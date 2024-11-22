@@ -93,4 +93,19 @@ export class LessonRequestService {
       throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
     }
   }
+
+  static async deleteLessonRequestById(classId: number) {
+    try {
+      const lessonRequest =
+        await LessonRequestRepository.getLessonRequestById(classId);
+
+      if (!lessonRequest) {
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+      }
+
+      await LessonRequestRepository.deleteByClassId(classId);
+    } catch (error) {
+      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+    }
+  }
 }
