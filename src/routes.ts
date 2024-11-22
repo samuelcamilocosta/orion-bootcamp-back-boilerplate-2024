@@ -50,7 +50,7 @@ router.patch(
 );
 
 router.patch(
-  '/api/update/tutor-accept-lesson',
+  '/api/tutor-accept-lesson',
   authMiddleware(),
   new TutorController().acceptLessonRequest
 );
