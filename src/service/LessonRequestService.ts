@@ -63,7 +63,8 @@ export class LessonRequestService {
       lessonRequest.subject = foundSubject;
       lessonRequest.student = foundStudent;
 
-      return await LessonRequestRepository.saveLessonRequest(lessonRequest);
+      await LessonRequestRepository.saveLessonRequest(lessonRequest);
+      return this.formatLessonRequest(lessonRequest);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -163,6 +164,24 @@ export class LessonRequestService {
       }
 
       await LessonRequestRepository.deleteByClassId(classId);
+    } catch (error) {
+      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+    }
+  }
+
+  static async cancelTutorLessonRequestById(classId: number) {
+    try {
+      const lessonRequest =
+        await LessonRequestRepository.getLessonRequestById(classId);
+
+      if (!lessonRequest) {
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+      }
+
+      if (lessonRequest.status === EnumStatusName.ACEITO) {
+        lessonRequest.status = EnumStatusName.PENDENTE;
+      }
+      await LessonRequestRepository.saveLessonRequest(lessonRequest);
     } catch (error) {
       throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
     }
