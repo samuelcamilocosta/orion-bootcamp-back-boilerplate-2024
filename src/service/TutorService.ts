@@ -5,6 +5,7 @@ import { FileStorageService } from './FileStorageService';
 import { SubjectRepository } from '../repository/SubjectRepository';
 import { EducationLevelRepository } from '../repository/EducationLevelRepository';
 import { LessonRequestRepository } from '../repository/LessonRequestRepository';
+import { LessonRequestTutorRepository } from '../repository/LessonRequestTutorRepository';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { EnumStatusName } from '../enum/EnumStatusName';
 import { EnumUserType } from '../enum/EnumUserType';
@@ -22,11 +23,14 @@ export class TutorService extends UserService {
       birthDate: tutor.birthDate,
       expertise: tutor.expertise,
       projectReason: tutor.projectReason,
-      educationLevels: tutor.educationLevels,
-      lessonRequests: tutor.lessonRequests
-        ? tutor.lessonRequests.map((lessonRequest) =>
-            LessonRequestService.formatLessonRequest(lessonRequest)
-          )
+      lessonRequestTutors: tutor.lessonRequestTutors
+        ? tutor.lessonRequestTutors.map((lessonRequestTutor) => ({
+            lessonRequestId: lessonRequestTutor.lessonRequest.ClassId,
+            chosenDate: lessonRequestTutor.chosenDate,
+            lessonRequest: LessonRequestService.formatLessonRequest(
+              lessonRequestTutor.lessonRequest
+            )
+          }))
         : [],
       subjects: tutor.subjects ? tutor.subjects : []
     };
@@ -153,7 +157,11 @@ export class TutorService extends UserService {
     }
   }
 
-  static async acceptLessonRequest(lessonId: number, tutorId: number) {
+  static async acceptLessonRequest(
+    lessonId: number,
+    tutorId: number,
+    chosenDate: string
+  ) {
     try {
       const lessonRequest =
         await LessonRequestRepository.getLessonRequestById(lessonId);
@@ -162,8 +170,14 @@ export class TutorService extends UserService {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
 
-      if (lessonRequest.status !== EnumStatusName.PENDENTE) {
-        throw new AppError(EnumErrorMessages.INVALID_PENDENTE_STATUS, 400);
+      if (
+        lessonRequest.status !== EnumStatusName.PENDENTE &&
+        lessonRequest.status !== EnumStatusName.ACEITO
+      ) {
+        throw new AppError(
+          EnumErrorMessages.INVALID_PENDENTE_ACEITO_STATUS,
+          400
+        );
       }
 
       const tutor = await TutorRepository.findTutorById(tutorId);
@@ -171,22 +185,30 @@ export class TutorService extends UserService {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
-      if (!lessonRequest.tutors) {
-        lessonRequest.tutors = [];
-      }
+      const existingLessonRequestTutor =
+        await LessonRequestTutorRepository.findByLessonRequestAndTutor(
+          lessonRequest.ClassId,
+          tutor.id
+        );
 
-      if (
-        lessonRequest.tutors.some(
-          (existingTutor) => existingTutor.id === tutor.id
-        )
-      ) {
+      if (existingLessonRequestTutor) {
         throw new AppError(EnumErrorMessages.TUTOR_ALREADY_ADDED, 400);
       }
 
-      lessonRequest.tutors.push(tutor);
+      if (!lessonRequest.preferredDates.includes(chosenDate)) {
+        throw new AppError(EnumErrorMessages.DATE_INVALID, 400);
+      }
+
       lessonRequest.status = EnumStatusName.ACEITO;
 
       await LessonRequestRepository.saveLessonRequest(lessonRequest);
+
+      await LessonRequestTutorRepository.createLessonRequestTutor(
+        lessonRequest,
+        tutor,
+        chosenDate,
+        lessonRequest.status
+      );
 
       return true;
     } catch (error) {
