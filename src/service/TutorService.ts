@@ -32,7 +32,12 @@ export class TutorService extends UserService {
             )
           }))
         : [],
-      subjects: tutor.subjects ? tutor.subjects : []
+      subjects: tutor.subjects
+        ? tutor.subjects.map((subject) => ({
+            id: subject.subjectId,
+            name: subject.subjectName
+          }))
+        : []
     };
   }
 

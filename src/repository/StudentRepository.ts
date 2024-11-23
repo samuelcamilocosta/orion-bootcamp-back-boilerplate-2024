@@ -26,6 +26,7 @@ export class StudentRepository extends UserRepository {
         'lessonRequestTutor'
       )
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .leftJoinAndSelect('tutor.subjects', 'subjects')
       .orderBy('student.id', 'ASC')
       .addOrderBy('lessonRequest.ClassId', 'ASC')
       .getMany();
@@ -45,6 +46,7 @@ export class StudentRepository extends UserRepository {
         'lessonRequestTutor'
       )
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .leftJoinAndSelect('tutor.subjects', 'subjects')
       .where('student.id = :id', { id })
       .getOne();
 
@@ -73,6 +75,7 @@ export class StudentRepository extends UserRepository {
         'lessonRequestTutor'
       )
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .leftJoinAndSelect('tutor.subjects', 'subjects')
       .where('student.id = :id', { id: numericStudentId })
       .andWhere('lessonRequest.status = :status', { status })
       .getMany();
