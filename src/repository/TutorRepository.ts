@@ -21,6 +21,7 @@ export class TutorRepository extends UserRepository {
       .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.student', 'student')
+      .leftJoinAndSelect('mainTutor.subjects', 'subjects')
       .getMany();
   }
 
@@ -33,6 +34,7 @@ export class TutorRepository extends UserRepository {
       .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.student', 'student')
+      .leftJoinAndSelect('mainTutor.subjects', 'subjects')
       .where('mainTutor.id = :id', { id: tutorId })
       .getOne();
 
