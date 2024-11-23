@@ -101,18 +101,19 @@ export class TutorService extends UserService {
   }
 
   static async updateTutorPersonalData(
-    tutor,
+    tutor: Tutor,
     expertise: string,
     projectReason: string,
     subjectIds: number[]
   ) {
     try {
-      if (!tutor) {
+      const tutorFound = await TutorRepository.findTutorById(tutor.id);
+      if (!tutorFound) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
-      tutor.expertise = expertise;
-      tutor.projectReason = projectReason;
+      tutorFound.expertise = expertise;
+      tutorFound.projectReason = projectReason;
 
       const foundSubjects =
         await SubjectRepository.findSubjectByIds(subjectIds);
@@ -120,8 +121,9 @@ export class TutorService extends UserService {
         throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND, 404);
       }
 
-      tutor.subjects = foundSubjects;
-      return await TutorRepository.saveTutor(tutor);
+      tutorFound.subjects = foundSubjects;
+
+      return await TutorRepository.saveTutor(tutorFound);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
