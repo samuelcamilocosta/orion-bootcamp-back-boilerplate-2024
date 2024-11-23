@@ -75,7 +75,6 @@ export class StudentService extends UserService {
       }
       return StudentService.formatStudent(student);
     } catch (error) {
-      console.error('Error fetching student:', error); // Log completo do erro
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
     }
