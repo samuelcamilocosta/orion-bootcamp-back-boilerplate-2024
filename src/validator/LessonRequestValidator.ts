@@ -101,7 +101,7 @@ export class LessonRequestValidator {
                     formattedDate,
                     studentId
                   );
-                console.log(existingLesson);
+
                 if (existingLesson) {
                   throw new AppError(
                     EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
