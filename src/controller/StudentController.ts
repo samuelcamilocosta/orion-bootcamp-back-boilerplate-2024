@@ -725,6 +725,164 @@ export class StudentController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/student-confirm-lesson:
+   *   post:
+   *     summary: Student confirm a lesson, having a tutor selected
+   *     tags: [Student Lessons]
+   *     security:
+   *       - BearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               lessonId:
+   *                 type: integer
+   *                 description: ID of the lesson request
+   *                 example: 3
+   *               tutorId:
+   *                 type: integer
+   *                 description: ID of the tutor to confirm
+   *                 example: 2
+   *     responses:
+   *       '200':
+   *         description: Lesson request successfully confirmed
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula confirmada com sucesso!"
+   *                 lessonRequest:
+   *                   type: object
+   *                   properties:
+   *                     ClassId:
+   *                       type: integer
+   *                       example: 3
+   *                     reason:
+   *                       type: array
+   *                       items:
+   *                         type: string
+   *                       example: ["reforço"]
+   *                     preferredDates:
+   *                       type: array
+   *                       items:
+   *                         type: string
+   *                         format: date-time
+   *                       example: ["2025-12-15 22:00"]
+   *                     status:
+   *                       type: string
+   *                       example: "confirmado"
+   *                     additionalInfo:
+   *                       type: string
+   *                       example: "Looking for a tutor with experience in calculus."
+   *                     subject:
+   *                       type: object
+   *                       properties:
+   *                         subjectId:
+   *                           type: integer
+   *                           example: 1
+   *                         subjectName:
+   *                           type: string
+   *                           example: "Biologia"
+   *                     student:
+   *                       type: object
+   *                       properties:
+   *                         id:
+   *                           type: integer
+   *                           example: 1
+   *                         username:
+   *                           type: string
+   *                           example: "alunoTESTE11"
+   *                         fullName:
+   *                           type: string
+   *                           example: "alunoTESTE11"
+   *                         birthDate:
+   *                           type: string
+   *                           format: date
+   *                           example: "2024-11-09"
+   *                     tutors:
+   *                       type: array
+   *                       items:
+   *                         type: object
+   *                         properties:
+   *                           tutor:
+   *                             type: object
+   *                             properties:
+   *                               id:
+   *                                 type: integer
+   *                                 example: 2
+   *                               username:
+   *                                 type: string
+   *                                 example: "tutorTeste02"
+   *                               fullName:
+   *                                 type: string
+   *                                 example: "tutorTeste02"
+   *                               expertise:
+   *                                 type: string
+   *                                 example: "Matemática"
+   *                               subjects:
+   *                                 type: array
+   *                                 items:
+   *                                   type: object
+   *                                   properties:
+   *                                     id:
+   *                                       type: integer
+   *                                       example: 2
+   *                                     name:
+   *                                       type: string
+   *                                       example: "Sociologia"
+   *                           chosenDate:
+   *                             type: string
+   *                             format: date-time
+   *                             example: "2025-12-15 22:00"
+   *       '400':
+   *         description: Validation error, such as the lesson already being confirmed or invalid status
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula já foi confirmada, não é possível confirmar novamente."
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *       '404':
+   *         description: Lesson or tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula não encontrada."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async confirmLessonRequest(req: Request, res: Response) {
     try {
       const { lessonId, tutorId } = req.body;
