@@ -682,6 +682,93 @@ export class TutorController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/lesson-request/accept:
+   *   patch:
+   *     summary: Accept a lesson request
+   *     tags: [Lesson Requests]
+   *     security:
+   *       - BearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               lessonId:
+   *                 type: integer
+   *                 description: ID of the lesson request
+   *                 example: 1
+   *               tutorId:
+   *                 type: integer
+   *                 description: ID of the tutor accepting the lesson request
+   *                 example: 2
+   *               chosenDate:
+   *                 type: string
+   *                 format: date-time
+   *                 description: The date chosen for the lesson
+   *                 example: "2025-06-07T22:45"
+   *     responses:
+   *       '200':
+   *         description: Lesson request accepted successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula aceita com sucesso!"
+   *       '400':
+   *         description: Bad request due to invalid data or conditions
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   enum:
+   *                     - "O status do pedido de aula deve estar como pendente ou como aceito."
+   *                     - "O tutor já está na lista de tutores do pedido de aula."
+   *                     - "Data inválida. Verifique se a data existe."
+   *       '401':
+   *         description: Unauthorized access, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   enum:
+   *                     - "Token inválido."
+   *                     - "Acesso negado. Token não fornecido."
+   *       '404':
+   *         description: Lesson request or tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   enum:
+   *                     - "Aula não encontrada."
+   *                     - "Tutor não encontrado."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async acceptLessonRequest(req: Request, res: Response) {
     try {
       const { lessonId, tutorId, chosenDate } = req.body;
