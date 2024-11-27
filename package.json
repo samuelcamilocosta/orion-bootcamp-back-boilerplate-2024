@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "start:dev": "npx nodemon -L",
-    "build": "nnpm run prettier && npm run lint && npx tsc",
+    "build": "npm run prettier && npm run lint && npx tsc",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest",
     "prettier": "npx prettier --write ."
