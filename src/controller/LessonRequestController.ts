@@ -208,31 +208,86 @@ export class LessonRequestController {
    *               items:
    *                 type: object
    *                 properties:
-   *                   classId:
+   *                   ClassId:
    *                     type: integer
    *                     example: 1
    *                   reason:
    *                     type: array
    *                     items:
    *                       type: string
-   *                     example: ["reforço"]
+   *                     example: ["prova ou trabalho"]
    *                   preferredDates:
    *                     type: array
    *                     items:
    *                       type: string
-   *                     example: ["29/12/2025 às 23:45"]
+   *                       format: date-time
+   *                     example: ["2025-06-07T22:45"]
    *                   status:
    *                     type: string
-   *                     example: "pendente"
+   *                     example: "confirmado"
    *                   additionalInfo:
    *                     type: string
-   *                     example: "Looking for a tutor with experience in calculus."
-   *                   subjectId:
-   *                     type: integer
-   *                     example: 1
-   *                   studentId:
-   *                     type: integer
-   *                     example: 1
+   *                     example: "Testando1234testando"
+   *                   lessonRequestTutors:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         id:
+   *                           type: integer
+   *                           example: 1
+   *                         chosenDate:
+   *                           type: string
+   *                           format: date-time
+   *                           example: "2025-06-07T22:45"
+   *                         status:
+   *                           type: string
+   *                           example: "confirmado"
+   *                         tutor:
+   *                           type: object
+   *                           nullable: true
+   *                           properties:
+   *                             id:
+   *                               type: integer
+   *                               example: 2
+   *                             username:
+   *                               type: string
+   *                               example: "tutorTeste02"
+   *                             expertise:
+   *                               type: string
+   *                               example: "Matemática"
+   *                             projectReason:
+   *                               type: string
+   *                               example: "I love studying"
+   *                             subjects:
+   *                               type: array
+   *                               items:
+   *                                 type: object
+   *                                 properties:
+   *                                   subjectId:
+   *                                     type: integer
+   *                                     example: 2
+   *                                   subjectName:
+   *                                     type: string
+   *                                     example: "Sociologia"
+   *                   subject:
+   *                     type: object
+   *                     properties:
+   *                       subjectId:
+   *                         type: integer
+   *                         example: 1
+   *                       subjectName:
+   *                         type: string
+   *                         example: "Biologia"
+   *                   student:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: integer
+   *                         example: 1
+   *                       username:
+   *                         type: string
+   *                         example: "alunoTESTE11"
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:
@@ -295,18 +350,39 @@ export class LessonRequestController {
    *                   type: array
    *                   items:
    *                     type: string
-   *                     example: ["reforço"]
+   *                   example:
+   *                     - "prova ou trabalho"
    *                 preferredDates:
    *                   type: array
    *                   items:
    *                     type: string
-   *                     example: ["29/12/2025 às 23:45"]
+   *                   example:
+   *                     - "2025-06-07T22:45"
    *                 status:
    *                   type: string
-   *                   example: "pendente"
+   *                   example: "confirmado"
    *                 additionalInfo:
    *                   type: string
-   *                   example: "Looking for a tutor with experience in calculus."
+   *                   example: "Testando1234testando"
+   *                 lessonRequestTutors:
+   *                   type: array
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: integer
+   *                         example: 1
+   *                       chosenDate:
+   *                         type: string
+   *                         format: date-time
+   *                         example: "2025-06-07T22:45"
+   *                       status:
+   *                         type: string
+   *                         example: "confirmado"
+   *                       tutor:
+   *                         type: object
+   *                         nullable: true
+   *                         example: null
    *                 subject:
    *                   type: object
    *                   properties:
@@ -324,18 +400,7 @@ export class LessonRequestController {
    *                       example: 1
    *                     username:
    *                       type: string
-   *                       example: "teste123"
-   *                     fullName:
-   *                       type: string
-   *                       example: "Teste"
-   *                     birthDate:
-   *                       type: string
-   *                       format: date
-   *                       example: "2001-03-19"
-   *                 tutor:
-   *                   type: object
-   *                   nullable: true
-   *                   example: null
+   *                       example: "alunoTESTE11"
    *       '401':
    *         description: Unauthorized, missing or invalid token
    *         content:

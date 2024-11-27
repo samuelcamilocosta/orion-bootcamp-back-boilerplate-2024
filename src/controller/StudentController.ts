@@ -172,12 +172,6 @@ export class StudentController {
    *                   username:
    *                     type: string
    *                     example: "nome_aluno_usuario1234"
-   *                   fullName:
-   *                     type: string
-   *                     example: "Nome Aluno"
-   *                   birthDate:
-   *                     type: string
-   *                     example: "2001-03-19"
    *                   educationLevel:
    *                     type: object
    *                     properties:
@@ -260,7 +254,7 @@ export class StudentController {
    *           example: 1
    *     responses:
    *       '200':
-   *         description: Successfully retrieved the student by id
+   *         description: Successfully retrieved the student by ID
    *         content:
    *           application/json:
    *             schema:
@@ -271,13 +265,11 @@ export class StudentController {
    *                   example: 1
    *                 username:
    *                   type: string
-   *                   example: "nome_aluno_usuario1234"
-   *                 fullName:
-   *                   type: string
-   *                   example: "Nome Aluno"
+   *                   example: "alunoTESTE11"
    *                 birthDate:
    *                   type: string
-   *                   example: "2001-03-19"
+   *                   format: date
+   *                   example: "2024-11-09"
    *                 educationLevel:
    *                   type: object
    *                   properties:
@@ -294,7 +286,7 @@ export class StudentController {
    *                     properties:
    *                       ClassId:
    *                         type: integer
-   *                         example: 14
+   *                         example: 1
    *                       reason:
    *                         type: array
    *                         items:
@@ -304,13 +296,75 @@ export class StudentController {
    *                         type: array
    *                         items:
    *                           type: string
-   *                           example: "29/12/2025 às 23:45"
+   *                           format: date-time
+   *                           example: "2025-12-15T22:00"
    *                       status:
    *                         type: string
    *                         example: "pendente"
    *                       additionalInfo:
    *                         type: string
    *                         example: "Looking for a tutor with experience in calculus."
+   *                       subject:
+   *                         type: object
+   *                         properties:
+   *                           subjectId:
+   *                             type: integer
+   *                             example: 1
+   *                           subjectName:
+   *                             type: string
+   *                             example: "Biologia"
+   *                       lessonRequestTutors:
+   *                         type: array
+   *                         items:
+   *                           type: object
+   *                           properties:
+   *                             id:
+   *                               type: integer
+   *                               example: 2
+   *                             chosenDate:
+   *                               type: string
+   *                               format: date-time
+   *                               example: "2025-12-15T22:00"
+   *                             status:
+   *                               type: string
+   *                               example: "confirmado"
+   *                             tutor:
+   *                               type: object
+   *                               nullable: true
+   *                               properties:
+   *                                 id:
+   *                                   type: integer
+   *                                   example: 2
+   *                                 username:
+   *                                   type: string
+   *                                   example: "tutorTeste02"
+   *                                 expertise:
+   *                                   type: string
+   *                                   example: "Matemática"
+   *                                 projectReason:
+   *                                   type: string
+   *                                   example: "I love studying"
+   *                                 subjects:
+   *                                   type: array
+   *                                   items:
+   *                                     type: object
+   *                                     properties:
+   *                                       subjectId:
+   *                                         type: integer
+   *                                         example: 2
+   *                                       subjectName:
+   *                                         type: string
+   *                                         example: "Sociologia"
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
    *       '404':
    *         description: Student not found
    *         content:
