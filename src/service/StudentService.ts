@@ -104,35 +104,7 @@ export class StudentService extends UserService {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
 
-      const sanitizedResults = lessonRequests.map((student) => ({
-        id: student.id || null,
-        username: student.username || '',
-        email: student.email || '',
-        fullName: student.fullName || '',
-        birthDate: student.birthDate || null,
-        educationLevel: student.educationLevel
-          ? {
-              educationId: student.educationLevel.educationId || null,
-              levelType: student.educationLevel.levelType || ''
-            }
-          : null,
-        lessonRequests: (student.lessonRequests || []).map((request) => ({
-          ClassId: request.ClassId || null,
-          reason: request.reason || [],
-          preferredDates: request.preferredDates || [],
-          status: request.status || '',
-          additionalInfo: request.additionalInfo || '',
-          subject: request.subject
-            ? {
-                subjectId: request.subject.subjectId || null,
-                subjectName: request.subject.subjectName || ''
-              }
-            : null,
-          lessonRequestTutors: request.lessonRequestTutors || []
-        }))
-      }));
-
-      return sanitizedResults;
+      return lessonRequests;
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);

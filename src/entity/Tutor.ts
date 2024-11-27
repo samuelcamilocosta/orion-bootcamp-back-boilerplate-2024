@@ -6,7 +6,13 @@ import { LessonRequestTutor } from './LessonRequestTutor';
 
 @Entity()
 export class Tutor extends User {
-  @Column({ type: 'varchar', length: 11, unique: true, nullable: false })
+  @Column({
+    type: 'varchar',
+    length: 11,
+    unique: true,
+    nullable: false,
+    select: false
+  })
   cpf: string;
 
   @ManyToMany(() => Subject, { cascade: true })
@@ -43,7 +49,7 @@ export class Tutor extends User {
   @Column({ type: 'varchar', length: 200, nullable: true })
   projectReason: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
   photoUrl: string;
 
   @OneToMany(
