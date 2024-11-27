@@ -68,29 +68,19 @@ export class StudentService extends UserService {
   }
 
   static async getStudentById(id: number) {
-    try {
-      const student = await StudentRepository.findStudentById(id);
-      if (!student) {
-        throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
-      }
-      return StudentService.formatStudent(student);
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      throw new AppError(message, statusCode);
+    const student = await StudentRepository.findStudentById(id);
+    if (!student) {
+      throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
     }
+    return student;
   }
 
   static async getAllStudents() {
-    try {
-      const students = await StudentRepository.findAllStudents();
-      if (!students) {
-        throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
-      }
-      return students.map(StudentService.formatStudent);
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      throw new AppError(message, statusCode);
+    const students = await StudentRepository.findAllStudents();
+    if (!students) {
+      throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
     }
+    return students;
   }
 
   static async getStudentLessonsByStatus(id: number, status: EnumStatusName) {

@@ -46,6 +46,7 @@ export class StudentRepository extends UserRepository {
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('tutor.subjects', 'subjects')
       .where('student.id = :id', { id })
+      .addSelect('student.birthDate')
       .getOne();
 
     if (!student) {
