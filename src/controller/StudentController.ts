@@ -361,7 +361,7 @@ export class StudentController {
     try {
       const studentId = req.params;
       const lessons = await StudentService.getStudentLessonsByStatus(
-        studentId,
+        Number(studentId),
         status
       );
       return res.status(200).json(lessons);
