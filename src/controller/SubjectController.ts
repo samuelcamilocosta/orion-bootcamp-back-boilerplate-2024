@@ -69,7 +69,9 @@ export class SubjectController {
     try {
       const { subjectName } = req.body;
       await SubjectService.createSubject(subjectName);
-      return res.status(201).json({ message: EnumSuccessMessages.SUBJECT_CREATED });
+      return res
+        .status(201)
+        .json({ message: EnumSuccessMessages.SUBJECT_CREATED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });

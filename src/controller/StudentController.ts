@@ -133,7 +133,9 @@ export class StudentController {
    */
   async create(req: Request, res: Response) {
     try {
-      const { user: savedStudent, token } = await StudentService.createStudent(req.body);
+      const { user: savedStudent, token } = await StudentService.createStudent(
+        req.body
+      );
 
       return res.status(201).json({
         message: EnumSuccessMessages.STUDENT_CREATED,
@@ -351,10 +353,17 @@ export class StudentController {
     }
   }
 
-  static async getStudentLessonsByStatus(req: Request, res: Response, status: EnumStatusName) {
+  static async getStudentLessonsByStatus(
+    req: Request,
+    res: Response,
+    status: EnumStatusName
+  ) {
     try {
       const studentId = req.params;
-      const lessons = await StudentService.getStudentLessonsByStatus(studentId, status);
+      const lessons = await StudentService.getStudentLessonsByStatus(
+        studentId,
+        status
+      );
       return res.status(200).json(lessons);
     } catch (error) {
       const { statusCode, message } = handleError(error);
@@ -483,7 +492,10 @@ export class StudentController {
   async getStudentLessons(req: Request, res: Response) {
     try {
       const { id, status } = req.query;
-      const lessons = await StudentService.getStudentLessonsByStatus(Number(id), status as EnumStatusName);
+      const lessons = await StudentService.getStudentLessonsByStatus(
+        Number(id),
+        status as EnumStatusName
+      );
       return res.status(200).json(lessons);
     } catch (error) {
       const { statusCode, message } = handleError(error);

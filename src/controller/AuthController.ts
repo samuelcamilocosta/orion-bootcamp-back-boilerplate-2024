@@ -95,7 +95,11 @@ export class AuthController {
     const { email, password, role } = req.body;
 
     try {
-      const { userId, token, role: userRole } = await AuthService.login(email, password, role);
+      const {
+        userId,
+        token,
+        role: userRole
+      } = await AuthService.login(email, password, role);
 
       return res.status(200).json({
         message: EnumSuccessMessages.LOGIN_SUCCESS,
