@@ -2,8 +2,6 @@ import { MysqlDataSource } from '../config/database';
 import { Student } from '../entity/Student';
 import { UserRepository } from './UserRepository';
 import { EnumStatusName } from '../enum/EnumStatusName';
-import { LessonRequest } from '../entity/LessonRequest';
-import { LessonRequestTutorRepository } from './LessonRequestTutorRepository';
 import { AppError } from '../error/AppError';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
