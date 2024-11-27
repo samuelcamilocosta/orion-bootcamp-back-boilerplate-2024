@@ -72,31 +72,19 @@ export class LessonRequestService {
   }
 
   static async getAllLessonRequests() {
-    try {
-      const lessonRequests =
-        await LessonRequestRepository.getAllLessonRequests();
+    const lessonRequests = await LessonRequestRepository.getAllLessonRequests();
 
-      return lessonRequests.map(this.formatLessonRequest);
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      throw new AppError(message, statusCode);
-    }
+    return lessonRequests;
   }
 
   static async getLessonRequestById(id: number) {
-    try {
-      const lessonRequest =
-        await LessonRequestRepository.getLessonRequestById(id);
-
-      if (!lessonRequest) {
-        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
-      }
-
-      return LessonRequestService.formatLessonRequest(lessonRequest);
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      throw new AppError(message, statusCode);
+    const lessonRequest =
+      await LessonRequestRepository.getLessonRequestById(id);
+    if (!lessonRequest) {
+      throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
     }
+
+    return lessonRequest;
   }
 
   static async updateLessonRequest(
