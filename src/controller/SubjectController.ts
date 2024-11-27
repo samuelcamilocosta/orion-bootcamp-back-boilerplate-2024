@@ -6,7 +6,7 @@ import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 export class SubjectController {
   /**
    * @swagger
-   * /api/register/subject:
+   * /api/subject:
    *   post:
    *     summary: Create a new subject
    *     tags: [Subject]
@@ -69,9 +69,7 @@ export class SubjectController {
     try {
       const { subjectName } = req.body;
       await SubjectService.createSubject(subjectName);
-      return res
-        .status(201)
-        .json({ message: EnumSuccessMessages.SUBJECT_CREATED });
+      return res.status(201).json({ message: EnumSuccessMessages.SUBJECT_CREATED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });
@@ -80,7 +78,7 @@ export class SubjectController {
 
   /**
    * @swagger
-   * /api/get/subject:
+   * /api/subject:
    *   get:
    *     summary: Get all subjects
    *     tags: [Subject]

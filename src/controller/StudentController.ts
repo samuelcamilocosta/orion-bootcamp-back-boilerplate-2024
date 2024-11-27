@@ -7,7 +7,7 @@ import { EnumStatusName } from '../enum/EnumStatusName';
 export class StudentController {
   /**
    * @swagger
-   * /api/register/student:
+   * /api/student:
    *   post:
    *     summary: Creation of a new student
    *     tags: [Student]
@@ -148,7 +148,7 @@ export class StudentController {
 
   /**
    * @swagger
-   * /api/get/student:
+   * /api/student:
    *   get:
    *     summary: Retrieve a list of all students
    *     tags: [Student]
@@ -242,7 +242,7 @@ export class StudentController {
 
   /**
    * @swagger
-   * /api/get/student/{id}:
+   * /api/student/{id}:
    *   get:
    *     summary: Retrieve a student by ID
    *     tags: [Student]

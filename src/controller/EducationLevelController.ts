@@ -6,7 +6,7 @@ import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 export class EducationLevelController {
   /**
    * @swagger
-   * /api/register/educationLevel:
+   * /api/educationLevel:
    *   post:
    *     summary: Create a new education level
    *     tags: [Education Level]
@@ -75,8 +75,7 @@ export class EducationLevelController {
     const { levelType } = req.body;
 
     try {
-      const educationLevel =
-        await EducationLevelService.createEducationLevel(levelType);
+      const educationLevel = await EducationLevelService.createEducationLevel(levelType);
       return res.status(201).json({
         educationLevel,
         message: EnumSuccessMessages.EDUCATION_LEVEL_CREATED
@@ -89,7 +88,7 @@ export class EducationLevelController {
 
   /**
    * @swagger
-   * /api/get/educationLevel:
+   * /api/educationLevel:
    *   get:
    *     summary: Get all education levels
    *     tags: [Education Level]
@@ -134,8 +133,7 @@ export class EducationLevelController {
    */
   async getAll(req: Request, res: Response) {
     try {
-      const educationLevels =
-        await EducationLevelService.getAllEducationLevels();
+      const educationLevels = await EducationLevelService.getAllEducationLevels();
       return res.status(200).json(educationLevels);
     } catch (error) {
       const { statusCode, message } = handleError(error);

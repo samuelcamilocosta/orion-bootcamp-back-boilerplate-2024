@@ -6,7 +6,7 @@ import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 export class LessonRequestController {
   /**
    * @swagger
-   * /api/register/lessonrequest:
+   * /api/lessonrequest:
    *   post:
    *     summary: Create a new lesson request
    *     tags: [Lesson Request]
@@ -176,9 +176,7 @@ export class LessonRequestController {
    */
   async create(req: Request, res: Response) {
     try {
-      const lessonRequest = await LessonRequestService.createLessonRequest(
-        req.body
-      );
+      const lessonRequest = await LessonRequestService.createLessonRequest(req.body);
 
       return res.status(201).json({
         message: EnumSuccessMessages.LESSON_REQUEST_CREATED,
@@ -192,7 +190,7 @@ export class LessonRequestController {
 
   /**
    * @swagger
-   * /api/get/lessonrequest:
+   * /api/lessonrequest:
    *   get:
    *     summary: Retrieve all lesson requests
    *     tags: [Lesson Request]
@@ -266,7 +264,7 @@ export class LessonRequestController {
 
   /**
    * @swagger
-   * /api/get/lessonrequest/{id}:
+   * /api/lessonrequest/{id}:
    *   get:
    *     summary: Get lesson request by ID
    *     tags: [Lesson Request]
@@ -371,9 +369,7 @@ export class LessonRequestController {
     const { id } = req.params;
 
     try {
-      const lesson = await LessonRequestService.getLessonRequestById(
-        Number(id)
-      );
+      const lesson = await LessonRequestService.getLessonRequestById(Number(id));
 
       return res.status(200).json(lesson);
     } catch (error) {
@@ -384,7 +380,7 @@ export class LessonRequestController {
 
   /**
    * @swagger
-   * /api/delete/lessonrequest/{id}:
+   * /api/lessonrequest/{id}:
    *   delete:
    *     summary: Delete a lesson request by ID
    *     tags: [Lesson Request]
@@ -439,9 +435,7 @@ export class LessonRequestController {
     }
 
     try {
-      const deletedRequest = await LessonRequestService.deleteLessonRequestById(
-        Number(classId)
-      );
+      const deletedRequest = await LessonRequestService.deleteLessonRequestById(Number(classId));
       return res.status(204).end().json({ deletedRequest });
     } catch (error) {
       const { statusCode, message } = handleError(error);
@@ -451,7 +445,7 @@ export class LessonRequestController {
 
   /**
    * @swagger
-   * /api/update/lessonrequest/{id}:
+   * /api/lessonrequest/{id}:
    *   patch:
    *     summary: Update lesson request by ID
    *     tags: [Lesson Request]
@@ -551,17 +545,9 @@ export class LessonRequestController {
       const { lessonId } = req.params;
       const { subjectId, reason, additionalInfo, preferredDates } = req.body;
 
-      await LessonRequestService.updateLessonRequest(
-        Number(lessonId),
-        subjectId,
-        reason,
-        additionalInfo,
-        preferredDates
-      );
+      await LessonRequestService.updateLessonRequest(Number(lessonId), subjectId, reason, additionalInfo, preferredDates);
 
-      return res
-        .status(200)
-        .json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
+      return res.status(200).json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });
@@ -576,10 +562,7 @@ export class LessonRequestController {
     }
 
     try {
-      const updateRequest =
-        await LessonRequestService.cancelTutorLessonRequestById(
-          Number(classId)
-        );
+      const updateRequest = await LessonRequestService.cancelTutorLessonRequestById(Number(classId));
       return res.status(204).end().json({ updateRequest });
     } catch (error) {
       const { statusCode, message } = handleError(error);
