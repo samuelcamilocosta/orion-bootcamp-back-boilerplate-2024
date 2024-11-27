@@ -59,7 +59,7 @@ describe('updatePersonalData', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         leftJoinAndSelect: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(mockTutor),
+        getOne: jest.fn().mockResolvedValue(mockTutor)
       })
     });
 
@@ -81,7 +81,7 @@ describe('updatePersonalData', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         leftJoinAndSelect: jest.fn().mockReturnThis(),
-        getOne: jest.fn().mockResolvedValue(null),
+        getOne: jest.fn().mockResolvedValue(null)
       })
     });
 
