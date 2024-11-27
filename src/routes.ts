@@ -1,4 +1,4 @@
 import { getRouter } from './decorators/HttpRoute';
-import './controller/TutorController';
+import '../src/controller/TutorController';
 
 export default getRouter();

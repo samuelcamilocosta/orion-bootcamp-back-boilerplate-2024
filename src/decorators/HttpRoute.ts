@@ -6,11 +6,11 @@ const router = Router();
 type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 interface RouteOptions {
-  path: string; // Caminho da rota
-  method: HttpMethod; // Método HTTP
+  path: string;
+  method: HttpMethod;
   middlewares?: Array<
     (req: Request, res: Response, next: NextFunction) => void
-  >; // Middlewares opcionais
+  >;
 }
 
 /**
