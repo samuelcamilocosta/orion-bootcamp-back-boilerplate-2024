@@ -133,9 +133,7 @@ export class StudentController {
    */
   async create(req: Request, res: Response) {
     try {
-      const { user: savedStudent, token } = await StudentService.createStudent(
-        req.body
-      );
+      const { user: savedStudent, token } = await StudentService.createStudent(req.body);
 
       return res.status(201).json({
         message: EnumSuccessMessages.STUDENT_CREATED,
@@ -353,17 +351,10 @@ export class StudentController {
     }
   }
 
-  static async getStudentLessonsByStatus(
-    req: Request,
-    res: Response,
-    status: EnumStatusName
-  ) {
+  static async getStudentLessonsByStatus(req: Request, res: Response, status: EnumStatusName) {
     try {
       const studentId = req.params;
-      const lessons = await StudentService.getStudentLessonsByStatus(
-        studentId,
-        status
-      );
+      const lessons = await StudentService.getStudentLessonsByStatus(studentId, status);
       return res.status(200).json(lessons);
     } catch (error) {
       const { statusCode, message } = handleError(error);
@@ -373,20 +364,33 @@ export class StudentController {
 
   /**
    * @swagger
-   * /api/get/student-pending/{id}:
+   * /api/student-lesson-status:
    *   get:
    *     summary: Retrieve pending lessons for a student
    *     tags: [Student Lessons]
    *     security:
    *       - BearerAuth: []
    *     parameters:
-   *       - in: path
+   *       - in: query
    *         name: id
    *         required: true
    *         schema:
    *           type: integer
    *         description: ID of the student
    *         example: 1
+   *       - in: query
+   *         name: status
+   *         required: true
+   *         schema:
+   *           type: string
+   *           enum:
+   *             - pendente
+   *             - aceito
+   *             - confirmado
+   *             - finalizado
+   *             - cancelado
+   *         description: Status name
+   *         example: aceito
    *     responses:
    *       '200':
    *         description: List of pending lessons for the student
@@ -476,426 +480,11 @@ export class StudentController {
    *                   type: string
    *                   example: "Erro interno do servidor."
    */
-  async getStudentPendingLessons(req: Request, res: Response) {
+  async getStudentLessons(req: Request, res: Response) {
     try {
-      return StudentController.getStudentLessonsByStatus(
-        req,
-        res,
-        EnumStatusName.PENDENTE
-      );
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      return res.status(statusCode).json({ message });
-    }
-  }
-
-  /**
-   * @swagger
-   * /api/get/student-accepted-lessons/{id}:
-   *   get:
-   *     summary: Retrieve accepted lessons for a student
-   *     tags: [Student Lessons]
-   *     security:
-   *       - BearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *         description: ID of the student
-   *         example: 1
-   *     responses:
-   *       '200':
-   *         description: List of accepted lessons for the student
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items:
-   *                 type: object
-   *                 properties:
-   *                   ClassId:
-   *                     type: integer
-   *                     example: 3
-   *                   reason:
-   *                     type: array
-   *                     items:
-   *                       type: string
-   *                     example: ["reforço"]
-   *                   preferredDates:
-   *                     type: array
-   *                     items:
-   *                       type: string
-   *                       format: date-time
-   *                     example: ["2025-12-15 22:00", "2024-11-25 22:00"]
-   *                   status:
-   *                     type: string
-   *                     example: "aceito"
-   *                   additionalInfo:
-   *                     type: string
-   *                     example: "Looking for a tutor with experience in calculus."
-   *                   subject:
-   *                     type: object
-   *                     properties:
-   *                       subjectId:
-   *                         type: integer
-   *                         example: 1
-   *                       subjectName:
-   *                         type: string
-   *                         example: "Biologia"
-   *                   student:
-   *                     type: object
-   *                     nullable: true
-   *                     example: null
-   *                   tutors:
-   *                     type: array
-   *                     items:
-   *                       type: object
-   *                       example: []
-   *       '400':
-   *         description: Invalid request, status not valid
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "O status fornecido é inválido."
-   *       '401':
-   *         description: Unauthorized, missing or invalid token
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Token inválido."
-   *       '404':
-   *         description: Lessons not found for the provided status
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Aula não encontrada."
-   *       '500':
-   *         description: Internal server error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Erro interno do servidor."
-   */
-  async getStudentAcceptedLessons(req: Request, res: Response) {
-    try {
-      return StudentController.getStudentLessonsByStatus(
-        req,
-        res,
-        EnumStatusName.ACEITO
-      );
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      return res.status(statusCode).json({ message });
-    }
-  }
-
-  /**
-   * @swagger
-   * /api/student-confirmed-lessons/{id}:
-   *   get:
-   *     summary: Retrieve confirmed lessons for a student
-   *     tags: [Student Lessons]
-   *     security:
-   *       - BearerAuth: []
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         required: true
-   *         schema:
-   *           type: integer
-   *         description: ID of the student
-   *         example: 1
-   *     responses:
-   *       '200':
-   *         description: List of confirmed lessons for the student
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items:
-   *                 type: object
-   *                 properties:
-   *                   ClassId:
-   *                     type: integer
-   *                     example: 3
-   *                   reason:
-   *                     type: array
-   *                     items:
-   *                       type: string
-   *                     example: ["reforço"]
-   *                   preferredDates:
-   *                     type: array
-   *                     items:
-   *                       type: string
-   *                       format: date-time
-   *                     example: ["2025-12-15 22:00", "2024-11-25 22:00"]
-   *                   status:
-   *                     type: string
-   *                     example: "confirmado"
-   *                   additionalInfo:
-   *                     type: string
-   *                     example: "Looking for a tutor with experience in calculus."
-   *                   subject:
-   *                     type: object
-   *                     properties:
-   *                       subjectId:
-   *                         type: integer
-   *                         example: 1
-   *                       subjectName:
-   *                         type: string
-   *                         example: "Biologia"
-   *                   student:
-   *                     type: object
-   *                     nullable: true
-   *                     example: null
-   *                   tutors:
-   *                     type: array
-   *                     items:
-   *                       type: object
-   *                       example: []
-   *       '400':
-   *         description: Invalid request, status not valid
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "O status fornecido é inválido."
-   *       '401':
-   *         description: Unauthorized, missing or invalid token
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Token inválido."
-   *       '404':
-   *         description: Lessons not found for the provided status
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Aula não encontrada."
-   *       '500':
-   *         description: Internal server error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Erro interno do servidor."
-   */
-  async getStudentConfirmedLessons(req: Request, res: Response) {
-    try {
-      return StudentController.getStudentLessonsByStatus(
-        req,
-        res,
-        EnumStatusName.CONFIRMADO
-      );
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      return res.status(statusCode).json({ message });
-    }
-  }
-
-  /**
-   * @swagger
-   * /api/student-confirm-lesson:
-   *   post:
-   *     summary: Student confirm a lesson, having a tutor selected
-   *     tags: [Student Lessons]
-   *     security:
-   *       - BearerAuth: []
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               lessonId:
-   *                 type: integer
-   *                 description: ID of the lesson request
-   *                 example: 3
-   *               tutorId:
-   *                 type: integer
-   *                 description: ID of the tutor to confirm
-   *                 example: 2
-   *     responses:
-   *       '200':
-   *         description: Lesson request successfully confirmed
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Aula confirmada com sucesso!"
-   *                 lessonRequest:
-   *                   type: object
-   *                   properties:
-   *                     ClassId:
-   *                       type: integer
-   *                       example: 3
-   *                     reason:
-   *                       type: array
-   *                       items:
-   *                         type: string
-   *                       example: ["reforço"]
-   *                     preferredDates:
-   *                       type: array
-   *                       items:
-   *                         type: string
-   *                         format: date-time
-   *                       example: ["2025-12-15 22:00"]
-   *                     status:
-   *                       type: string
-   *                       example: "confirmado"
-   *                     additionalInfo:
-   *                       type: string
-   *                       example: "Looking for a tutor with experience in calculus."
-   *                     subject:
-   *                       type: object
-   *                       properties:
-   *                         subjectId:
-   *                           type: integer
-   *                           example: 1
-   *                         subjectName:
-   *                           type: string
-   *                           example: "Biologia"
-   *                     student:
-   *                       type: object
-   *                       properties:
-   *                         id:
-   *                           type: integer
-   *                           example: 1
-   *                         username:
-   *                           type: string
-   *                           example: "alunoTESTE11"
-   *                         fullName:
-   *                           type: string
-   *                           example: "alunoTESTE11"
-   *                         birthDate:
-   *                           type: string
-   *                           format: date
-   *                           example: "2024-11-09"
-   *                     tutors:
-   *                       type: array
-   *                       items:
-   *                         type: object
-   *                         properties:
-   *                           tutor:
-   *                             type: object
-   *                             properties:
-   *                               id:
-   *                                 type: integer
-   *                                 example: 2
-   *                               username:
-   *                                 type: string
-   *                                 example: "tutorTeste02"
-   *                               fullName:
-   *                                 type: string
-   *                                 example: "tutorTeste02"
-   *                               expertise:
-   *                                 type: string
-   *                                 example: "Matemática"
-   *                               subjects:
-   *                                 type: array
-   *                                 items:
-   *                                   type: object
-   *                                   properties:
-   *                                     id:
-   *                                       type: integer
-   *                                       example: 2
-   *                                     name:
-   *                                       type: string
-   *                                       example: "Sociologia"
-   *                           chosenDate:
-   *                             type: string
-   *                             format: date-time
-   *                             example: "2025-12-15 22:00"
-   *       '400':
-   *         description: Validation error, such as the lesson already being confirmed or invalid status
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Aula já foi confirmada, não é possível confirmar novamente."
-   *       '401':
-   *         description: Unauthorized, missing or invalid token
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Token inválido."
-   *       '404':
-   *         description: Lesson or tutor not found
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Aula não encontrada."
-   *       '500':
-   *         description: Internal server error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: "Erro interno do servidor."
-   */
-  async confirmLessonRequest(req: Request, res: Response) {
-    try {
-      const { lessonId, tutorId } = req.body;
-
-      const lessonRequest = await StudentService.confirmLessonRequest(
-        lessonId,
-        tutorId
-      );
-
-      return res.status(200).json({
-        message: EnumSuccessMessages.LESSON_REQUEST_CONFIRMED,
-        lessonRequest
-      });
+      const { id, status } = req.query;
+      const lessons = await StudentService.getStudentLessonsByStatus(Number(id), status as EnumStatusName);
+      return res.status(200).json(lessons);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });

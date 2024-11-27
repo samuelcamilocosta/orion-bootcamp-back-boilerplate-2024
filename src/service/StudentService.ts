@@ -20,23 +20,14 @@ export class StudentService extends UserService {
       birthDate: student.birthDate,
       educationLevel: student.educationLevel,
       lessonRequests: student.lessonRequests
-        ? student.lessonRequests.map((lessonRequest) =>
-            LessonRequestService.formatLessonRequest(lessonRequest)
-          )
+        ? student.lessonRequests.map((lessonRequest) => LessonRequestService.formatLessonRequest(lessonRequest))
         : []
     };
   }
 
   static async createStudent(studentData) {
     try {
-      const {
-        fullName,
-        username,
-        birthDate,
-        email,
-        educationLevelId,
-        password
-      } = studentData;
+      const { fullName, username, birthDate, email, educationLevelId, password } = studentData;
       const { hashedPassword, salt } = password;
 
       const student = new Student();
@@ -47,8 +38,7 @@ export class StudentService extends UserService {
       student.email = email;
       student.salt = salt;
 
-      const foundEducationLevel =
-        await EducationLevelRepository.findEducationLevelById(educationLevelId);
+      const foundEducationLevel = await EducationLevelRepository.findEducationLevelById(educationLevelId);
 
       if (!foundEducationLevel) {
         throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_NOT_FOUND, 404);
@@ -57,10 +47,7 @@ export class StudentService extends UserService {
       student.educationLevel = foundEducationLevel;
 
       const savedStudent = await StudentRepository.saveStudent(student);
-      return UserService.generateUserResponse(
-        savedStudent,
-        EnumUserType.STUDENT
-      );
+      return UserService.generateUserResponse(savedStudent, EnumUserType.STUDENT);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -95,18 +82,41 @@ export class StudentService extends UserService {
 
   static async getStudentLessonsByStatus(id: number, status: EnumStatusName) {
     try {
-      const lessonRequests = await StudentRepository.findStudentLessonsByStatus(
-        id,
-        status
-      );
+      const lessonRequests = await StudentRepository.findStudentLessonsByStatus(id, status);
 
       if (!lessonRequests || lessonRequests.length === 0) {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
 
-      return lessonRequests.map((lessonRequest) =>
-        LessonRequestService.formatLessonRequest(lessonRequest)
-      );
+      const sanitizedResults = lessonRequests.map((student) => ({
+        id: student.id || null,
+        username: student.username || '',
+        email: student.email || '',
+        fullName: student.fullName || '',
+        birthDate: student.birthDate || null,
+        educationLevel: student.educationLevel
+          ? {
+              educationId: student.educationLevel.educationId || null,
+              levelType: student.educationLevel.levelType || ''
+            }
+          : null,
+        lessonRequests: (student.lessonRequests || []).map((request) => ({
+          ClassId: request.ClassId || null,
+          reason: request.reason || [],
+          preferredDates: request.preferredDates || [],
+          status: request.status || '',
+          additionalInfo: request.additionalInfo || '',
+          subject: request.subject
+            ? {
+                subjectId: request.subject.subjectId || null,
+                subjectName: request.subject.subjectName || ''
+              }
+            : null,
+          lessonRequestTutors: request.lessonRequestTutors || []
+        }))
+      }));
+
+      return sanitizedResults;
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -115,45 +125,31 @@ export class StudentService extends UserService {
 
   static async confirmLessonRequest(lessonId: number, tutorId: number) {
     try {
-      const lessonRequest =
-        await LessonRequestRepository.getLessonRequestById(lessonId);
+      const lessonRequest = await LessonRequestRepository.getLessonRequestById(lessonId);
 
       if (!lessonRequest) {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
 
       if (lessonRequest.status === EnumStatusName.CONFIRMADO) {
-        throw new AppError(
-          EnumErrorMessages.LESSON_REQUEST_ALREADY_CONFIRMED,
-          400
-        );
+        throw new AppError(EnumErrorMessages.LESSON_REQUEST_ALREADY_CONFIRMED, 400);
       }
 
       if (lessonRequest.status !== EnumStatusName.ACEITO) {
         throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
       }
 
-      const lessonRequestTutor =
-        await LessonRequestTutorRepository.findByLessonRequestAndTutor(
-          lessonId,
-          tutorId
-        );
+      const lessonRequestTutor = await LessonRequestTutorRepository.findByLessonRequestAndTutor(lessonId, tutorId);
 
       if (!lessonRequestTutor) {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
-      await LessonRequestTutorRepository.updateStatus(
-        lessonRequestTutor.id,
-        EnumStatusName.CONFIRMADO
-      );
+      await LessonRequestTutorRepository.updateStatus(lessonRequestTutor.id, EnumStatusName.CONFIRMADO);
 
       lessonRequest.preferredDates = [lessonRequestTutor.chosenDate];
 
-      lessonRequest.lessonRequestTutors =
-        lessonRequest.lessonRequestTutors.filter(
-          (lrt) => lrt.id === lessonRequestTutor.id
-        );
+      lessonRequest.lessonRequestTutors = lessonRequest.lessonRequestTutors.filter((lrt) => lrt.id === lessonRequestTutor.id);
 
       lessonRequest.status = EnumStatusName.CONFIRMADO;
       await LessonRequestRepository.saveLessonRequest(lessonRequest);
