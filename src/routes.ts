@@ -21,139 +21,51 @@ const router = Router();
 router.get('/', new HomeController().hello);
 
 // Tutor routes
-router.post(
-  '/api/register/tutor',
-  TutorValidator.createTutor(),
-  new TutorController().create
-);
+router.post('/api/tutor', TutorValidator.createTutor(), new TutorController().create);
 
-router.get('/api/get/tutor', authMiddleware(), new TutorController().getAll);
-router.get(
-  '/api/get/tutor/:id',
-  authMiddleware(),
-  new TutorController().getById
-);
+router.get('/api/tutor', authMiddleware(), new TutorController().getAll);
+router.get('/api/tutor/:id', authMiddleware(), new TutorController().getById);
 
-router.patch(
-  '/api/update/tutor',
-  authMiddleware(),
-  UpdatePersonalDataValidator,
-  new TutorController().updatePersonalData
-);
+router.patch('/api/tutor', authMiddleware(), UpdatePersonalDataValidator, new TutorController().updatePersonalData);
 
-router.patch(
-  '/api/update/photo',
-  authMiddleware(),
-  upload.single('image'),
-  UploadPhotoValidator,
-  new TutorController().updatePhoto
-);
+router.patch('/api/photo', authMiddleware(), upload.single('image'), UploadPhotoValidator, new TutorController().updatePhoto);
 
-router.patch(
-  '/api/tutor-accept-lesson',
-  authMiddleware(),
-  new TutorController().acceptLessonRequest
-);
+router.patch('/api/tutor-accept-lesson', authMiddleware(), new TutorController().acceptLessonRequest);
 
 // Students routes
-router.get(
-  '/api/get/student',
-  authMiddleware(),
-  new StudentController().getAll
-);
+router.get('/api/student', authMiddleware(), new StudentController().getAll);
 
-router.post(
-  '/api/register/student',
-  StudentValidator.createStudent(),
-  new StudentController().create
-);
+router.post('/api/student', StudentValidator.createStudent(), new StudentController().create);
 
-router.get(
-  '/api/get/student/:id',
-  authMiddleware(),
-  new StudentController().getById
-);
+router.get('/api/student/:id', authMiddleware(), new StudentController().getById);
 
-router.get(
-  '/api/get/student-pending/:id',
-  authMiddleware(),
-  new StudentController().getStudentPendingLessons
-);
-
-router.get(
-  '/api/get/student-accepted-lessons/:id',
-  authMiddleware(),
-  new StudentController().getStudentAcceptedLessons
-);
-
-router.get(
-  '/api/student-confirmed-lessons/:id',
-  authMiddleware(),
-  new StudentController().getStudentConfirmedLessons
-);
-
-router.patch(
-  '/api/student-confirm-lesson',
-  authMiddleware(),
-  new StudentController().confirmLessonRequest
-);
+router.get('/api/student-lesson-status', authMiddleware(), new StudentController().getStudentLessons);
 
 // Education Level routes
-router.post(
-  '/api/register/educationlevel',
-  authMiddleware(),
-  new EducationLevelController().create
-);
+router.post('/api/educationlevel', authMiddleware(), new EducationLevelController().create);
 
-router.get(
-  '/api/get/educationlevel',
-  authMiddleware(),
-  new EducationLevelController().getAll
-);
+router.get('/api/educationlevel', authMiddleware(), new EducationLevelController().getAll);
 
 // Login route
 router.post('/api/login', AuthValidator.login(), new AuthController().login);
 
 // Lesson Request route
 router.post(
-  '/api/register/lessonrequest',
+  '/api/lessonrequest',
   authMiddleware(),
   LessonRequestValidator.createLessonRequest(),
   new LessonRequestController().create
 );
 
-router.get(
-  '/api/get/lessonrequest',
-  authMiddleware(),
-  new LessonRequestController().getAll
-);
+router.get('/api/lessonrequest', authMiddleware(), new LessonRequestController().getAll);
 
-router.get(
-  '/api/get/lessonrequest/:id',
-  authMiddleware(),
-  new LessonRequestController().getById
-);
+router.get('/api/lessonrequest/:id', authMiddleware(), new LessonRequestController().getById);
 
-router.delete(
-  '/api/delete/lessonrequest/:id',
-  new LessonRequestController().DeleteById
-);
+router.delete('/api/lessonrequest/:id', new LessonRequestController().DeleteById);
 
-router.patch(
-  '/api/update/lessonrequest/:lessonId',
-  authMiddleware(),
-  new LessonRequestController().updateLesson
-);
+router.patch('/api/lessonrequest/:lessonId', authMiddleware(), new LessonRequestController().updateLesson);
 
 // Subject route
-router.post(
-  '/api/register/subject',
-  authMiddleware(),
-  new SubjectController().create
-);
-router.get(
-  '/api/get/subject',
-  authMiddleware(),
-  new SubjectController().getAll
-);
+router.post('/api/subject', authMiddleware(), new SubjectController().create);
+router.get('/api/subject', authMiddleware(), new SubjectController().getAll);
 export default router;
