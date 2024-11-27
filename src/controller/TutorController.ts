@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { TutorService } from '../service/TutorService';
 import { handleError } from '../utils/ErrorHandler';
 import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
+import { HttpRoute } from '../decorators/HttpRoute';
 
 export class TutorController {
   /**
@@ -172,6 +173,7 @@ export class TutorController {
    *                 error:
    *                   type: string
    */
+  @HttpRoute({ path: '/api/register/tutor', method: 'post' })
   async create(req: Request, res: Response) {
     try {
       const { user: savedTutor, token } = await TutorService.createTutor(
@@ -305,6 +307,7 @@ export class TutorController {
    *                   type: string
    *                   example: "Erro interno do servidor."
    */
+  @HttpRoute({ path: '/api/get/tutor', method: 'get' })
   async getAll(req: Request, res: Response) {
     try {
       const tutors = await TutorService.getAllTutors();
@@ -445,6 +448,7 @@ export class TutorController {
    *                   type: string
    *                   example: "Erro interno do servidor."
    */
+  @HttpRoute({ path: '/api/update/tutor', method: 'patch' })
   async updatePersonalData(req: Request, res: Response) {
     try {
       const { id, expertise, projectReason, subject: subjectIds } = req.body;
@@ -531,6 +535,7 @@ export class TutorController {
    *                   type: string
    *                   example: "Erro interno do servidor."
    */
+  @HttpRoute({ path: '/api/update/tutor/photo', method: 'patch' })
   async updatePhoto(req: Request, res: Response) {
     try {
       const { id } = req.body;
@@ -671,6 +676,7 @@ export class TutorController {
    *                   type: string
    *                   example: "Erro interno do servidor."
    */
+  @HttpRoute({ path: '/api/get/tutor/:id', method: 'get' })
   async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;
