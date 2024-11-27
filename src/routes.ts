@@ -85,6 +85,12 @@ router.get(
   new EducationLevelController().getAll
 );
 
+router.patch(
+  '/api/student-confirm-lesson',
+  authMiddleware(),
+  new StudentController().confirmLessonRequest
+);
+
 // Login route
 router.post('/api/login', AuthValidator.login(), new AuthController().login);
 
