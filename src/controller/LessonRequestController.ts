@@ -176,9 +176,7 @@ export class LessonRequestController {
    */
   async create(req: Request, res: Response) {
     try {
-      const lessonRequest = await LessonRequestService.createLessonRequest(
-        req.body
-      );
+      const lessonRequest = await LessonRequestService.createLessonRequest(req.body);
 
       return res.status(201).json({
         message: EnumSuccessMessages.LESSON_REQUEST_CREATED,
@@ -436,9 +434,7 @@ export class LessonRequestController {
     const { id } = req.params;
 
     try {
-      const lesson = await LessonRequestService.getLessonRequestById(
-        Number(id)
-      );
+      const lesson = await LessonRequestService.getLessonRequestById(Number(id));
 
       return res.status(200).json(lesson);
     } catch (error) {
@@ -504,9 +500,7 @@ export class LessonRequestController {
     }
 
     try {
-      const deletedRequest = await LessonRequestService.deleteLessonRequestById(
-        Number(classId)
-      );
+      const deletedRequest = await LessonRequestService.deleteLessonRequestById(Number(classId));
       return res.status(204).end().json({ deletedRequest });
     } catch (error) {
       const { statusCode, message } = handleError(error);
@@ -616,17 +610,9 @@ export class LessonRequestController {
       const { lessonId } = req.params;
       const { subjectId, reason, additionalInfo, preferredDates } = req.body;
 
-      await LessonRequestService.updateLessonRequest(
-        Number(lessonId),
-        subjectId,
-        reason,
-        additionalInfo,
-        preferredDates
-      );
+      await LessonRequestService.updateLessonRequest(Number(lessonId), subjectId, reason, additionalInfo, preferredDates);
 
-      return res
-        .status(200)
-        .json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
+      return res.status(200).json({ message: EnumSuccessMessages.LESSON_REQUEST_UPDATED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });
@@ -712,14 +698,9 @@ export class LessonRequestController {
     const { classId, tutorId } = req.query;
 
     try {
-      await LessonRequestService.cancelTutorLessonRequestById(
-        Number(classId),
-        Number(tutorId)
-      );
+      await LessonRequestService.cancelTutorLessonRequestById(Number(classId), Number(tutorId));
 
-      return res
-        .status(200)
-        .json({ message: EnumSuccessMessages.LESSON_REQUEST_CANCELED });
+      return res.status(200).json({ message: EnumSuccessMessages.LESSON_REQUEST_CANCELED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });

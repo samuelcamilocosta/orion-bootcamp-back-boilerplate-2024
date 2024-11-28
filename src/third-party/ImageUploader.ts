@@ -2,10 +2,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { s3, bucketName, randomImgName } from '../config/s3Client';
 
 export class ImageUploader {
-  static async uploadPhotoS3(
-    buffer: Buffer,
-    mimeType: string
-  ): Promise<string> {
+  static async uploadPhotoS3(buffer: Buffer, mimeType: string): Promise<string> {
     const randomName = randomImgName();
     const params = {
       Bucket: bucketName,

@@ -52,9 +52,6 @@ export class Tutor extends User {
   @Column({ type: 'varchar', length: 255, nullable: true, select: false })
   photoUrl: string;
 
-  @OneToMany(
-    () => LessonRequestTutor,
-    (lessonRequestTutor) => lessonRequestTutor.tutor
-  )
+  @OneToMany(() => LessonRequestTutor, (lessonRequestTutor) => lessonRequestTutor.tutor)
   lessonRequestTutors: LessonRequestTutor[];
 }

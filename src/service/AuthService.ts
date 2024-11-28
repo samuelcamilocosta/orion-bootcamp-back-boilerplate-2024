@@ -15,10 +15,7 @@ export class AuthService {
         throw new AppError(EnumErrorMessages.INVALID_CREDENTIALS, 400);
       }
 
-      const user = await UserRepository.findUserByEmail(
-        email,
-        role as EnumUserType
-      );
+      const user = await UserRepository.findUserByEmail(email, role as EnumUserType);
       if (!user) {
         throw new AppError(EnumErrorMessages.INVALID_CREDENTIALS, 404);
       }

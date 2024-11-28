@@ -8,9 +8,7 @@ async function connectWithRetry() {
       console.log(`Banco de dados reconectado!`);
       break;
     } catch (err) {
-      console.log(
-        `Erro ao reconectar ao banco de dados. Tentanto novamente... ${retries} tentativas restantes`
-      );
+      console.log(`Erro ao reconectar ao banco de dados. Tentanto novamente... ${retries} tentativas restantes`);
       retries -= 1;
       await new Promise((res) => setTimeout(res, 3000));
     }

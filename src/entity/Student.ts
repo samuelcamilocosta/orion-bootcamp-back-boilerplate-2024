@@ -1,11 +1,4 @@
-import {
-  Entity,
-  ManyToMany,
-  ManyToOne,
-  JoinTable,
-  JoinColumn,
-  OneToMany
-} from 'typeorm';
+import { Entity, ManyToMany, ManyToOne, JoinTable, JoinColumn, OneToMany } from 'typeorm';
 import { Subject } from './Subject';
 import { EducationLevel } from './EducationLevel';
 import { User } from './User';

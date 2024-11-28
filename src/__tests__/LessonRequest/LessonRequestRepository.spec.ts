@@ -35,8 +35,6 @@ describe('LessonRequestRepository - deleteByClassId', () => {
 
     mockRepo.delete.mockRejectedValueOnce(error);
 
-    await expect(
-      LessonRequestRepository.deleteByClassId(classId)
-    ).rejects.toThrow('Erro na exclusão');
+    await expect(LessonRequestRepository.deleteByClassId(classId)).rejects.toThrow('Erro na exclusão');
   });
 });

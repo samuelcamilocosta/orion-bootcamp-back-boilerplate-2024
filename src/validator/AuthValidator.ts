@@ -9,12 +9,7 @@ export class AuthValidator extends BaseValidator {
    */
   static login() {
     return this.validationList([
-      body('email')
-        .trim()
-        .notEmpty()
-        .withMessage(EnumErrorMessages.EMAIL_REQUIRED)
-        .isEmail()
-        .withMessage(EnumErrorMessages.EMAIL_INVALID),
+      body('email').trim().notEmpty().withMessage(EnumErrorMessages.EMAIL_REQUIRED).isEmail().withMessage(EnumErrorMessages.EMAIL_INVALID),
 
       body('password')
         .trim()

@@ -6,11 +6,9 @@ import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 import { AppError } from '../error/AppError';
 import { handleError } from '../utils/ErrorHandler';
 
-const birthDateRegex =
-  /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
+const birthDateRegex = /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4}$/;
 
-const passwordRegex =
-  /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%¨&*])[A-Za-z\d!@#$%¨&*]{6,}$/;
+const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%¨&*])[A-Za-z\d!@#$%¨&*]{6,}$/;
 
 export class CommonValidations {
   protected fullName() {
@@ -31,8 +29,7 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.USERNAME_REQUIRED)
       .custom(async (value: string): Promise<boolean> => {
         try {
-          const existingUser =
-            await UserRepository.findExistingUserByUsername(value);
+          const existingUser = await UserRepository.findExistingUserByUsername(value);
 
           if (existingUser) {
             throw new AppError(EnumErrorMessages.USERNAME_ALREADY_EXISTS);
@@ -61,10 +58,7 @@ export class CommonValidations {
         const [day, month, year] = value.split('/').map(Number);
 
         if (month === 2) {
-          const isLeapYear =
-            (year % 4 === 0 && year % 100 === 0) || year % 400 === 0
-              ? true
-              : false;
+          const isLeapYear = (year % 4 === 0 && year % 100 === 0) || year % 400 === 0 ? true : false;
           if (day > 29 || (day === 29 && !isLeapYear)) {
             throw new AppError(EnumErrorMessages.BIRTH_DATE_INCORRECT);
           }
@@ -80,9 +74,7 @@ export class CommonValidations {
         const offset = now.getTimezoneOffset();
 
         const inputDate = new Date(Date.UTC(year, month - 1, day));
-        const currentDate = new Date(
-          Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
-        );
+        const currentDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0));
 
         inputDate.setMinutes(inputDate.getMinutes() + offset);
         currentDate.setMinutes(currentDate.getMinutes() + offset);
@@ -95,9 +87,7 @@ export class CommonValidations {
       })
       .customSanitizer((value: string): Date => {
         const [day, month, year] = value.split('/');
-        const date = new Date(
-          Date.UTC(Number(year), Number(month) - 1, Number(day))
-        );
+        const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
         const offset = date.getTimezoneOffset();
         date.setMinutes(date.getMinutes() + offset);
         return date;
@@ -134,13 +124,11 @@ export class CommonValidations {
         }
         return true;
       })
-      .customSanitizer(
-        async (value: string): Promise<{ hashedPassword; salt }> => {
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(value, salt);
-          return { hashedPassword, salt };
-        }
-      );
+      .customSanitizer(async (value: string): Promise<{ hashedPassword; salt }> => {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(value, salt);
+        return { hashedPassword, salt };
+      });
   }
 
   protected email() {
@@ -154,8 +142,7 @@ export class CommonValidations {
       .withMessage(EnumErrorMessages.EMAIL_INVALID)
       .custom(async (value: string): Promise<boolean> => {
         try {
-          const existingUser =
-            await UserRepository.findExistingUserByEmail(value);
+          const existingUser = await UserRepository.findExistingUserByEmail(value);
 
           if (existingUser) {
             throw new AppError(EnumErrorMessages.EMAIL_ALREADY_EXISTS);
@@ -181,10 +168,7 @@ export class CommonValidations {
             throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_SINGLE);
           }
 
-          if (
-            (!educationLevelId && !educationLevelIds) ||
-            (educationLevelId.length === 0 && educationLevelIds.length === 0)
-          ) {
+          if ((!educationLevelId && !educationLevelIds) || (educationLevelId.length === 0 && educationLevelIds.length === 0)) {
             throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_REQUIRED);
           }
 
@@ -192,14 +176,10 @@ export class CommonValidations {
             throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_CONFLICT);
           }
 
-          const educationLevels =
-            educationLevelIds || (educationLevelId ? [educationLevelId] : []);
+          const educationLevels = educationLevelIds || (educationLevelId ? [educationLevelId] : []);
 
           const parsedValues = educationLevels.map((id: string) => Number(id));
-          const existingEducationLevels =
-            await EducationLevelRepository.findEducationLevelsByIds(
-              parsedValues
-            );
+          const existingEducationLevels = await EducationLevelRepository.findEducationLevelsByIds(parsedValues);
 
           if (existingEducationLevels.length !== parsedValues.length) {
             throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_NOT_EXIST);

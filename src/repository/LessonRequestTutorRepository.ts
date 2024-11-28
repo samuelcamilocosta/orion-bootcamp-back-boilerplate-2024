@@ -20,9 +20,7 @@ export class LessonRequestTutorRepository {
     return repository.save(lessonRequestTutor);
   }
 
-  static async findLessonRequestTutorByLessonRequestId(
-    lessonRequestId: number
-  ): Promise<LessonRequestTutor[]> {
+  static async findLessonRequestTutorByLessonRequestId(lessonRequestId: number): Promise<LessonRequestTutor[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     return repository
       .createQueryBuilder('lessonRequestTutor')
@@ -34,9 +32,7 @@ export class LessonRequestTutorRepository {
       .getMany();
   }
 
-  static async findLessonRequestTutorByTutorId(
-    tutorId: number
-  ): Promise<LessonRequestTutor[]> {
+  static async findLessonRequestTutorByTutorId(tutorId: number): Promise<LessonRequestTutor[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     return repository
       .createQueryBuilder('lessonRequestTutor')
@@ -46,10 +42,7 @@ export class LessonRequestTutorRepository {
       .getMany();
   }
 
-  static async updateStatus(
-    lessonRequestTutorId: number,
-    status: EnumStatusName
-  ): Promise<void> {
+  static async updateStatus(lessonRequestTutorId: number, status: EnumStatusName): Promise<void> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     await repository
       .createQueryBuilder()
@@ -59,9 +52,7 @@ export class LessonRequestTutorRepository {
       .execute();
   }
 
-  static async getTutorsByLessonRequestId(
-    lessonRequestId: number
-  ): Promise<Tutor[]> {
+  static async getTutorsByLessonRequestId(lessonRequestId: number): Promise<Tutor[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     const result = await repository
       .createQueryBuilder('lessonRequestTutor')
@@ -74,9 +65,7 @@ export class LessonRequestTutorRepository {
     return result.map((entry) => entry.tutor);
   }
 
-  static async getLessonRequestsByTutorId(
-    tutorId: number
-  ): Promise<LessonRequest[]> {
+  static async getLessonRequestsByTutorId(tutorId: number): Promise<LessonRequest[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     const result = await repository
       .createQueryBuilder('lessonRequestTutor')
@@ -87,9 +76,7 @@ export class LessonRequestTutorRepository {
     return result.map((entry) => entry.lessonRequest);
   }
 
-  static async getChosenDatesByLessonRequestId(
-    lessonRequestId: number
-  ): Promise<string[]> {
+  static async getChosenDatesByLessonRequestId(lessonRequestId: number): Promise<string[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     const result = await repository
       .createQueryBuilder('lessonRequestTutor')
@@ -101,10 +88,7 @@ export class LessonRequestTutorRepository {
     return result.map((entry) => entry.chosenDate).flat();
   }
 
-  static async findByLessonRequestAndTutor(
-    lessonRequestId: number,
-    tutorId: number
-  ): Promise<LessonRequestTutor | null> {
+  static async findByLessonRequestAndTutor(lessonRequestId: number, tutorId: number): Promise<LessonRequestTutor | null> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
 
     return repository
@@ -116,10 +100,7 @@ export class LessonRequestTutorRepository {
       .getOne();
   }
 
-  static async deleteLessonRequestTutorByLessonRequestAndTutor(
-    lessonRequestId: number,
-    tutorId: number
-  ): Promise<void> {
+  static async deleteLessonRequestTutorByLessonRequestAndTutor(lessonRequestId: number, tutorId: number): Promise<void> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
     await repository
       .createQueryBuilder()

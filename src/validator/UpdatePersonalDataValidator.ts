@@ -1,17 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
-export const UpdatePersonalDataValidator = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const UpdatePersonalDataValidator = (req: Request, res: Response, next: NextFunction) => {
   const { id, expertise, projectReason } = req.body;
 
   if (expertise && expertise.length > 50) {
-    return res
-      .status(400)
-      .json({ message: EnumErrorMessages.EXPERTISE_LENGTH_EXCEEDED });
+    return res.status(400).json({ message: EnumErrorMessages.EXPERTISE_LENGTH_EXCEEDED });
   }
 
   if (projectReason && projectReason.length > 200) {
