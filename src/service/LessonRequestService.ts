@@ -9,6 +9,7 @@ import { EnumStatusName } from '../enum/EnumStatusName';
 import { StudentService } from './StudentService';
 import { TutorService } from './TutorService';
 import { handleError } from '../utils/ErrorHandler';
+import { LessonRequestTutorRepository } from '../repository/LessonRequestTutorRepository';
 
 export class LessonRequestService {
   static formatLessonRequest(lessonRequest: LessonRequest) {
@@ -157,21 +158,50 @@ export class LessonRequestService {
     }
   }
 
-  static async cancelTutorLessonRequestById(classId: number) {
-    try {
-      const lessonRequest =
-        await LessonRequestRepository.getLessonRequestById(classId);
+  static async cancelTutorLessonRequestById(classId: number, tutorId: number) {
+    const lessonRequestTutor =
+      await LessonRequestTutorRepository.findByLessonRequestAndTutor(
+        classId,
+        tutorId
+      );
 
-      if (!lessonRequest) {
-        throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
-      }
-
-      if (lessonRequest.status === EnumStatusName.ACEITO) {
-        lessonRequest.status = EnumStatusName.PENDENTE;
-      }
-      await LessonRequestRepository.saveLessonRequest(lessonRequest);
-    } catch (error) {
-      throw new AppError(EnumErrorMessages.INTERNAL_SERVER, 500);
+    if (!lessonRequestTutor) {
+      throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
     }
+
+    await LessonRequestTutorRepository.deleteLessonRequestTutorByLessonRequestAndTutor(
+      classId,
+      tutorId
+    );
+
+    const tutorsRemaining =
+      await LessonRequestTutorRepository.getTutorsByLessonRequestId(classId);
+
+    if (tutorsRemaining.length === 0) {
+      await this.updateStatus(classId, EnumStatusName.PENDENTE);
+    }
+  }
+
+  static async updateStatus(lessonId: number, status: EnumStatusName) {
+    const lessonRequest =
+      await LessonRequestRepository.getLessonRequestById(lessonId);
+
+    if (!lessonRequest) {
+      throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+    }
+
+    if (
+      lessonRequest.status === EnumStatusName.ACEITO &&
+      status !== EnumStatusName.PENDENTE
+    ) {
+      throw new AppError(EnumErrorMessages.INVALID_PENDENTE_STATUS, 400);
+    }
+
+    lessonRequest.status = status;
+
+    const updatedLessonRequest =
+      await LessonRequestRepository.saveLessonRequest(lessonRequest);
+
+    return updatedLessonRequest;
   }
 }

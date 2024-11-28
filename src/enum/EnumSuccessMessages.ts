@@ -23,6 +23,7 @@ export enum EnumSuccessMessages {
   LESSON_REQUEST_STATUS_UPDATED = 'Status da aula atualizado com sucesso!',
   LESSON_REQUEST_ACCEPTED = 'Aula aceita com sucesso!',
   LESSON_REQUEST_CONFIRMED = 'Aula confirmada com sucesso!',
+  LESSON_REQUEST_CANCELED = 'Aula cancelada com sucesso!',
 
   // Authentication success messages
   LOGIN_SUCCESS = 'Login realizado com sucesso!',

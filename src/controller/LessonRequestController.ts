@@ -633,19 +633,93 @@ export class LessonRequestController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/lessonrequest-cancel:
+   *   post:
+   *     summary: Cancel a tutor's lesson request relationship by classId and tutorId
+   *     tags: [Lesson Request]
+   *     security:
+   *       - BearerAuth: []
+   *     parameters:
+   *       - name: classId
+   *         in: query
+   *         required: true
+   *         description: ID of the lesson request to cancel
+   *         schema:
+   *           type: integer
+   *           example: 21
+   *       - name: tutorId
+   *         in: query
+   *         required: true
+   *         description: ID of the tutor whose lesson request is to be cancelled
+   *         schema:
+   *           type: integer
+   *           example: 1
+   *     responses:
+   *       '200':
+   *         description: Lesson request relationship canceled successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula cancelada com sucesso!"
+   *       '400':
+   *         description: Bad request, invalid data provided
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Parâmetro inválido"
+   *       '401':
+   *         description: Unauthorized, missing or invalid token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Token inválido."
+   *       '404':
+   *         description: Lesson request or tutor not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Aula não encontrada."
+   *       '500':
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: "Erro interno do servidor."
+   */
   async cancelTutorLessonRequest(req: Request, res: Response) {
-    const classId = Number(req.params.id);
-
-    if (isNaN(classId) || classId <= 0) {
-      return res.status(400).json({ message: 'Parâmetro inválido' });
-    }
+    const { classId, tutorId } = req.query;
 
     try {
-      const updateRequest =
-        await LessonRequestService.cancelTutorLessonRequestById(
-          Number(classId)
-        );
-      return res.status(204).end().json({ updateRequest });
+      await LessonRequestService.cancelTutorLessonRequestById(
+        Number(classId),
+        Number(tutorId)
+      );
+
+      return res
+        .status(200)
+        .json({ message: EnumSuccessMessages.LESSON_REQUEST_CANCELED });
     } catch (error) {
       const { statusCode, message } = handleError(error);
       return res.status(statusCode).json({ message });

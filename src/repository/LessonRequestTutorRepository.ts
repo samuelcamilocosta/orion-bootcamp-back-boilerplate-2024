@@ -3,6 +3,8 @@ import { LessonRequestTutor } from '../entity/LessonRequestTutor';
 import { LessonRequest } from '../entity/LessonRequest';
 import { Tutor } from '../entity/Tutor';
 import { EnumStatusName } from '../enum/EnumStatusName';
+import { AppError } from '../error/AppError';
+import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class LessonRequestTutorRepository {
   static async createLessonRequestTutor(
@@ -106,12 +108,40 @@ export class LessonRequestTutorRepository {
     tutorId: number
   ): Promise<LessonRequestTutor | null> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
-    return await repository
+
+    return repository
       .createQueryBuilder('lessonRequestTutor')
       .where('lessonRequestTutor.lessonRequestId = :lessonRequestId', {
         lessonRequestId
       })
       .andWhere('lessonRequestTutor.tutorId = :tutorId', { tutorId })
       .getOne();
+  }
+
+  static async deleteLessonRequestTutorByLessonRequestAndTutor(
+    lessonRequestId: number,
+    tutorId: number
+  ): Promise<void> {
+    const repository = MysqlDataSource.getRepository(LessonRequestTutor);
+
+    console.log(
+      'Deletando relação entre lessonRequestId:',
+      lessonRequestId,
+      'e tutorId:',
+      tutorId
+    );
+    const result = await repository
+      .createQueryBuilder()
+      .delete()
+      .from(LessonRequestTutor)
+      .where('lessonRequestId = :lessonRequestId', { lessonRequestId })
+      .andWhere('tutorId = :tutorId', { tutorId })
+      .execute();
+
+    if (result.affected === 0) {
+      throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
+    }
+
+    console.log('Deleção realizada com sucesso');
   }
 }

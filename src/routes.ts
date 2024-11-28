@@ -125,6 +125,12 @@ router.patch(
   new LessonRequestController().updateLesson
 );
 
+router.delete(
+  '/api/lessonrequest-cancel',
+  authMiddleware(),
+  new LessonRequestController().cancelTutorLessonRequest
+);
+
 // Subject route
 router.post('/api/subject', authMiddleware(), new SubjectController().create);
 router.get('/api/subject', authMiddleware(), new SubjectController().getAll);
