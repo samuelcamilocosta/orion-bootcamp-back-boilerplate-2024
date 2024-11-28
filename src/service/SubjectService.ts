@@ -13,7 +13,7 @@ export class SubjectService {
 
       const subject = new Subject();
       subject.subjectName = subjectName;
-      return await SubjectRepository.saveSubject(subject);
+      return SubjectRepository.saveSubject(subject);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -22,7 +22,7 @@ export class SubjectService {
 
   static async getAllSubjects() {
     try {
-      return await SubjectRepository.findAllSubjects();
+      return SubjectRepository.findAllSubjects();
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);

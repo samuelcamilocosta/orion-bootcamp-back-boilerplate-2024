@@ -6,7 +6,7 @@ import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 export class SubjectController {
   /**
    * @swagger
-   * /api/register/subject:
+   * /api/subject:
    *   post:
    *     summary: Create a new subject
    *     tags: [Subject]
@@ -80,7 +80,7 @@ export class SubjectController {
 
   /**
    * @swagger
-   * /api/get/subject:
+   * /api/subject:
    *   get:
    *     summary: Get all subjects
    *     tags: [Subject]

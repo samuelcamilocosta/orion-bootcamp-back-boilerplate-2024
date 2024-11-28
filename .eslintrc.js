@@ -25,6 +25,7 @@ module.exports = {
       {
         endOfLine: 'auto'
       }
-    ]
+    ],
+    'no-return-await': 'error'
   }
 };

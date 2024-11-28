@@ -4,73 +4,73 @@ import { UserRepository } from './UserRepository';
 import { EnumStatusName } from '../enum/EnumStatusName';
 
 export class StudentRepository extends UserRepository {
-  private static relations = ['educationLevel', 'lessonRequests'];
-  private static selectFields = [
-    'id',
-    'username',
-    'fullName',
-    'birthDate',
-    'fullName',
-    'educationLevel',
-    'lessonRequests'
-  ];
-
   static async saveStudent(student: Student): Promise<Student> {
     const repository = MysqlDataSource.getRepository(Student);
-    return await repository.save(student);
+    return repository.save(student);
   }
 
   static async findAllStudents() {
     const repository = MysqlDataSource.getRepository(Student);
-    return await repository.find({
-      select: Object.fromEntries(
-        this.selectFields.map((field) => [field, true])
-      ),
-      relations: this.relations
-    });
-  }
 
-  static async findStudentById(id: number) {
-    const repository = MysqlDataSource.getRepository(Student);
-    return await repository.findOne({
-      where: { id },
-      select: Object.fromEntries(
-        this.selectFields.map((field) => [field, true])
-      ),
-      relations: this.relations
-    });
-  }
-
-  static async findPendingLessonByStudentId(id: number) {
-    const repository = MysqlDataSource.getRepository(Student);
-    const rawResults = await repository
+    const student = await repository
       .createQueryBuilder('student')
+      .leftJoinAndSelect('student.educationLevel', 'educationLevel')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
-      .where('student.id = :id', { id })
-      .andWhere('lessonRequest.status = :status', {
-        status: EnumStatusName.PENDENTE
-      })
-      .select([
-        'lessonRequest.ClassId as classId',
-        'lessonRequest.reason as reason',
-        'lessonRequest.preferredDates as preferredDates',
-        'lessonRequest.status as status',
-        'lessonRequest.additionalInfo as additionalInfo',
-        'lessonRequest.subject.subjectId as subjectId',
-        'lessonRequest.student.id as studentId',
-        'lessonRequest.tutor.id as tutorId'
-      ])
-      .getRawMany();
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect(
+        'lessonRequest.lessonRequestTutors',
+        'lessonRequestTutor'
+      )
+      .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .leftJoinAndSelect('tutor.subjects', 'subjects')
+      .orderBy('student.id', 'ASC')
+      .addOrderBy('lessonRequest.ClassId', 'ASC')
+      .getMany();
 
-    return rawResults.map((result) => ({
-      classId: result.classId,
-      reason: result.reason,
-      preferredDates: result.preferredDates,
-      status: result.status,
-      additionalInfo: result.additionalInfo,
-      subjectId: result.subjectId,
-      studentId: result.studentId,
-      tutorId: result.tutorId
-    }));
+    return student;
+  }
+
+  static async findStudentById(id: number): Promise<Student> {
+    const repository = MysqlDataSource.getRepository(Student);
+    const student = await repository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.educationLevel', 'educationLevel')
+      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect(
+        'lessonRequest.lessonRequestTutors',
+        'lessonRequestTutor'
+      )
+      .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .leftJoinAndSelect('tutor.subjects', 'subjects')
+      .where('student.id = :id', { id })
+      .addSelect('student.birthDate')
+      .getOne();
+
+    return student;
+  }
+
+  static async findStudentLessonsByStatus(
+    studentId: number,
+    status: EnumStatusName
+  ): Promise<Student[]> {
+    const repository = MysqlDataSource.getRepository(Student);
+
+    const results = await repository
+      .createQueryBuilder('student')
+      .leftJoinAndSelect('student.educationLevel', 'educationLevel')
+      .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect(
+        'lessonRequest.lessonRequestTutors',
+        'lessonRequestTutor'
+      )
+      .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
+      .leftJoinAndSelect('tutor.subjects', 'subjects')
+      .where('student.id = :id', { id: studentId })
+      .andWhere('lessonRequest.status = :status', { status })
+      .getMany();
+
+    return results;
   }
 }

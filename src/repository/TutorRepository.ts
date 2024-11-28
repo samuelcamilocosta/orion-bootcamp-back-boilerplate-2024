@@ -3,48 +3,41 @@ import { Tutor } from '../entity/Tutor';
 import { UserRepository } from './UserRepository';
 
 export class TutorRepository extends UserRepository {
-  private static relations = ['educationLevels', 'lessonRequests', 'subjects'];
-  private static selectFields = [
-    'id',
-    'username',
-    'fullName',
-    'photoUrl',
-    'birthDate',
-    'expertise',
-    'projectReason',
-    'educationLevels',
-    'lessonRequests',
-    'subjects'
-  ];
-
   static async saveTutor(tutor: Tutor): Promise<Tutor> {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.save(tutor);
+    return repository.save(tutor);
   }
 
   static async findTutorByCpf(cpf: string) {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.findOne({ where: { cpf } });
+    return repository.findOne({ where: { cpf } });
   }
 
   static async findAllTutors() {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.find({
-      select: Object.fromEntries(
-        this.selectFields.map((field) => [field, true])
-      ),
-      relations: this.relations
-    });
+    return repository
+      .createQueryBuilder('mainTutor')
+      .leftJoinAndSelect('mainTutor.lessonRequestTutors', 'lessonRequestTutor')
+      .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect('lessonRequest.student', 'student')
+      .leftJoinAndSelect('mainTutor.subjects', 'subjects')
+      .getMany();
   }
 
-  static async findTutorById(id: number) {
+  static async findTutorById(tutorId: number) {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.findOne({
-      where: { id },
-      select: Object.fromEntries(
-        this.selectFields.map((field) => [field, true])
-      ),
-      relations: this.relations
-    });
+
+    const tutor = await repository
+      .createQueryBuilder('mainTutor')
+      .leftJoinAndSelect('mainTutor.lessonRequestTutors', 'lessonRequestTutor')
+      .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
+      .leftJoinAndSelect('lessonRequest.subject', 'subject')
+      .leftJoinAndSelect('lessonRequest.student', 'student')
+      .leftJoinAndSelect('mainTutor.subjects', 'subjects')
+      .where('mainTutor.id = :id', { id: tutorId })
+      .getOne();
+
+    return tutor;
   }
 }

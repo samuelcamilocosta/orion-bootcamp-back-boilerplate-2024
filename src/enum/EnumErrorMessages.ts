@@ -55,6 +55,11 @@ export enum EnumErrorMessages {
   PREFERRED_DATES_REQUIRED = 'Datas preferidas são obrigatórias. Mínimo de 1 e máximo de 3.',
   ADDITIONAL_INFO_STRING = 'Informações adicionais devem ser uma string.',
   ADDITIONAL_INFO_LENGTH = 'Informações adicionais deve ter no máximo 200 caracteres.',
+  INVALID_PENDENTE_STATUS = 'O status do pedido de aula deve estar como pendente.',
+  INVALID_PENDENTE_ACEITO_STATUS = 'O status do pedido de aula deve estar como pendente ou como aceito.',
+  INVALID_ACEITO_STATUS = 'O status do pedido de aula deve estar como aceito.',
+  TUTOR_ALREADY_ADDED = 'O tutor já está na lista de tutores do pedido de aula.',
+  LESSON_REQUEST_ALREADY_CONFIRMED = 'A aula já foi confirmada, não é possível confirmar novamente.',
 
   // Education level errors
   EDUCATION_LEVEL_NOT_FOUND = 'Nível de ensino não encontrado.',

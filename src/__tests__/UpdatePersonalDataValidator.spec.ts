@@ -26,7 +26,7 @@ describe('updatePersonalData', () => {
   it('should update personal data with valid inputs', async () => {
     req.body = {
       id: 1,
-      expertise: 'Mathematics',
+      expertise: 'Matemática',
       projectReason: 'I love teaching',
       subject: [1, 2]
     };
@@ -43,7 +43,6 @@ describe('updatePersonalData', () => {
         { educationId: 2, levelType: 'Médio' },
         { educationId: 3, levelType: 'Pré-Vestibular' }
       ],
-      lessonRequests: [],
       subjects: [1, 2]
     };
 
@@ -55,7 +54,13 @@ describe('updatePersonalData', () => {
     MysqlDataSource.getRepository = jest.fn().mockReturnValue({
       findOne: jest.fn().mockResolvedValue(mockTutor),
       find: jest.fn().mockResolvedValue(mockFoundSubjects),
-      save: jest.fn().mockResolvedValue({ ...mockTutor, ...req.body })
+      save: jest.fn().mockResolvedValue({ ...mockTutor, ...req.body }),
+      createQueryBuilder: jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue(mockTutor)
+      })
     });
 
     await updatePersonalData(req as Request, res as Response);
@@ -72,7 +77,12 @@ describe('updatePersonalData', () => {
     req.body = { id: 999 };
 
     MysqlDataSource.getRepository = jest.fn().mockReturnValue({
-      findOne: jest.fn().mockResolvedValue(null)
+      createQueryBuilder: jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue(null)
+      })
     });
 
     await updatePersonalData(req as Request, res as Response);

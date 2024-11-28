@@ -17,7 +17,7 @@ export class EducationLevelService {
 
     const educationLevel = new EducationLevel();
     educationLevel.levelType = levelType;
-    return await EducationLevelRepository.saveEducationLevel(educationLevel);
+    return EducationLevelRepository.saveEducationLevel(educationLevel);
   }
 
   static async getAllEducationLevels() {

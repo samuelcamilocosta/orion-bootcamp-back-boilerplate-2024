@@ -22,70 +22,69 @@ router.get('/', new HomeController().hello);
 
 // Tutor routes
 router.post(
-  '/api/register/tutor',
+  '/api/tutor',
   TutorValidator.createTutor(),
   new TutorController().create
 );
 
-router.get('/api/get/tutor', authMiddleware(), new TutorController().getAll);
+router.get('/api/tutor', authMiddleware(), new TutorController().getAll);
+router.get('/api/tutor/:id', authMiddleware(), new TutorController().getById);
 
 router.patch(
-  '/api/update/tutor',
+  '/api/tutor',
   authMiddleware(),
   UpdatePersonalDataValidator,
   new TutorController().updatePersonalData
 );
 
 router.patch(
-  '/api/update/photo',
+  '/api/photo',
   authMiddleware(),
   upload.single('image'),
   UploadPhotoValidator,
   new TutorController().updatePhoto
 );
 
-router.get(
-  '/api/get/tutor/:id',
+router.patch(
+  '/api/tutor-accept-lesson',
   authMiddleware(),
-  new TutorController().getById
+  new TutorController().acceptLessonRequest
 );
 
 // Students routes
-router.get(
-  '/api/get/student',
-  authMiddleware(),
-  new StudentController().getAll
-);
+router.get('/api/student', authMiddleware(), new StudentController().getAll);
 
 router.post(
-  '/api/register/student',
+  '/api/student',
   StudentValidator.createStudent(),
   new StudentController().create
 );
 
 router.get(
-  '/api/get/student/:id',
+  '/api/student/:id',
   authMiddleware(),
   new StudentController().getById
 );
 
 router.get(
-  '/api/get/student-pending/:id',
+  '/api/student-lesson-status',
   authMiddleware(),
-  new StudentController().getPendingLessonByStudentId
+  new StudentController().getStudentLessons
 );
 
 // Education Level routes
 router.post(
-  '/api/register/educationlevel',
+  '/api/educationlevel',
   authMiddleware(),
   new EducationLevelController().create
 );
 
-router.get(
-  '/api/get/educationlevel',
+router.get('/api/educationlevel', new EducationLevelController().getAll);
+
+router.patch(
+  '/api/student-confirm-lesson',
   authMiddleware(),
-  new EducationLevelController().getAll
+  new StudentController().confirmLessonRequest
 );
 
 // Login route
@@ -93,38 +92,42 @@ router.post('/api/login', AuthValidator.login(), new AuthController().login);
 
 // Lesson Request route
 router.post(
-  '/api/register/lessonrequest',
+  '/api/lessonrequest',
   authMiddleware(),
   LessonRequestValidator.createLessonRequest(),
   new LessonRequestController().create
 );
 
 router.get(
-  '/api/get/lessonrequest',
+  '/api/lessonrequest',
   authMiddleware(),
   new LessonRequestController().getAll
 );
 
 router.get(
-  '/api/get/lessonrequest/:id',
+  '/api/lessonrequest/:id',
   authMiddleware(),
   new LessonRequestController().getById
 );
 
 router.delete(
-  '/api/delete/lessonrequest/:id',
+  '/api/lessonrequest/:id',
   new LessonRequestController().DeleteById
 );
 
+router.patch(
+  '/api/lessonrequest/:lessonId',
+  authMiddleware(),
+  new LessonRequestController().updateLesson
+);
+
+router.delete(
+  '/api/lessonrequest-cancel',
+  authMiddleware(),
+  new LessonRequestController().cancelTutorLessonRequest
+);
+
 // Subject route
-router.post(
-  '/api/register/subject',
-  authMiddleware(),
-  new SubjectController().create
-);
-router.get(
-  '/api/get/subject',
-  authMiddleware(),
-  new SubjectController().getAll
-);
+router.post('/api/subject', authMiddleware(), new SubjectController().create);
+router.get('/api/subject', authMiddleware(), new SubjectController().getAll);
 export default router;

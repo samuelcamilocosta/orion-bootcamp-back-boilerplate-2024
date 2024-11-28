@@ -11,6 +11,6 @@ export class FileStorageService {
       })
       .toBuffer();
 
-    return await ImageUploader.uploadPhotoS3(buffer, file.mimetype);
+    return ImageUploader.uploadPhotoS3(buffer, file.mimetype);
   }
 }

@@ -6,7 +6,7 @@ import { EnumSuccessMessages } from '../enum/EnumSuccessMessages';
 export class EducationLevelController {
   /**
    * @swagger
-   * /api/register/educationLevel:
+   * /api/educationLevel:
    *   post:
    *     summary: Create a new education level
    *     tags: [Education Level]
@@ -89,7 +89,7 @@ export class EducationLevelController {
 
   /**
    * @swagger
-   * /api/get/educationLevel:
+   * /api/educationLevel:
    *   get:
    *     summary: Get all education levels
    *     tags: [Education Level]
