@@ -8,7 +8,7 @@ import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 export class StudentRepository extends UserRepository {
   static async saveStudent(student: Student): Promise<Student> {
     const repository = MysqlDataSource.getRepository(Student);
-    return await repository.save(student);
+    return repository.save(student);
   }
 
   static async findAllStudents() {
@@ -48,11 +48,6 @@ export class StudentRepository extends UserRepository {
       .where('student.id = :id', { id })
       .addSelect('student.birthDate')
       .getOne();
-
-    if (!student) {
-      console.error(`Student with ID ${id} not found`);
-      throw new AppError(EnumErrorMessages.STUDENT_NOT_FOUND, 404);
-    }
 
     return student;
   }

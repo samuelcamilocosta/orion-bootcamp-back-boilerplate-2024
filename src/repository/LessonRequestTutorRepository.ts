@@ -3,8 +3,6 @@ import { LessonRequestTutor } from '../entity/LessonRequestTutor';
 import { LessonRequest } from '../entity/LessonRequest';
 import { Tutor } from '../entity/Tutor';
 import { EnumStatusName } from '../enum/EnumStatusName';
-import { AppError } from '../error/AppError';
-import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
 export class LessonRequestTutorRepository {
   static async createLessonRequestTutor(
@@ -19,14 +17,14 @@ export class LessonRequestTutorRepository {
     lessonRequestTutor.tutor = tutor;
     lessonRequestTutor.chosenDate = chosenDate;
     lessonRequestTutor.status = lessonRequestStatus;
-    return await repository.save(lessonRequestTutor);
+    return repository.save(lessonRequestTutor);
   }
 
   static async findLessonRequestTutorByLessonRequestId(
     lessonRequestId: number
   ): Promise<LessonRequestTutor[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
-    return await repository
+    return repository
       .createQueryBuilder('lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
@@ -40,7 +38,7 @@ export class LessonRequestTutorRepository {
     tutorId: number
   ): Promise<LessonRequestTutor[]> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
-    return await repository
+    return repository
       .createQueryBuilder('lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
@@ -123,13 +121,6 @@ export class LessonRequestTutorRepository {
     tutorId: number
   ): Promise<void> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
-
-    console.log(
-      'Deletando relação entre lessonRequestId:',
-      lessonRequestId,
-      'e tutorId:',
-      tutorId
-    );
     const result = await repository
       .createQueryBuilder()
       .delete()
@@ -137,11 +128,5 @@ export class LessonRequestTutorRepository {
       .where('lessonRequestId = :lessonRequestId', { lessonRequestId })
       .andWhere('tutorId = :tutorId', { tutorId })
       .execute();
-
-    if (result.affected === 0) {
-      throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
-    }
-
-    console.log('Deleção realizada com sucesso');
   }
 }

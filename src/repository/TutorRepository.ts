@@ -5,17 +5,17 @@ import { UserRepository } from './UserRepository';
 export class TutorRepository extends UserRepository {
   static async saveTutor(tutor: Tutor): Promise<Tutor> {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.save(tutor);
+    return repository.save(tutor);
   }
 
   static async findTutorByCpf(cpf: string) {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository.findOne({ where: { cpf } });
+    return repository.findOne({ where: { cpf } });
   }
 
   static async findAllTutors() {
     const repository = MysqlDataSource.getRepository(Tutor);
-    return await repository
+    return repository
       .createQueryBuilder('mainTutor')
       .leftJoinAndSelect('mainTutor.lessonRequestTutors', 'lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.lessonRequest', 'lessonRequest')
