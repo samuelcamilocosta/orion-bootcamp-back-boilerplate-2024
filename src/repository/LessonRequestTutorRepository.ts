@@ -121,7 +121,7 @@ export class LessonRequestTutorRepository {
     tutorId: number
   ): Promise<void> {
     const repository = MysqlDataSource.getRepository(LessonRequestTutor);
-    const result = await repository
+    await repository
       .createQueryBuilder()
       .delete()
       .from(LessonRequestTutor)
