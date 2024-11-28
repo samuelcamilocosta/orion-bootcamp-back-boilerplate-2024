@@ -98,7 +98,7 @@ export class TutorService extends UserService {
       const photoUrl = await FileStorageService.uploadPhoto(file);
       tutor.photoUrl = photoUrl;
 
-      return await TutorRepository.saveTutor(tutor);
+      return TutorRepository.saveTutor(tutor);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
@@ -128,7 +128,7 @@ export class TutorService extends UserService {
 
       tutorFound.subjects = foundSubjects;
 
-      return await TutorRepository.saveTutor(tutorFound);
+      return TutorRepository.saveTutor(tutorFound);
     } catch (error) {
       const { statusCode, message } = handleError(error);
       throw new AppError(message, statusCode);
