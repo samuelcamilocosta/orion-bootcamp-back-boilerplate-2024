@@ -19,7 +19,7 @@ export class LessonRequestRepository {
     });
   }
 
-  static async getAllLessonRequests() {
+  static async getAllLessonRequests(): Promise<LessonRequest[] | null> {
     const repository = MysqlDataSource.getRepository(LessonRequest);
 
     return await repository
