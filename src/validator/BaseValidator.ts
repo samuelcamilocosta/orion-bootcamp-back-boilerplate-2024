@@ -2,9 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
 
 export class BaseValidator {
-  public static validationList(
-    schema: RequestHandler[]
-  ): Array<RequestHandler> {
+  public static validationList(schema: RequestHandler[]): Array<RequestHandler> {
     return [
       ...schema,
       (req: Request, res: Response, next: NextFunction): void | Response => {

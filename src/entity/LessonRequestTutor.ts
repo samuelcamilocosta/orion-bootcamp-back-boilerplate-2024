@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { LessonRequest } from './LessonRequest';
 import { Tutor } from './Tutor';
 import { EnumStatusName } from '../enum/EnumStatusName';
@@ -18,10 +12,7 @@ export class LessonRequestTutor {
   @JoinColumn({ name: 'tutorId' })
   tutor: Tutor;
 
-  @ManyToOne(
-    () => LessonRequest,
-    (lessonRequest) => lessonRequest.lessonRequestTutors
-  )
+  @ManyToOne(() => LessonRequest, (lessonRequest) => lessonRequest.lessonRequestTutors)
   @JoinColumn({ name: 'lessonRequestId' })
   lessonRequest: LessonRequest;
 

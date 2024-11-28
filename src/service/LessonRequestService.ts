@@ -15,21 +15,14 @@ export class LessonRequestService {
   static formatLessonRequest(lessonRequest: LessonRequest) {
     return {
       ClassId: lessonRequest.ClassId,
-      reason: Array.isArray(lessonRequest.reason)
-        ? lessonRequest.reason
-        : [lessonRequest.reason],
-      preferredDates: lessonRequest.preferredDates
-        ? lessonRequest.preferredDates
-        : [],
+      reason: Array.isArray(lessonRequest.reason) ? lessonRequest.reason : [lessonRequest.reason],
+      preferredDates: lessonRequest.preferredDates ? lessonRequest.preferredDates : [],
       status: lessonRequest.status,
       additionalInfo: lessonRequest.additionalInfo,
       subject: lessonRequest.subject,
-      student: lessonRequest.student
-        ? StudentService.formatStudent(lessonRequest.student)
-        : null,
+      student: lessonRequest.student ? StudentService.formatStudent(lessonRequest.student) : null,
       tutors:
-        lessonRequest.lessonRequestTutors &&
-        lessonRequest.lessonRequestTutors.length > 0
+        lessonRequest.lessonRequestTutors && lessonRequest.lessonRequestTutors.length > 0
           ? lessonRequest.lessonRequestTutors.map((lessonRequestTutor) => ({
               tutor: TutorService.formatTutor(lessonRequestTutor.tutor),
               chosenDate: lessonRequestTutor.chosenDate
@@ -40,8 +33,7 @@ export class LessonRequestService {
 
   static async createLessonRequest(lessonRequestData) {
     try {
-      const { reason, preferredDates, subjectId, additionalInfo, studentId } =
-        lessonRequestData;
+      const { reason, preferredDates, subjectId, additionalInfo, studentId } = lessonRequestData;
 
       const lessonRequest = new LessonRequest();
       lessonRequest.reason = reason;
@@ -79,8 +71,7 @@ export class LessonRequestService {
   }
 
   static async getLessonRequestById(id: number) {
-    const lessonRequest =
-      await LessonRequestRepository.getLessonRequestById(id);
+    const lessonRequest = await LessonRequestRepository.getLessonRequestById(id);
     if (!lessonRequest) {
       throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
     }
@@ -96,8 +87,7 @@ export class LessonRequestService {
     preferredDates: string[]
   ) {
     try {
-      const lessonRequest =
-        await LessonRequestRepository.getLessonRequestById(lessonId);
+      const lessonRequest = await LessonRequestRepository.getLessonRequestById(lessonId);
 
       if (!lessonRequest) {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
@@ -107,19 +97,9 @@ export class LessonRequestService {
         throw new AppError(EnumErrorMessages.INVALID_PENDENTE_STATUS, 400);
       }
 
-      if (
-        !reason.every((reason) =>
-          Object.values(EnumReasonName).includes(reason)
-        )
-      ) {
+      if (!reason.every((reason) => Object.values(EnumReasonName).includes(reason))) {
         const validReasons = Object.values(EnumReasonName).join(', ');
-        throw new AppError(
-          EnumErrorMessages.REASON_INVALID.replace(
-            '${validReasons}',
-            validReasons
-          ),
-          400
-        );
+        throw new AppError(EnumErrorMessages.REASON_INVALID.replace('${validReasons}', validReasons), 400);
       }
 
       const foundSubject = await SubjectRepository.findSubjectById(subjectId);
@@ -133,8 +113,7 @@ export class LessonRequestService {
       lessonRequest.preferredDates = preferredDates;
       lessonRequest.subject = foundSubject;
 
-      const updatedLesson =
-        await LessonRequestRepository.saveLessonRequest(lessonRequest);
+      const updatedLesson = await LessonRequestRepository.saveLessonRequest(lessonRequest);
 
       return updatedLesson;
     } catch (error) {
@@ -145,8 +124,7 @@ export class LessonRequestService {
 
   static async deleteLessonRequestById(classId: number) {
     try {
-      const lessonRequest =
-        await LessonRequestRepository.getLessonRequestById(classId);
+      const lessonRequest = await LessonRequestRepository.getLessonRequestById(classId);
 
       if (!lessonRequest) {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
@@ -159,11 +137,7 @@ export class LessonRequestService {
   }
 
   static async cancelTutorLessonRequestById(classId: number, tutorId: number) {
-    const lessonRequestTutor =
-      await LessonRequestTutorRepository.findByLessonRequestAndTutor(
-        classId,
-        tutorId
-      );
+    const lessonRequestTutor = await LessonRequestTutorRepository.findByLessonRequestAndTutor(classId, tutorId);
 
     if (!lessonRequestTutor) {
       throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
@@ -173,13 +147,9 @@ export class LessonRequestService {
       throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
     }
 
-    await LessonRequestTutorRepository.deleteLessonRequestTutorByLessonRequestAndTutor(
-      classId,
-      tutorId
-    );
+    await LessonRequestTutorRepository.deleteLessonRequestTutorByLessonRequestAndTutor(classId, tutorId);
 
-    const tutorsRemaining =
-      await LessonRequestTutorRepository.getTutorsByLessonRequestId(classId);
+    const tutorsRemaining = await LessonRequestTutorRepository.getTutorsByLessonRequestId(classId);
 
     if (tutorsRemaining.length === 0) {
       await this.updateStatus(classId, EnumStatusName.PENDENTE);
@@ -187,24 +157,19 @@ export class LessonRequestService {
   }
 
   static async updateStatus(lessonId: number, status: EnumStatusName) {
-    const lessonRequest =
-      await LessonRequestRepository.getLessonRequestById(lessonId);
+    const lessonRequest = await LessonRequestRepository.getLessonRequestById(lessonId);
 
     if (!lessonRequest) {
       throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
     }
 
-    if (
-      lessonRequest.status === EnumStatusName.ACEITO &&
-      status !== EnumStatusName.PENDENTE
-    ) {
+    if (lessonRequest.status === EnumStatusName.ACEITO && status !== EnumStatusName.PENDENTE) {
       throw new AppError(EnumErrorMessages.INVALID_PENDENTE_STATUS, 400);
     }
 
     lessonRequest.status = status;
 
-    const updatedLessonRequest =
-      await LessonRequestRepository.saveLessonRequest(lessonRequest);
+    const updatedLessonRequest = await LessonRequestRepository.saveLessonRequest(lessonRequest);
 
     return updatedLessonRequest;
   }

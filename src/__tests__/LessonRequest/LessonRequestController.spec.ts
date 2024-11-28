@@ -32,15 +32,11 @@ describe('LessonRequestController - DeleteById', () => {
   it('deve retornar 204 se a exclusão for bem-sucedida', async () => {
     req.params.id = '1';
 
-    jest
-      .spyOn(LessonRequestService, 'deleteLessonRequestById')
-      .mockResolvedValueOnce();
+    jest.spyOn(LessonRequestService, 'deleteLessonRequestById').mockResolvedValueOnce();
 
     await controller.DeleteById(req as Request, res as Response);
 
-    expect(LessonRequestService.deleteLessonRequestById).toHaveBeenCalledWith(
-      1
-    );
+    expect(LessonRequestService.deleteLessonRequestById).toHaveBeenCalledWith(1);
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.end).toHaveBeenCalled();
   });
@@ -48,15 +44,11 @@ describe('LessonRequestController - DeleteById', () => {
   it('deve retornar 500 se ocorrer um erro durante a exclusão', async () => {
     req.params.id = '1';
 
-    jest
-      .spyOn(LessonRequestService, 'deleteLessonRequestById')
-      .mockRejectedValueOnce(new Error('Erro interno do servidor'));
+    jest.spyOn(LessonRequestService, 'deleteLessonRequestById').mockRejectedValueOnce(new Error('Erro interno do servidor'));
 
     await controller.DeleteById(req as Request, res as Response);
 
-    expect(LessonRequestService.deleteLessonRequestById).toHaveBeenCalledWith(
-      1
-    );
+    expect(LessonRequestService.deleteLessonRequestById).toHaveBeenCalledWith(1);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       message: 'Erro interno do servidor.'

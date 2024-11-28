@@ -27,9 +27,7 @@ export class TutorService extends UserService {
         ? tutor.lessonRequestTutors.map((lessonRequestTutor) => ({
             lessonRequestId: lessonRequestTutor.lessonRequest.ClassId,
             chosenDate: lessonRequestTutor.chosenDate,
-            lessonRequest: LessonRequestService.formatLessonRequest(
-              lessonRequestTutor.lessonRequest
-            )
+            lessonRequest: LessonRequestService.formatLessonRequest(lessonRequestTutor.lessonRequest)
           }))
         : [],
       subjects: tutor.subjects
@@ -43,15 +41,7 @@ export class TutorService extends UserService {
 
   static async createTutor(tutorData) {
     try {
-      const {
-        fullName,
-        username,
-        birthDate,
-        email,
-        cpf,
-        educationLevelIds,
-        password
-      } = tutorData;
+      const { fullName, username, birthDate, email, cpf, educationLevelIds, password } = tutorData;
 
       const { hashedPassword, salt } = password;
 
@@ -64,15 +54,9 @@ export class TutorService extends UserService {
       tutor.cpf = cpf;
       tutor.salt = salt;
 
-      const foundEducationLevels =
-        await EducationLevelRepository.findEducationLevelsByIds(
-          educationLevelIds
-        );
+      const foundEducationLevels = await EducationLevelRepository.findEducationLevelsByIds(educationLevelIds);
 
-      if (
-        !foundEducationLevels ||
-        foundEducationLevels.length !== educationLevelIds.length
-      ) {
+      if (!foundEducationLevels || foundEducationLevels.length !== educationLevelIds.length) {
         throw new AppError(EnumErrorMessages.EDUCATION_LEVEL_NOT_FOUND, 404);
       }
 
@@ -105,12 +89,7 @@ export class TutorService extends UserService {
     }
   }
 
-  static async updateTutorPersonalData(
-    tutor: Tutor,
-    expertise: string,
-    projectReason: string,
-    subjectIds: number[]
-  ) {
+  static async updateTutorPersonalData(tutor: Tutor, expertise: string, projectReason: string, subjectIds: number[]) {
     try {
       const tutorFound = await TutorRepository.findTutorById(tutor.id);
       if (!tutorFound) {
@@ -120,8 +99,7 @@ export class TutorService extends UserService {
       tutorFound.expertise = expertise;
       tutorFound.projectReason = projectReason;
 
-      const foundSubjects =
-        await SubjectRepository.findSubjectByIds(subjectIds);
+      const foundSubjects = await SubjectRepository.findSubjectByIds(subjectIds);
       if (!foundSubjects || foundSubjects.length !== subjectIds.length) {
         throw new AppError(EnumErrorMessages.SUBJECT_NOT_FOUND, 404);
       }
@@ -164,27 +142,16 @@ export class TutorService extends UserService {
     }
   }
 
-  static async acceptLessonRequest(
-    lessonId: number,
-    tutorId: number,
-    chosenDate: string
-  ) {
+  static async acceptLessonRequest(lessonId: number, tutorId: number, chosenDate: string) {
     try {
-      const lessonRequest =
-        await LessonRequestRepository.getLessonRequestById(lessonId);
+      const lessonRequest = await LessonRequestRepository.getLessonRequestById(lessonId);
 
       if (!lessonRequest) {
         throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
       }
 
-      if (
-        lessonRequest.status !== EnumStatusName.PENDENTE &&
-        lessonRequest.status !== EnumStatusName.ACEITO
-      ) {
-        throw new AppError(
-          EnumErrorMessages.INVALID_PENDENTE_ACEITO_STATUS,
-          400
-        );
+      if (lessonRequest.status !== EnumStatusName.PENDENTE && lessonRequest.status !== EnumStatusName.ACEITO) {
+        throw new AppError(EnumErrorMessages.INVALID_PENDENTE_ACEITO_STATUS, 400);
       }
 
       const tutor = await TutorRepository.findTutorById(tutorId);
@@ -192,11 +159,7 @@ export class TutorService extends UserService {
         throw new AppError(EnumErrorMessages.TUTOR_NOT_FOUND, 404);
       }
 
-      const existingLessonRequestTutor =
-        await LessonRequestTutorRepository.findByLessonRequestAndTutor(
-          lessonRequest.ClassId,
-          tutor.id
-        );
+      const existingLessonRequestTutor = await LessonRequestTutorRepository.findByLessonRequestAndTutor(lessonRequest.ClassId, tutor.id);
 
       if (existingLessonRequestTutor) {
         throw new AppError(EnumErrorMessages.TUTOR_ALREADY_ADDED, 400);
@@ -210,12 +173,7 @@ export class TutorService extends UserService {
 
       await LessonRequestRepository.saveLessonRequest(lessonRequest);
 
-      await LessonRequestTutorRepository.createLessonRequestTutor(
-        lessonRequest,
-        tutor,
-        chosenDate,
-        lessonRequest.status
-      );
+      await LessonRequestTutorRepository.createLessonRequestTutor(lessonRequest, tutor, chosenDate, lessonRequest.status);
 
       return true;
     } catch (error) {

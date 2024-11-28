@@ -15,10 +15,7 @@ export class LessonRequestValidator {
         .trim()
         .custom((value): boolean => {
           const validReasons = Object.values(EnumReasonName);
-          const invalidReason = EnumErrorMessages.REASON_INVALID.replace(
-            '${validReasons}',
-            validReasons.join(', ')
-          );
+          const invalidReason = EnumErrorMessages.REASON_INVALID.replace('${validReasons}', validReasons.join(', '));
 
           if (!Array.isArray(value)) {
             throw new AppError(invalidReason);
@@ -29,10 +26,7 @@ export class LessonRequestValidator {
           }
 
           for (const reason of value) {
-            if (
-              typeof reason !== 'string' ||
-              !validReasons.includes(reason as EnumReasonName)
-            ) {
+            if (typeof reason !== 'string' || !validReasons.includes(reason as EnumReasonName)) {
               throw new AppError(invalidReason);
             }
           }
@@ -42,8 +36,7 @@ export class LessonRequestValidator {
         .isArray({ min: 1, max: 3 })
         .withMessage(EnumErrorMessages.PREFERRED_DATES_REQUIRED)
         .custom((value): boolean => {
-          const dateRegex =
-            /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} às \d{2}:\d{2}$/;
+          const dateRegex = /^(0[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/\d{4} às \d{2}:\d{2}$/;
           for (const date of value) {
             if (typeof date !== 'string' || !dateRegex.test(date)) {
               throw new Error(EnumErrorMessages.DATE_FORMAT_INVALID);
@@ -79,33 +72,18 @@ export class LessonRequestValidator {
                 const lessonDate = new Date(formattedDate);
                 const now = new Date();
                 if (lessonDate < now) {
-                  throw new AppError(
-                    EnumErrorMessages.PAST_DATE_ERROR.replace('${date}', date)
-                  );
+                  throw new AppError(EnumErrorMessages.PAST_DATE_ERROR.replace('${date}', date));
                 }
 
                 const [hour, minute] = time.split(':');
-                if (
-                  parseInt(hour) < 0 ||
-                  parseInt(hour) > 23 ||
-                  parseInt(minute) < 0 ||
-                  parseInt(minute) > 59
-                ) {
-                  throw new AppError(
-                    EnumErrorMessages.TIME_INVALID.replace('${time}', time)
-                  );
+                if (parseInt(hour) < 0 || parseInt(hour) > 23 || parseInt(minute) < 0 || parseInt(minute) > 59) {
+                  throw new AppError(EnumErrorMessages.TIME_INVALID.replace('${time}', time));
                 }
 
-                const existingLesson =
-                  await LessonRequestRepository.findByPreferredDate(
-                    formattedDate,
-                    studentId
-                  );
+                const existingLesson = await LessonRequestRepository.findByPreferredDate(formattedDate, studentId);
 
                 if (existingLesson) {
-                  throw new AppError(
-                    EnumErrorMessages.EXISTING_LESSON.replace('${date}', date)
-                  );
+                  throw new AppError(EnumErrorMessages.EXISTING_LESSON.replace('${date}', date));
                 }
               })
             );

@@ -1,9 +1,7 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { EnumLevelName } from '../enum/EnumLevelName';
 
-export class CreateEducationLevelTable1730156513928
-  implements MigrationInterface
-{
+export class CreateEducationLevelTable1730156513928 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tableExists = await queryRunner.hasTable('education_level');
     if (!tableExists) {

@@ -1,23 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { EnumErrorMessages } from '../enum/EnumErrorMessages';
 
-export const UploadPhotoValidator = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const UploadPhotoValidator = (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.body;
 
   if (!id) {
-    return res
-      .status(400)
-      .json({ message: EnumErrorMessages.TUTOR_ID_REQUIRED });
+    return res.status(400).json({ message: EnumErrorMessages.TUTOR_ID_REQUIRED });
   }
 
   if (isNaN(Number(id))) {
-    return res
-      .status(400)
-      .json({ message: EnumErrorMessages.TUTOR_ID_INVALID });
+    return res.status(400).json({ message: EnumErrorMessages.TUTOR_ID_INVALID });
   }
 
   if (!req.file) {

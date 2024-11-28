@@ -12,9 +12,7 @@ export const authMiddleware = (requiredRole?: string) => {
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: 'Acesso negado. Token não fornecido.' });
+      return res.status(401).json({ message: 'Acesso negado. Token não fornecido.' });
     }
 
     try {
@@ -22,9 +20,7 @@ export const authMiddleware = (requiredRole?: string) => {
       (req as unknown as { decoded: DecodedToken }).decoded = decoded;
 
       if (requiredRole && decoded.role !== requiredRole) {
-        return res
-          .status(403)
-          .json({ message: 'Acesso negado. Permissão insuficiente.' });
+        return res.status(403).json({ message: 'Acesso negado. Permissão insuficiente.' });
       }
 
       next();

@@ -7,30 +7,18 @@ export class UserRepository {
   static async findExistingUserByUsername(username: string) {
     const tutorRepository = MysqlDataSource.getRepository(Tutor);
     const studentRepository = MysqlDataSource.getRepository(Student);
-    return (
-      tutorRepository.findOne({ where: { username } }) ||
-      studentRepository.findOne({ where: { username } })
-    );
+    return tutorRepository.findOne({ where: { username } }) || studentRepository.findOne({ where: { username } });
   }
 
   static async findExistingUserByEmail(email: string) {
     const tutorRepository = MysqlDataSource.getRepository(Tutor);
     const studentRepository = MysqlDataSource.getRepository(Student);
 
-    return (
-      tutorRepository.findOne({ where: { email } }) ||
-      studentRepository.findOne({ where: { email } })
-    );
+    return tutorRepository.findOne({ where: { email } }) || studentRepository.findOne({ where: { email } });
   }
 
-  static async findUserByEmail(
-    email: string,
-    userType: EnumUserType.TUTOR | EnumUserType.STUDENT
-  ) {
-    const repository =
-      userType === EnumUserType.TUTOR
-        ? MysqlDataSource.getRepository(Tutor)
-        : MysqlDataSource.getRepository(Student);
+  static async findUserByEmail(email: string, userType: EnumUserType.TUTOR | EnumUserType.STUDENT) {
+    const repository = userType === EnumUserType.TUTOR ? MysqlDataSource.getRepository(Tutor) : MysqlDataSource.getRepository(Student);
 
     return repository.findOne({
       where: { email },

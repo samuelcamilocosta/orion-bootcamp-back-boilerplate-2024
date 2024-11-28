@@ -5,8 +5,7 @@ import multer from 'multer';
 
 dotenv.config();
 
-export const randomImgName = (bytes = 32) =>
-  crypto.randomBytes(bytes).toString('hex');
+export const randomImgName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
 export const bucketRegion = process.env.BUCKET_REGION;
 export const bucketName = process.env.BUCKET_NAME;

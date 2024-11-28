@@ -17,10 +17,7 @@ export class StudentRepository extends UserRepository {
       .leftJoinAndSelect('student.educationLevel', 'educationLevel')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect(
-        'lessonRequest.lessonRequestTutors',
-        'lessonRequestTutor'
-      )
+      .leftJoinAndSelect('lessonRequest.lessonRequestTutors', 'lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('tutor.subjects', 'subjects')
       .orderBy('student.id', 'ASC')
@@ -37,10 +34,7 @@ export class StudentRepository extends UserRepository {
       .leftJoinAndSelect('student.educationLevel', 'educationLevel')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect(
-        'lessonRequest.lessonRequestTutors',
-        'lessonRequestTutor'
-      )
+      .leftJoinAndSelect('lessonRequest.lessonRequestTutors', 'lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('tutor.subjects', 'subjects')
       .where('student.id = :id', { id })
@@ -50,10 +44,7 @@ export class StudentRepository extends UserRepository {
     return student;
   }
 
-  static async findStudentLessonsByStatus(
-    studentId: number,
-    status: EnumStatusName
-  ): Promise<Student[]> {
+  static async findStudentLessonsByStatus(studentId: number, status: EnumStatusName): Promise<Student[]> {
     const repository = MysqlDataSource.getRepository(Student);
 
     const results = await repository
@@ -61,10 +52,7 @@ export class StudentRepository extends UserRepository {
       .leftJoinAndSelect('student.educationLevel', 'educationLevel')
       .leftJoinAndSelect('student.lessonRequests', 'lessonRequest')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
-      .leftJoinAndSelect(
-        'lessonRequest.lessonRequestTutors',
-        'lessonRequestTutor'
-      )
+      .leftJoinAndSelect('lessonRequest.lessonRequestTutors', 'lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('tutor.subjects', 'subjects')
       .where('student.id = :id', { id: studentId })

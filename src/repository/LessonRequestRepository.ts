@@ -2,17 +2,12 @@ import { MysqlDataSource } from '../config/database';
 import { LessonRequest } from '../entity/LessonRequest';
 
 export class LessonRequestRepository {
-  static async saveLessonRequest(
-    lessonRequest: LessonRequest
-  ): Promise<LessonRequest> {
+  static async saveLessonRequest(lessonRequest: LessonRequest): Promise<LessonRequest> {
     const repository = MysqlDataSource.getRepository(LessonRequest);
     return repository.save(lessonRequest);
   }
 
-  static async findByPreferredDate(
-    preferredDate: string,
-    studentId: number
-  ): Promise<LessonRequest | null> {
+  static async findByPreferredDate(preferredDate: string, studentId: number): Promise<LessonRequest | null> {
     const repository = MysqlDataSource.getRepository(LessonRequest);
     return repository.findOne({
       where: { preferredDates: preferredDate, student: { id: studentId } }
@@ -24,10 +19,7 @@ export class LessonRequestRepository {
 
     return repository
       .createQueryBuilder('lessonRequest')
-      .leftJoinAndSelect(
-        'lessonRequest.lessonRequestTutors',
-        'lessonRequestTutor'
-      )
+      .leftJoinAndSelect('lessonRequest.lessonRequestTutors', 'lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.student', 'student')
@@ -38,10 +30,7 @@ export class LessonRequestRepository {
   static async getLessonRequestById(id: number): Promise<LessonRequest | null> {
     return MysqlDataSource.getRepository(LessonRequest)
       .createQueryBuilder('lessonRequest')
-      .leftJoinAndSelect(
-        'lessonRequest.lessonRequestTutors',
-        'lessonRequestTutor'
-      )
+      .leftJoinAndSelect('lessonRequest.lessonRequestTutors', 'lessonRequestTutor')
       .leftJoinAndSelect('lessonRequestTutor.tutor', 'tutor')
       .leftJoinAndSelect('lessonRequest.subject', 'subject')
       .leftJoinAndSelect('lessonRequest.student', 'student')

@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Subject } from './Subject';
 import { Student } from './Student';
 import { EnumReasonName } from '../enum/EnumReasonName';
@@ -32,10 +26,7 @@ export class LessonRequest {
   @ManyToOne(() => Student, (student) => student.lessonRequests)
   student: Student;
 
-  @OneToMany(
-    () => LessonRequestTutor,
-    (lessonRequestTutor) => lessonRequestTutor.lessonRequest
-  )
+  @OneToMany(() => LessonRequestTutor, (lessonRequestTutor) => lessonRequestTutor.lessonRequest)
   lessonRequestTutors: LessonRequestTutor[];
 
   @Column({

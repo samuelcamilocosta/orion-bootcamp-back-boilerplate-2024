@@ -44,8 +44,7 @@ export class TutorValidator extends CommonValidations {
         .custom(async (value: string): Promise<boolean> => {
           try {
             const cleanCpf = value.replace(/\D/g, '');
-            const existingTutor =
-              await TutorRepository.findTutorByCpf(cleanCpf);
+            const existingTutor = await TutorRepository.findTutorByCpf(cleanCpf);
 
             if (existingTutor) {
               throw new AppError(EnumErrorMessages.CPF_ALREADY_EXISTS);
