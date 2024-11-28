@@ -6,9 +6,10 @@
   "license": "ISC",
   "scripts": {
     "start:dev": "npx nodemon -L",
-    "build": "npm run lint && npx tsc",
+    "build": "npm run prettier && npm run lint && npx tsc",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "test": "jest"
+    "test": "jest",
+    "prettier": "npx prettier --write ."
   },
   "devDependencies": {
     "@types/cors": "2.8.14",
