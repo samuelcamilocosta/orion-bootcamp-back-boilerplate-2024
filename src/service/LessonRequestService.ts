@@ -169,6 +169,10 @@ export class LessonRequestService {
       throw new AppError(EnumErrorMessages.LESSON_REQUEST_NOT_FOUND, 404);
     }
 
+    if (lessonRequestTutor.status !== EnumStatusName.ACEITO) {
+      throw new AppError(EnumErrorMessages.INVALID_ACEITO_STATUS, 400);
+    }
+
     await LessonRequestTutorRepository.deleteLessonRequestTutorByLessonRequestAndTutor(
       classId,
       tutorId
