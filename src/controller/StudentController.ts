@@ -407,24 +407,6 @@ export class StudentController {
     }
   }
 
-  static async getStudentLessonsByStatus(
-    req: Request,
-    res: Response,
-    status: EnumStatusName
-  ) {
-    try {
-      const studentId = req.params;
-      const lessons = await StudentService.getStudentLessonsByStatus(
-        Number(studentId),
-        status
-      );
-      return res.status(200).json(lessons);
-    } catch (error) {
-      const { statusCode, message } = handleError(error);
-      return res.status(statusCode).json({ message });
-    }
-  }
-
   /**
    * @swagger
    * /api/student-lesson-status:
