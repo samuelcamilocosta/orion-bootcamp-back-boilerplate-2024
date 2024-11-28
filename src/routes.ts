@@ -79,11 +79,7 @@ router.post(
   new EducationLevelController().create
 );
 
-router.get(
-  '/api/educationlevel',
-  authMiddleware(),
-  new EducationLevelController().getAll
-);
+router.get('/api/educationlevel', new EducationLevelController().getAll);
 
 router.patch(
   '/api/student-confirm-lesson',
